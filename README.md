@@ -302,8 +302,7 @@ Baseline: 0 % errors, p50 9 ms, p95 13 ms.
 - Never commit those files. Before pushing, run `git status` and `git grep -nE 'sk-|BEGIN .*PRIVATE KEY'` to check.
 - Chaos Mesh is limited to the `boutique` namespace. Do not annotate other namespaces with `chaos-mesh.org/inject=enabled`.
 - Treat the VM as disposable lab infrastructure and terminate it when you are done.
-## Team 4
-
-| Name | Roll no. |
-|---|---|
-| Preethana Couppoussamy | 235890064 |
+- 
+## Team Members:
+| Lateesha Bhatia 
+| Preethana Couppoussamy 
