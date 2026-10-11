@@ -1,0 +1,246 @@
+{
+  "agent": "planner",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "seconds": 68.8,
+  "error": null,
+  "instructions": "You are the experiment planner of an AI-driven chaos-engineering agent. The system under test is Google's Online\nBoutique (11 gRPC microservices) on a single-node Kubernetes (k3s) cluster. Chaos Mesh injects the faults; a\ndeterministic safety guard watches real user flows every second and removes the fault when users are hurt too much.\n\nYour job: choose and RANK the experiments that will teach us the most about the shop's resilience, riskiest and\nmost informative first, within the budget you are given.\n\nHow to decide:\n- Use the dependency map: services on many user flows (high reach), shared dependencies (fan-in), single replicas,\n  the checkout (revenue) path and stateful services are the most likely weak spots.\n- Use observed behaviour: past runs show what is already known. Do not repeat an experiment whose outcome is\n  already known unless the repeat answers a new question (e.g. a different intensity); prefer gaps.\n- Cover at least 3 different failure classes (errors, slowdown, recovery, resource exhaustion) in the plan.\n- Respect the safety guard: it aborts when the error rate exceeds 20 % or p95 exceeds 1500 ms for 2 checks in a\n  row. An expected abort is acceptable for a short error-class experiment (it measures the blast radius), but a\n  slowdown experiment that would just trip the guard teaches little - pick an intensity below it (Day-1 lesson:\n  +100 ms on productcatalogservice already makes pages ~700 ms slower because of ~7 sequential calls).\n- Respect the AI policy rules and the per-type parameter caps. Use the check_experiment tool to verify each\n  experiment before you include it; fix or drop anything it rejects.\n- Keep durations short (30-60 s is usually enough; traffic spikes need ramp time).\n- For every experiment give: a reason that cites map facts or evidence, a steady-state hypothesis, a checkable\n  prediction (affected flows, error band, slowdown band, outcome) and the question it answers.\n- List ideas you considered but dropped, with why (e.g. too destructive, already known, blocked by policy).\nAnswer only with the structured plan.\n",
+  "input": "{\n \"budget\": {\n  \"max_experiments\": 5,\n  \"note\": \"each experiment takes ~1.5-4 min incl. observation and recovery\"\n },\n \"focus\": \"overall resilience of the shop\",\n \"user_flows\": [\n  \"home\",\n  \"product\",\n  \"add_to_cart\",\n  \"view_cart\",\n  \"checkout\"\n ],\n \"dependency_map\": [\n  {\n   \"service\": \"adservice\",\n   \"replicas\": 1,\n   \"risk\": \"medium\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"frontend\"\n   ],\n   \"reach\": 0.4,\n   \"reach_flows\": [\n    \"home\",\n    \"product\"\n   ],\n   \"on_checkout_path\": false,\n   \"stateful\": false,\n   \"cpu_limit\": \"300m\",\n   \"memory_limit\": \"300Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"cartservice\",\n   \"replicas\": 2,\n   \"risk\": \"low\",\n   \"risk_reasons\": [\n    \"shared dependency of 2 services (checkoutservice, frontend)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [\n    \"redis-cart\"\n   ],\n   \"callers\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 1.0,\n   \"reach_flows\": [\n    \"home\",\n    \"product\",\n    \"add_to_cart\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"300m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"checkoutservice\",\n   \"replicas\": 1,\n   \"risk\": \"medium\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [\n    \"productcatalogservice\",\n    \"shippingservice\",\n    \"paymentservice\",\n    \"emailservice\",\n    \"currencyservice\",\n    \"cartservice\"\n   ],\n   \"callers\": [\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"frontend\"\n   ],\n   \"reach\": 0.2,\n   \"reach_flows\": [\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"currencyservice\",\n   \"replicas\": 1,\n   \"risk\": \"high\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"shared dependency of 2 services (checkoutservice, frontend)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 0.8,\n   \"reach_flows\": [\n    \"home\",\n    \"product\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"emailservice\",\n   \"replicas\": 1,\n   \"risk\": \"medium\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"checkoutservice\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 0.2,\n   \"reach_flows\": [\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"frontend\",\n   \"replicas\": 1,\n   \"risk\": \"high\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"entrypoint: every user request passes through it\"\n   ],\n   \"depends_on\": [\n    \"productcatalogservice\",\n    \"currencyservice\",\n    \"cartservice\",\n    \"recommendationservice\",\n    \"shippingservice\",\n    \"checkoutservice\",\n    \"adservice\"\n   ],\n   \"callers\": [],\n   \"dependents\": [],\n   \"reach\": 1.0,\n   \"reach_flows\": [\n    \"home\",\n    \"product\",\n    \"add_to_cart\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": false,\n   \"stateful\": false,\n   \"cpu_limit\": \"800m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"loadgenerator\",\n   \"role\": \"traffic\",\n   \"targetable\": false\n  },\n  {\n   \"service\": \"paymentservice\",\n   \"replicas\": 2,\n   \"risk\": \"low\",\n   \"risk_reasons\": [\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"checkoutservice\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 0.2,\n   \"reach_flows\": [\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"productcatalogservice\",\n   \"replicas\": 2,\n   \"risk\": \"low\",\n   \"risk_reasons\": [\n    \"shared dependency of 3 services (checkoutservice, frontend, recommendationservice)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"checkoutservice\",\n    \"frontend\",\n    \"recommendationservice\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\",\n    \"recommendationservice\"\n   ],\n   \"reach\": 1.0,\n   \"reach_flows\": [\n    \"home\",\n    \"product\",\n    \"add_to_cart\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"recommendationservice\",\n   \"replicas\": 1,\n   \"risk\": \"medium\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\"\n   ],\n   \"depends_on\": [\n    \"productcatalogservice\"\n   ],\n   \"callers\": [\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"frontend\"\n   ],\n   \"reach\": 0.6,\n   \"reach_flows\": [\n    \"product\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": false,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"450Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"redis-cart\",\n   \"replicas\": 1,\n   \"risk\": \"high\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"stateful: holds cart data\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"cartservice\"\n   ],\n   \"dependents\": [\n    \"cartservice\",\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 1.0,\n   \"reach_flows\": [\n    \"home\",\n    \"product\",\n    \"add_to_cart\",\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": true,\n   \"cpu_limit\": \"125m\",\n   \"memory_limit\": \"256Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"shippingservice\",\n   \"replicas\": 1,\n   \"risk\": \"high\",\n   \"risk_reasons\": [\n    \"single replica (no redundancy)\",\n    \"shared dependency of 2 services (checkoutservice, frontend)\",\n    \"on the checkout (revenue) path\"\n   ],\n   \"depends_on\": [],\n   \"callers\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"dependents\": [\n    \"checkoutservice\",\n    \"frontend\"\n   ],\n   \"reach\": 0.4,\n   \"reach_flows\": [\n    \"view_cart\",\n    \"checkout\"\n   ],\n   \"on_checkout_path\": true,\n   \"stateful\": false,\n   \"cpu_limit\": \"200m\",\n   \"memory_limit\": \"128Mi\",\n   \"readiness_probe\": true,\n   \"liveness_probe\": true\n  },\n  {\n   \"service\": \"shoppingassistantservice\",\n   \"missing\": true,\n   \"referenced_by\": [\n    \"frontend\"\n   ]\n  }\n ],\n \"baseline\": {\n  \"measured_at\": \"2026-10-10T17:15:30+00:00\",\n  \"overall\": {\n   \"requests\": 476,\n   \"error_rate\": 0.0,\n   \"p50_ms\": 9.1,\n   \"p95_ms\": 13.8\n  },\n  \"flows\": {\n   \"home\": {\n    \"requests\": 96,\n    \"error_rate\": 0.0,\n    \"p50_ms\": 10.5,\n    \"p95_ms\": 15.9\n   },\n   \"product\": {\n    \"requests\": 96,\n    \"error_rate\": 0.0,\n    \"p50_ms\": 8.4,\n    \"p95_ms\": 10.1\n   },\n   \"add_to_cart\": {\n    \"requests\": 96,\n    \"error_rate\": 0.0,\n    \"p50_ms\": 3.3,\n    \"p95_ms\": 3.9\n   },\n   \"view_cart\": {\n    \"requests\": 95,\n    \"error_rate\": 0.0,\n    \"p50_ms\": 8.9,\n    \"p95_ms\": 11.9\n   },\n   \"checkout\": {\n    \"requests\": 93,\n    \"error_rate\": 0.0,\n    \"p50_ms\": 12.8,\n    \"p95_ms\": 15.1\n   }\n  }\n },\n \"experiment_catalog\": [\n  {\n   \"type\": \"pod_kill\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"PodChaos\",\n   \"failure_class\": \"recovery\",\n   \"description\": \"Kill the target's pod; measures how fast Kubernetes replaces it and what users see meanwhile.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"grace_period_s\": {\n      \"default\": 0,\n      \"description\": \"Seconds the pod gets to shut down\",\n      \"maximum\": 30,\n      \"minimum\": 0,\n      \"title\": \"Grace Period S\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"PodKillParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"pod_failure\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"PodChaos\",\n   \"failure_class\": \"errors\",\n   \"description\": \"Make the target's pod unavailable for the whole duration (service down, pod not deleted); shows what users see while a dependency is gone. Removing the fault restores the pod.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"description\": \"No knobs: the pod stays unavailable for the whole duration (Chaos Mesh swaps in a pause image).\",\n    \"properties\": {},\n    \"title\": \"PodFailureParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"network_delay\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"NetworkChaos\",\n   \"failure_class\": \"slowdown\",\n   \"description\": \"Add latency to all traffic of the target's pod; shows how slowness propagates to callers.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"latency_ms\": {\n      \"default\": 300,\n      \"description\": \"Added latency on the target's traffic\",\n      \"maximum\": 2000,\n      \"minimum\": 1,\n      \"title\": \"Latency Ms\",\n      \"type\": \"integer\"\n     },\n     \"jitter_ms\": {\n      \"default\": 0,\n      \"maximum\": 500,\n      \"minimum\": 0,\n      \"title\": \"Jitter Ms\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"NetworkDelayParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"network_loss\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"NetworkChaos\",\n   \"failure_class\": \"errors\",\n   \"description\": \"Drop a share of the target pod's packets; shows how partial network failure turns into retries, latency and errors for callers.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"loss_pct\": {\n      \"default\": 20,\n      \"description\": \"Percent of the target's packets dropped\",\n      \"maximum\": 50,\n      \"minimum\": 1,\n      \"title\": \"Loss Pct\",\n      \"type\": \"integer\"\n     },\n     \"correlation_pct\": {\n      \"default\": 0,\n      \"description\": \"How much each drop depends on the previous one\",\n      \"maximum\": 100,\n      \"minimum\": 0,\n      \"title\": \"Correlation Pct\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"NetworkLossParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"cpu_stress\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"StressChaos\",\n   \"failure_class\": \"slowdown\",\n   \"description\": \"Burn CPU inside the target's pod (within its CPU limit); shows sensitivity to noisy neighbours.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"workers\": {\n      \"default\": 1,\n      \"description\": \"CPU stress worker threads\",\n      \"maximum\": 2,\n      \"minimum\": 1,\n      \"title\": \"Workers\",\n      \"type\": \"integer\"\n     },\n     \"load\": {\n      \"default\": 100,\n      \"description\": \"Percent load per worker\",\n      \"maximum\": 100,\n      \"minimum\": 10,\n      \"title\": \"Load\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"CpuStressParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"memory_stress\",\n   \"engine\": \"chaos-mesh\",\n   \"chaos_kind\": \"StressChaos\",\n   \"failure_class\": \"resource exhaustion\",\n   \"description\": \"Allocate memory inside the target's container (counts against its memory limit); shows memory pressure and OOM-kill/restart behaviour.\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"size_mb\": {\n      \"default\": 64,\n      \"description\": \"Memory each worker allocates inside the target container (limit is 128 Mi for most services, so >~100 MB tests OOM behaviour)\",\n      \"maximum\": 256,\n      \"minimum\": 16,\n      \"title\": \"Size Mb\",\n      \"type\": \"integer\"\n     },\n     \"workers\": {\n      \"default\": 1,\n      \"description\": \"Memory stress workers\",\n      \"maximum\": 2,\n      \"minimum\": 1,\n      \"title\": \"Workers\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"MemoryStressParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  },\n  {\n   \"type\": \"traffic_spike\",\n   \"engine\": \"k6\",\n   \"chaos_kind\": \"K6Load\",\n   \"failure_class\": \"resource exhaustion\",\n   \"description\": \"Flood the shop with many concurrent shoppers (k6) through the frontend; shows where CPU limits and single replicas make it slow down or fail. Target must be the frontend (entrypoint).\",\n   \"params_schema\": {\n    \"additionalProperties\": false,\n    \"properties\": {\n     \"users\": {\n      \"default\": 100,\n      \"description\": \"Peak concurrent virtual shoppers\",\n      \"maximum\": 500,\n      \"minimum\": 1,\n      \"title\": \"Users\",\n      \"type\": \"integer\"\n     },\n     \"ramp_s\": {\n      \"default\": 30,\n      \"description\": \"Seconds to ramp from 0 to `users` (then held)\",\n      \"maximum\": 120,\n      \"minimum\": 1,\n      \"title\": \"Ramp S\",\n      \"type\": \"integer\"\n     },\n     \"think_ms\": {\n      \"default\": 1000,\n      \"description\": \"Pause between a shopper's requests\",\n      \"maximum\": 5000,\n      \"minimum\": 200,\n      \"title\": \"Think Ms\",\n      \"type\": \"integer\"\n     },\n     \"checkout_pct\": {\n      \"default\": 20,\n      \"description\": \"Share of shopping rounds that end in checkout\",\n      \"maximum\": 100,\n      \"minimum\": 0,\n      \"title\": \"Checkout Pct\",\n      \"type\": \"integer\"\n     }\n    },\n    \"title\": \"TrafficSpikeParams\",\n    \"type\": \"object\"\n   },\n   \"duration_s\": {\n    \"min\": 10,\n    \"max\": 180\n   }\n  }\n ],\n \"safety_guard\": {\n  \"max_error_rate\": 0.2,\n  \"max_p95_ms\": 1500.0,\n  \"consecutive_checks\": 2,\n  \"frontend_silent_s\": 3.0,\n  \"blast_radius\": \"abort if any non-target pod becomes NotReady\"\n },\n \"ai_policy\": [\n  \"no pod_kill / pod_failure on frontend (that is a total outage, not an experiment)\",\n  \"pod_failure and network_loss last at most 60 s\",\n  \"traffic_spike at most 300 users\",\n  \"guard thresholds may only be made stricter than the defaults (lower max_error_rate / max_p95_ms)\",\n  \"no duplicate experiments (same type, target and parameters)\"\n ],\n \"past_runs\": [\n  {\n   \"run_id\": \"20261010-184948-pod_kill-cartservice\",\n   \"type\": \"pod_kill\",\n   \"target\": \"cartservice\",\n   \"params\": {\n    \"grace_period_s\": 0\n   },\n   \"duration_s\": 30,\n   \"origin\": \"manual\",\n   \"status\": \"COMPLETED\",\n   \"abort_reason\": null,\n   \"peak_error_rate\": 0.0,\n   \"impact_error_rate\": 0.0,\n   \"peak_p95_ms\": 14.3,\n   \"slowdown_factor\": 1.21,\n   \"affected_flows\": [],\n   \"worst_flow\": \"home\",\n   \"recovery_s\": 0.0,\n   \"pod_ready_s\": 23.1,\n   \"pod_restarts\": {},\n   \"fault_active_s\": 0.0\n  },\n  {\n   \"run_id\": \"20261010-185042-pod_kill-productcatalogservice\",\n   \"type\": \"pod_kill\",\n   \"target\": \"productcatalogservice\",\n   \"params\": {\n    \"grace_period_s\": 0\n   },\n   \"duration_s\": 30,\n   \"origin\": \"manual\",\n   \"status\": \"COMPLETED\",\n   \"abort_reason\": null,\n   \"peak_error_rate\": 0.0,\n   \"impact_error_rate\": 0.0,\n   \"peak_p95_ms\": 17.3,\n   \"slowdown_factor\": 1.75,\n   \"affected_flows\": [],\n   \"worst_flow\": \"home\",\n   \"recovery_s\": 0.0,\n   \"pod_ready_s\": 2.1,\n   \"pod_restarts\": {},\n   \"fault_active_s\": 0.0\n  }\n ]\n}",
+  "steps": [
+    {
+      "tool": "list_runs",
+      "arguments": "{}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"redis-cart\"}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"currencyservice\"}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"shippingservice\"}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"recommendationservice\"}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"checkoutservice\"}"
+    },
+    {
+      "tool": "get_service",
+      "arguments": "{\"name\":\"frontend\"}"
+    },
+    {
+      "tool_output": "[{\"run_id\": \"20261010-184948-pod_kill-cartservice\", \"type\": \"pod_kill\", \"target\": \"cartservice\", \"params\": {\"grace_period_s\": 0}, \"duration_s\": 30, \"origin\": \"manual\", \"status\": \"COMPLETED\", \"abort_reason\": null, \"peak_error_rate\": 0.0, \"impact_error_rate\": 0.0, \"peak_p95_ms\": 14.3, \"slowdown_factor\": 1.21, \"affected_flows\": [], \"worst_flow\": \"home\", \"recovery_s\": 0.0, \"pod_ready_s\": 23.1, \"pod_restarts\": {}, \"fault_active_s\": 0.0}, {\"run_id\": \"20261010-185042-pod_kill-productcatalogservice\", \"type\": \"pod_kill\", \"target\": \"productcatalogservice\", \"params\": {\"grace_period_s\": 0}, \"duration_s\": 30, \"origin\": \"manual\", \"status\": \"COMPLETED\", \"abort_reason\": null, \"peak_error_rate\": 0.0, \"impact_error_rate\": 0.0, \"peak_p95_ms\": 17.3, \"slowdown_factor\": 1.75, \"affected_flows\": [], \"worst_flow\": \"home\", \"recovery_s\": 0.0, \"pod_ready_s\": 2.1, \"pod_restarts\": {}, \"fault_active_s\": 0.0}]"
+    },
+    {
+      "tool_output": "{\"name\":\"redis-cart\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"125m\",\"memory_limit\":\"256Mi\",\"depends_on\":[],\"callers\":[\"cartservice\"],\"fan_in\":1,\"fan_out\":0,\"is_entrypoint\":false,\"on_checkout_path\":true,\"stateful\":true,\"risk\":\"high\",\"risk_reasons\":[\"single replica (no redundancy)\",\"stateful: holds cart data\",\"on the checkout (revenue) path\"],\"targetable\":true,\"dependents\":[\"cartservice\",\"checkoutservice\",\"frontend\"],\"reach_flows\":[\"home\",\"product\",\"add_to_cart\",\"view_cart\",\"checkout\"],\"reach\":1.0}"
+    },
+    {
+      "tool_output": "{\"name\":\"currencyservice\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"200m\",\"memory_limit\":\"128Mi\",\"depends_on\":[],\"callers\":[\"checkoutservice\",\"frontend\"],\"fan_in\":2,\"fan_out\":0,\"is_entrypoint\":false,\"on_checkout_path\":true,\"stateful\":false,\"risk\":\"high\",\"risk_reasons\":[\"single replica (no redundancy)\",\"shared dependency of 2 services (checkoutservice, frontend)\",\"on the checkout (revenue) path\"],\"targetable\":true,\"dependents\":[\"checkoutservice\",\"frontend\"],\"reach_flows\":[\"home\",\"product\",\"view_cart\",\"checkout\"],\"reach\":0.8}"
+    },
+    {
+      "tool_output": "{\"name\":\"shippingservice\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"200m\",\"memory_limit\":\"128Mi\",\"depends_on\":[],\"callers\":[\"checkoutservice\",\"frontend\"],\"fan_in\":2,\"fan_out\":0,\"is_entrypoint\":false,\"on_checkout_path\":true,\"stateful\":false,\"risk\":\"high\",\"risk_reasons\":[\"single replica (no redundancy)\",\"shared dependency of 2 services (checkoutservice, frontend)\",\"on the checkout (revenue) path\"],\"targetable\":true,\"dependents\":[\"checkoutservice\",\"frontend\"],\"reach_flows\":[\"view_cart\",\"checkout\"],\"reach\":0.4}"
+    },
+    {
+      "tool_output": "{\"name\":\"recommendationservice\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"200m\",\"memory_limit\":\"450Mi\",\"depends_on\":[\"productcatalogservice\"],\"callers\":[\"frontend\"],\"fan_in\":1,\"fan_out\":1,\"is_entrypoint\":false,\"on_checkout_path\":false,\"stateful\":false,\"risk\":\"medium\",\"risk_reasons\":[\"single replica (no redundancy)\"],\"targetable\":true,\"dependents\":[\"frontend\"],\"reach_flows\":[\"product\",\"view_cart\",\"checkout\"],\"reach\":0.6}"
+    },
+    {
+      "tool_output": "{\"name\":\"checkoutservice\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"200m\",\"memory_limit\":\"128Mi\",\"depends_on\":[\"productcatalogservice\",\"shippingservice\",\"paymentservice\",\"emailservice\",\"currencyservice\",\"cartservice\"],\"callers\":[\"frontend\"],\"fan_in\":1,\"fan_out\":6,\"is_entrypoint\":false,\"on_checkout_path\":true,\"stateful\":false,\"risk\":\"medium\",\"risk_reasons\":[\"single replica (no redundancy)\",\"on the checkout (revenue) path\"],\"targetable\":true,\"dependents\":[\"frontend\"],\"reach_flows\":[\"checkout\"],\"reach\":0.2}"
+    },
+    {
+      "tool_output": "{\"name\":\"frontend\",\"exists\":true,\"role\":\"app\",\"replicas\":1,\"ready_replicas\":1,\"readiness_probe\":true,\"liveness_probe\":true,\"cpu_limit\":\"800m\",\"memory_limit\":\"128Mi\",\"depends_on\":[\"productcatalogservice\",\"currencyservice\",\"cartservice\",\"recommendationservice\",\"shippingservice\",\"checkoutservice\",\"adservice\"],\"callers\":[],\"fan_in\":0,\"fan_out\":7,\"is_entrypoint\":true,\"on_checkout_path\":false,\"stateful\":false,\"risk\":\"high\",\"risk_reasons\":[\"single replica (no redundancy)\",\"entrypoint: every user request passes through it\"],\"targetable\":true,\"dependents\":[],\"reach_flows\":[\"home\",\"product\",\"add_to_cart\",\"view_cart\",\"checkout\"],\"reach\":1.0}"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"pod_failure\",\"target\":\"redis-cart\",\"duration_s\":20,\"params_json\":\"{}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"network_delay\",\"target\":\"recommendationservice\",\"duration_s\":45,\"params_json\":\"{\\\"latency_ms\\\":40,\\\"jitter_ms\\\":10}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"memory_stress\",\"target\":\"checkoutservice\",\"duration_s\":30,\"params_json\":\"{\\\"size_mb\\\":112,\\\"workers\\\":1}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"pod_kill\",\"target\":\"shippingservice\",\"duration_s\":30,\"params_json\":\"{\\\"grace_period_s\\\":0}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"network_loss\",\"target\":\"currencyservice\",\"duration_s\":30,\"params_json\":\"{\\\"loss_pct\\\":5,\\\"correlation_pct\\\":0}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    }
+  ],
+  "usage": {
+    "requests": 3,
+    "input_tokens": 27515,
+    "output_tokens": 6360,
+    "total_tokens": 33875
+  },
+  "output": {
+    "strategy": "Start with brief tests on the highest-reach dependencies and revenue path, where single-replica or stateful components could expose the largest user impact. Then test partial network impairment and a bounded slowdown to learn how degraded dependencies propagate without selecting an intensity expected to hit the p95 guard. Predictions anticipate guard aborts for the concentrated outage/resource tests; the guard should restore service promptly.",
+    "experiments": [
+      {
+        "experiment": {
+          "type": "pod_failure",
+          "target": "redis-cart",
+          "duration_s": 20,
+          "params": {}
+        },
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because redis-cart is a single-replica, stateful service holding cart data, and the map gives it reach across all five flows and the checkout path. This short outage tests the broadest critical dependency; the fault does not intentionally delete cart data.",
+        "hypothesis": "While Redis is unavailable, cart operations will fail and affect all flows that depend on cartservice; removing the fault should restore access to existing cart data.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "learning_goal": "Measure the blast radius of losing the cart datastore and verify recovery when its availability is restored."
+      },
+      {
+        "experiment": {
+          "type": "memory_stress",
+          "target": "checkoutservice",
+          "duration_s": 30,
+          "params": {
+            "size_mb": 112,
+            "workers": 1
+          }
+        },
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single-replica service on the revenue path with a 128Mi memory limit and six downstream dependencies. The 112MB allocation deliberately tests whether memory pressure causes OOM/restart behavior, while limiting expected user impact to checkout.",
+        "hypothesis": "The allocation may exhaust the checkout container's memory and interrupt checkout requests; other flows should remain available, and the guard may stop the experiment if checkout is sufficiently impaired.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "learning_goal": "Determine whether checkoutservice's memory headroom is sufficient under pressure and how checkout recovers from an OOM or restart."
+      },
+      {
+        "experiment": {
+          "type": "pod_kill",
+          "target": "shippingservice",
+          "duration_s": 30,
+          "params": {
+            "grace_period_s": 0
+          }
+        },
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice has one replica, is shared by frontend and checkoutservice, and serves view_cart and checkout on the revenue path. Unlike the past pod-kill runs on two-replica cartservice and productcatalogservice, this tests recovery without replica redundancy.",
+        "hypothesis": "Deleting the only shippingservice pod will briefly disrupt view_cart and checkout while Kubernetes replaces it; unaffected flows should remain healthy, and the guard may abort if recovery is slow.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "learning_goal": "Measure user impact and recovery time when a single-replica checkout dependency is restarted."
+      },
+      {
+        "experiment": {
+          "type": "network_loss",
+          "target": "currencyservice",
+          "duration_s": 30,
+          "params": {
+            "loss_pct": 5,
+            "correlation_pct": 0
+          }
+        },
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single-replica shared dependency of frontend and checkoutservice, with reach across home, product, view_cart, and checkout. A low, uncorrelated loss rate probes partial failure and retry behavior without starting with a full outage.",
+        "hypothesis": "Some currency calls may retry or fail, causing low errors or moderate latency increases in dependent flows; at this intensity the guard should not need to abort.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "learning_goal": "Learn whether partial packet loss to a shared dependency is absorbed by retries or becomes user-visible."
+      },
+      {
+        "experiment": {
+          "type": "network_delay",
+          "target": "recommendationservice",
+          "duration_s": 45,
+          "params": {
+            "latency_ms": 40,
+            "jitter_ms": 10
+          }
+        },
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice is a single-replica dependency reached by product, view_cart, and checkout. A 40ms delay is a bounded way to observe propagation on a non-entrypoint service, avoiding the known risk that +100ms on productcatalogservice compounds across sequential calls.",
+        "hypothesis": "Dependent flows will become moderately slower, but a single added delay of this size should stay well below the 1500ms p95 guard and should not cause errors.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "learning_goal": "Measure how latency in the single-replica recommendation dependency propagates to user-facing flows."
+      }
+    ],
+    "skipped_ideas": [
+      {
+        "idea": "pod_kill or pod_failure on frontend",
+        "why_not": "The AI policy forbids these experiments because frontend is the single-replica entrypoint and its loss would create a total outage."
+      },
+      {
+        "idea": "Repeat pod_kill on cartservice or productcatalogservice",
+        "why_not": "Past runs already showed no affected flows for these two-replica services; repeating the same recovery question adds little compared with testing single-replica targets."
+      },
+      {
+        "idea": "Add 100ms network delay to productcatalogservice",
+        "why_not": "The Day-1 evidence says this already makes pages about 700ms slower due to roughly seven sequential calls, so it risks tripping the guard and repeats a known slowdown."
+      }
+    ]
+  }
+}

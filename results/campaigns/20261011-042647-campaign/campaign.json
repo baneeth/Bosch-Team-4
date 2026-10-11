@@ -1,0 +1,83 @@
+{
+  "campaign_id": "20261011-042647-campaign",
+  "plan_id": "20261011-042352-plan",
+  "started_at": "2026-10-11T04:26:47+00:00",
+  "ended_at": "2026-10-11T04:28:34+00:00",
+  "status": "stopped: guard aborted 2 runs in a row on checkoutservice",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_failure",
+        "target": "checkoutservice",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": 0.15,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single replica on the checkout revenue path, and its reach is limited to checkout. A previous pod_kill had no observed user impact, but that tests rapid replacement rather than a sustained outage; the 15-second pod_failure fills that gap. The stricter 15% error guard limits exposure if checkout requests fail.",
+        "hypothesis": "While checkoutservice is unavailable, checkout requests will fail, while the other flows should remain available. The checkout error rate should cross the stricter guard threshold before the full fault duration.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-042647-pod_failure-checkoutservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 20% > 15%",
+      "recovery_s": 4.0,
+      "peak_error_rate": 0.2,
+      "peak_p95_ms": 47.0,
+      "prediction": "partly"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "checkoutservice",
+        "params": {
+          "size_mb": 124,
+          "workers": 1
+        },
+        "duration_s": 20,
+        "max_error_rate": 0.15,
+        "max_p95_ms": null,
+        "reason": "checkoutservice has a 128 Mi memory limit and is a single replica on the revenue path. A prior 112 MB stress run completed without impact, leaving the near-limit behavior untested; productcatalogservice did OOM at 124 MB, showing that near-limit allocation can reveal a sharp threshold. The stricter error guard bounds the impact if checkoutservice is OOM-killed.",
+        "hypothesis": "A 124 MB allocation is likely to push checkoutservice over its container limit, causing an OOM/restart and checkout errors; other flows should be largely unaffected because this service is specific to checkout.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-042745-memory_stress-checkoutservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 20% > 15%",
+      "recovery_s": 9.0,
+      "peak_error_rate": 0.2105,
+      "peak_p95_ms": 16.4,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-042647-pod_failure-checkoutservice",
+      "action": "continue",
+      "reason": "The 15-second checkoutservice outage was aborted when aggregate error rate reached 20%, above the 15% guard; impact stayed confined to checkout, where errors were 87.5% and p95 slowdown was 8.03×. This supports the isolation hypothesis, though the predicted error band was too high. The planned 124 MB checkoutservice memory test remains a useful, distinct resource-exhaustion probe and passed validation with the stricter 15% error guard.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-042745-adapter.json"
+    }
+  ],
+  "skipped": []
+}

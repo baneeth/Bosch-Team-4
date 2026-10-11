@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "productcatalogservice",
+    "params": {
+      "size_mb": 110,
+      "workers": 1
+    },
+    "duration_s": 15,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because productcatalogservice is single-replica, has a 128 Mi memory limit, and reaches all five user flows. The earlier 64 MB stress run had no user-visible impact, while 110 MB tests near-limit behavior; cartservice with the same 128 Mi limit OOMed under 110 MB stress.",
+    "hypothesis": "Near-limit allocation may OOM or destabilize productcatalogservice, causing broad errors and severe latency until the guard removes the fault.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-203523-memory-stress-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203523-memory_stress-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Ranked first because productcatalogservice is single-replica, has a 128 Mi memory limit, and reaches all five user flows. The earlier 64 MB stress run had no user-visible impact, while 110 MB tests near-limit behavior; cartservice with the same 128 M"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "15s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "110MB"
+        }
+      }
+    }
+  }
+}

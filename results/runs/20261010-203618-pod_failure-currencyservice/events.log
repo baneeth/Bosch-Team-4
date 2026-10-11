@@ -1,0 +1,13 @@
+2026-10-10T20:36:18.456+00:00 run 20261010-203618-pod_failure-currencyservice: pod_failure on currencyservice for 15s {}
+2026-10-10T20:36:18.457+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T20:36:18.478+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T20:36:18.493+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T20:36:38.511+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T20:36:38.518+00:00 INJECTED PodChaos/ca-20261010-203618-pod-failure-currencyservice
+2026-10-10T20:36:38.594+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T20:36:46.599+00:00 ABORT guard: error rate 40% > 20% -> removing PodChaos/ca-20261010-203618-pod-failure-currencyservice
+2026-10-10T20:36:47.109+00:00 fault removed in 0.5s
+2026-10-10T20:36:47.110+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T20:37:00.138+00:00 steady state restored: recovery 6.0s after the fault ended
+2026-10-10T20:37:00.153+00:00 prediction confirmed (4/4 aspects matched)
+2026-10-10T20:37:06.200+00:00 ABORTED: guard: error rate 40% > 20%

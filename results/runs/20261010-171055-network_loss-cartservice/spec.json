@@ -1,0 +1,50 @@
+{
+  "spec": {
+    "type": "network_loss",
+    "target": "cartservice",
+    "params": {
+      "loss_pct": 20
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Day-2 live test of network_loss",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-171055-network-loss-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-171055-network_loss-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Day-2 live test of network_loss"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "30s",
+      "action": "loss",
+      "direction": "to",
+      "loss": {
+        "loss": "20",
+        "correlation": "0"
+      }
+    }
+  }
+}

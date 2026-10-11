@@ -1,0 +1,58 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "cartservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because cartservice is a single replica, has high risk, is shared by frontend and checkoutservice, and reaches all five flows. Prior cartservice pod kills affected all flows with peak errors near 90\u2013100% and recovery around 22\u201331 seconds, making this the broadest shopper-visible test.",
+    "hypothesis": "The killed cartservice pod will cause visible errors across shopping and checkout flows until Kubernetes replaces it; recovery will take tens of seconds. The brief outage is expected to complete rather than be stopped by the guard, consistent with prior cartservice pod-kill runs.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-064201-pod-kill-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-064201-pod_kill-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Ranked first because cartservice is a single replica, has high risk, is shared by frontend and checkoutservice, and reaches all five flows. Prior cartservice pod kills affected all flows with peak errors near 90\u2013100% and recovery around 22\u201331 seconds"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

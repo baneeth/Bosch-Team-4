@@ -1,0 +1,63 @@
+{
+  "agent": "adapter",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "seconds": 21.8,
+  "error": null,
+  "instructions": "You are the adapter of an AI-driven chaos-engineering campaign against Online Boutique (Kubernetes, Chaos Mesh).\nA plan of ranked experiments is being executed one by one with a deterministic safety guard. After each run you\nsee the result and decide what happens next:\n- continue: the plan still makes sense.\n- modify_next: the next planned experiment should change (e.g. the last run showed the intensity is too high and\n  would only trip the guard, or a parameter should be adjusted to answer the question better). Give the full\n  replacement experiment.\n- insert_followup: the last run revealed something worth probing right away (e.g. a surprising error spread, a\n  refuted prediction, a dependency that broke). Give the experiment; it runs next. Use this sparingly.\n- stop: the remaining experiments would teach little (the questions are already answered) or are clearly too\n  risky given what was just learned.\nFacts you can rely on: code only asks you AFTER it has verified the shop is healthy again (\"shop_now\": all\nworkloads available and user flows back within baseline tolerance). The last run's timeline may still end in\nRECOVERING samples because its 5 s rolling window lags - that is not a reason to stop. If the shop had not\nrecovered, code would already have stopped the campaign. Guard aborts, errors and restarts during an experiment are\nthe findings we are looking for, not reasons to stop.\nRules: experiments must respect the per-type caps and AI policy (verify with check_experiment); don't repeat an\nexperiment that already ran with the same parameters; keep failure-class coverage in mind (the campaign should\ncover at least 3 classes). Base the decision on the measured facts and cite them in the reason.\n",
+  "input": "{\n \"plan_strategy\": \"Start with a short, near-limit memory test on the single-replica catalog service because it reaches every flow and may reveal OOM behavior that the earlier 64 MB test did not. Then test a brief currency-service outage for error blast radius, a moderate recommendation-service delay below the guard threshold, and a recommendation-service pod kill to measure recovery without repeating well-known high-impact tests.\",\n \"shop_now\": \"healthy: checked by code after the run - all workloads available and the probe within baseline tolerance for 3 checks in a row (5s after the run ended)\",\n \"last_run\": {\n  \"run_id\": \"20261010-203939-memory_stress-productcatalogservice\",\n  \"type\": \"memory_stress\",\n  \"target\": \"productcatalogservice\",\n  \"params\": {\n   \"size_mb\": 112,\n   \"workers\": 1\n  },\n  \"duration_s\": 30,\n  \"origin\": \"adapter\",\n  \"status\": \"COMPLETED\",\n  \"abort_reason\": null,\n  \"peak_error_rate\": 0.0,\n  \"impact_error_rate\": 0.0,\n  \"peak_p95_ms\": 22.1,\n  \"slowdown_factor\": 1.33,\n  \"affected_flows\": [],\n  \"worst_flow\": \"home\",\n  \"recovery_s\": 0.0,\n  \"pod_ready_s\": null,\n  \"pod_restarts\": {},\n  \"fault_active_s\": 30.1,\n  \"prediction\": {\n   \"verdict\": \"refuted\",\n   \"details\": [\n    \"affected flows: predicted ['add_to_cart', 'checkout', 'home', 'product', 'view_cart'], observed [] -> MISS\",\n    \"error band: predicted high, observed none -> MISS\",\n    \"slowdown band: predicted severe, observed none -> MISS\",\n    \"outcome: predicted ABORTED, observed COMPLETED -> MISS\"\n   ]\n  },\n  \"thresholds\": {\n   \"max_error_rate\": 0.2,\n   \"max_p95_ms\": 1500.0\n  },\n  \"reason\": \"Increase the earlier productcatalogservice memory allocation from 64 MB to 112 MB to probe the near-limit OOM behavior the prior test did not expose.\",\n  \"hypothesis\": \"Allocating 112 MB inside the catalog container may exceed its remaining memory headroom and trigger OOM or service unavailability; because the catalog dependency reaches all flows, this may cause broad impact and trip the safety guard.\",\n  \"flow_impact\": {\n   \"home\": {\n    \"baseline_p95_ms\": 15.9,\n    \"p95_ms\": 21.2,\n    \"p95_factor\": 1.33,\n    \"error_rate\": 0.0,\n    \"requests\": 24\n   },\n   \"product\": {\n    \"baseline_p95_ms\": 10.1,\n    \"p95_ms\": 9.4,\n    \"p95_factor\": 0.93,\n    \"error_rate\": 0.0,\n    \"requests\": 24\n   },\n   \"add_to_cart\": {\n    \"baseline_p95_ms\": 3.9,\n    \"p95_ms\": 4.6,\n    \"p95_factor\": 1.18,\n    \"error_rate\": 0.0,\n    \"requests\": 24\n   },\n   \"view_cart\": {\n    \"baseline_p95_ms\": 11.9,\n    \"p95_ms\": 9.8,\n    \"p95_factor\": 0.82,\n    \"error_rate\": 0.0,\n    \"requests\": 24\n   },\n   \"checkout\": {\n    \"baseline_p95_ms\": 15.1,\n    \"p95_ms\": 13.7,\n    \"p95_factor\": 0.91,\n    \"error_rate\": 0.0,\n    \"requests\": 23\n   }\n  },\n  \"resources_top\": {\n   \"frontend\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.03,\n    \"cpu_peak_cores\": 0.035,\n    \"cpu_peak_pct_of_limit\": 17.5,\n    \"throttled_peak_pct\": 0.0,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 14.9\n   },\n   \"currencyservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.018,\n    \"cpu_peak_cores\": 0.02,\n    \"cpu_peak_pct_of_limit\": 10.0,\n    \"throttled_peak_pct\": 2.3,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 34.6\n   },\n   \"productcatalogservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.011,\n    \"cpu_peak_cores\": 0.019,\n    \"cpu_peak_pct_of_limit\": 9.3,\n    \"throttled_peak_pct\": 2.4,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 118.2\n   },\n   \"recommendationservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.01,\n    \"cpu_peak_cores\": 0.012,\n    \"cpu_peak_pct_of_limit\": 6.2,\n    \"throttled_peak_pct\": 0.0,\n    \"memory_limit_mib\": 450.0,\n    \"memory_peak_mib\": 32.0\n   }\n  },\n  \"vm_cpu_pct\": {\n   \"before\": 12.1,\n   \"peak\": 14.9\n  },\n  \"guard_breaches\": [],\n  \"notes\": []\n },\n \"campaign_so_far\": [\n  {\n   \"run_id\": \"20261010-203523-memory_stress-productcatalogservice\",\n   \"type\": \"memory_stress\",\n   \"target\": \"productcatalogservice\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"refuted\"\n  },\n  {\n   \"run_id\": \"20261010-203618-pod_failure-currencyservice\",\n   \"type\": \"pod_failure\",\n   \"target\": \"currencyservice\",\n   \"status\": \"ABORTED\",\n   \"prediction\": \"confirmed\"\n  },\n  {\n   \"run_id\": \"20261010-203716-network_delay-recommendationservice\",\n   \"type\": \"network_delay\",\n   \"target\": \"recommendationservice\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"confirmed\"\n  },\n  {\n   \"run_id\": \"20261010-203842-pod_kill-recommendationservice\",\n   \"type\": \"pod_kill\",\n   \"target\": \"recommendationservice\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"partly\"\n  },\n  {\n   \"run_id\": \"20261010-203939-memory_stress-productcatalogservice\",\n   \"type\": \"memory_stress\",\n   \"target\": \"productcatalogservice\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"refuted\"\n  }\n ],\n \"remaining_plan\": [],\n \"followups_left\": 1,\n \"ai_policy\": [\n  \"no pod_kill / pod_failure on frontend (that is a total outage, not an experiment)\",\n  \"pod_failure and network_loss last at most 60 s\",\n  \"traffic_spike at most 300 users\",\n  \"guard thresholds may only be made stricter than the defaults (lower max_error_rate / max_p95_ms)\",\n  \"no duplicate experiments (same type, target and parameters)\"\n ]\n}",
+  "steps": [
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"memory_stress\",\"target\":\"productcatalogservice\",\"duration_s\":30,\"params_json\":\"{\\\"size_mb\\\":120,\\\"workers\\\":1}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"memory_stress\",\"target\":\"productcatalogservice\",\"duration_s\":30,\"params_json\":\"{\\\"size_mb\\\":124,\\\"workers\\\":1}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    }
+  ],
+  "usage": {
+    "requests": 3,
+    "input_tokens": 13244,
+    "output_tokens": 1546,
+    "total_tokens": 14790
+  },
+  "output": {
+    "action": "insert_followup",
+    "reason": "The 112 MB test completed with no errors, no guard breaches, and no affected flows, despite productcatalogservice peaking at 118.2 MiB of its 128 MiB limit. Since the catalog dependency reaches every flow, a 124 MB probe is a useful final check of whether crossing the apparent memory headroom triggers OOM and broad impact.",
+    "experiment": {
+      "experiment": {
+        "type": "memory_stress",
+        "target": "productcatalogservice",
+        "duration_s": 30,
+        "params": {
+          "size_mb": 124,
+          "workers": 1
+        }
+      },
+      "max_error_rate": null,
+      "max_p95_ms": null,
+      "reason": "Increase the allocation beyond the prior 112 MB test, which peaked at 118.2 MiB without impact, to probe the 128 MiB container limit on the single-replica catalog service.",
+      "hypothesis": "The larger allocation may exceed the catalog container's memory limit and cause OOM or temporary unavailability, affecting flows that depend on the catalog and potentially triggering the safety guard.",
+      "prediction": {
+        "affected_flows": [
+          "home",
+          "product",
+          "add_to_cart",
+          "view_cart",
+          "checkout"
+        ],
+        "error_band": "high",
+        "slowdown_band": "moderate",
+        "outcome": "ABORTED"
+      },
+      "learning_goal": "Determine whether memory pressure just beyond the previously observed headroom causes catalog OOM and broad user-flow impact."
+    }
+  }
+}

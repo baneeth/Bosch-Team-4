@@ -1,0 +1,13 @@
+2026-10-10T17:36:49.544+00:00 run 20261010-173649-pod_failure-emailservice: pod_failure on emailservice for 30s {}
+2026-10-10T17:36:49.545+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T17:36:49.568+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T17:36:49.583+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T17:37:09.598+00:00 pre-check ok: 60 requests, 0% errors, p95 14ms
+2026-10-10T17:37:09.604+00:00 INJECTED PodChaos/ca-20261010-173649-pod-failure-emailservice
+2026-10-10T17:37:09.688+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T17:37:39.713+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T17:37:39.713+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T17:37:41.732+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T17:37:42.242+00:00 cleaned up PodChaos/ca-20261010-173649-pod-failure-emailservice
+2026-10-10T17:37:42.263+00:00 prediction partly (2/4 aspects matched)
+2026-10-10T17:37:48.360+00:00 COMPLETED

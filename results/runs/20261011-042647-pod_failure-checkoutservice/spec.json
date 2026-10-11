@@ -1,0 +1,51 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "checkoutservice",
+    "params": {},
+    "duration_s": 15,
+    "max_error_rate": 0.15,
+    "max_p95_ms": null,
+    "reason": "checkoutservice is a single replica on the checkout revenue path, and its reach is limited to checkout. A previous pod_kill had no observed user impact, but that tests rapid replacement rather than a sustained outage; the 15-second pod_failure fills that gap. The stricter 15% error guard limits exposure if checkout requests fail.",
+    "hypothesis": "While checkoutservice is unavailable, checkout requests will fail, while the other flows should remain available. The checkout error rate should cross the stricter guard threshold before the full fault duration.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "none",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-042647-pod-failure-checkoutservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-042647-pod_failure-checkoutservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "checkoutservice is a single replica on the checkout revenue path, and its reach is limited to checkout. A previous pod_kill had no observed user impact, but that tests rapid replacement rather than a sustained outage; the 15-second pod_failure fills "
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "checkoutservice"
+        }
+      },
+      "duration": "15s",
+      "action": "pod-failure"
+    }
+  }
+}

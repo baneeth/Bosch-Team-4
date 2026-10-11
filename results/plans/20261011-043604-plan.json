@@ -1,0 +1,117 @@
+{
+  "plan_id": "20261011-043604-plan",
+  "created_at": "2026-10-11T04:36:04+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Prioritize the stateful, single-replica Redis cart dependency because it spans every flow and prior Redis unavailability caused a frontend-silence guard abort; use a short pod kill to measure recovery behavior. Then test partial packet loss on the checkout-only payment path and CPU contention on the recommendation service, covering three distinct failure classes without repeating established experiments.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "redis-cart",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because redis-cart is a single-replica stateful dependency holding cart data, with reach 1.0 across all five flows. A prior pod_failure on redis-cart caused frontend unresponsiveness and a guard abort; a pod kill tests the distinct recovery path and whether the cart state and dependent flows recover.",
+        "hypothesis": "With Redis unavailable during replacement, cart operations and dependent requests will be disrupted across the shop; Kubernetes will eventually restore the pod, but the user-flow guard is likely to abort before the full 30 seconds.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How quickly does the stateful cart dependency recover after pod replacement, and what is the user-visible blast radius while it is recovering?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_loss",
+        "target": "paymentservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single-replica dependency on the revenue path, with checkout as its only mapped user flow. Prior pod_failure runs showed checkout errors near the guard threshold, but partial network loss on this service has not been tested; 5% loss probes retry and timeout behavior at a restrained intensity.",
+        "hypothesis": "A small share of dropped packets will primarily affect checkout through retries or occasional failed payment calls, while other flows remain unaffected; the low loss rate should stay below the guard thresholds.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does intermittent packet loss on the payment dependency cause checkout errors, retry-driven latency, or both?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "cpu_stress",
+        "target": "recommendationservice",
+        "params": {
+          "workers": 1,
+          "load": 80
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice is a single-replica service reached by product, view_cart, and checkout flows, and has a 200m CPU limit. Its prior network-delay run affected those flows, but CPU contention has not been tested on it; this gives a distinct resource-pressure/slowdown measurement outside the already well-characterized frontend load tests.",
+        "hypothesis": "CPU contention will increase latency on requests waiting for recommendations in product, view_cart, and checkout, without causing broad errors; the short, sub-maximal stress should remain below the safety guard.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How sensitive are recommendation-dependent flows to CPU contention, and does the service remain available under a brief CPU load?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat 100 ms network delay on productcatalogservice",
+      "why_not": "Multiple past runs consistently showed severe slowdown across all flows; repeating the same intensity would add little new information."
+    },
+    {
+      "idea": "Traffic spike at 300 users on frontend",
+      "why_not": "Repeated runs already crossed the 1500 ms p95 guard at this load. A further test is unlikely to teach more than the existing capacity-threshold evidence."
+    },
+    {
+      "idea": "Memory stress on cartservice near its 128 Mi limit",
+      "why_not": "A 110 MB memory-stress run already caused broad high errors, an abort, and a restart; repeating this destructive resource-exhaustion experiment is lower value than testing new failure classes."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-043604-planner.json",
+  "note": null
+}

@@ -1,0 +1,98 @@
+{
+  "campaign_id": "20261011-073800-campaign",
+  "plan_id": "20261011-073756-plan",
+  "started_at": "2026-10-11T07:38:00+00:00",
+  "ended_at": "2026-10-11T07:40:37+00:00",
+  "status": "stopped: budget used (2 experiments)",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "cartservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "cartservice is a single replica with 1.0 reach across all five flows, is shared by frontend and checkoutservice, and has a 128 Mi memory limit. A prior 110 MB run caused errors across all flows, guard abort, and a 41-second recovery, so this is a high-risk, shopper-visible test of OOM behavior.",
+        "hypothesis": "Allocating 110 MB inside cartservice will exhaust its available memory, trigger errors across the shop, and likely cause the safety guard to abort the fault; the service may need time to recover.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-073801-memory_stress-cartservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 55% > 20%",
+      "recovery_s": 25.0,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 121.6,
+      "prediction": "partly"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_delay",
+        "target": "paymentservice",
+        "params": {
+          "latency_ms": 100,
+          "jitter_ms": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "This adds a network fault class alongside the cartservice memory stress and planned paymentservice pod failure, while probing the checkout dependency without repeating the memory test.",
+        "hypothesis": "Adding 100 ms of latency to paymentservice traffic will slow checkout, but should not cause widespread errors or trigger the safety guard.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "adapter",
+        "combined_with": []
+      },
+      "run_id": "20261011-073920-network_delay-paymentservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 117.8,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-073801-memory_stress-cartservice",
+      "action": "insert_followup",
+      "reason": "The cartservice memory-stress run was aborted after error rate reached 55% (peak 100%); all five flows were affected, cartservice restarted, and recovery took 25 seconds. Add a distinct network-fault class before the planned paymentservice pod failure to broaden coverage; the validator confirms this experiment is within policy.",
+      "applied": true,
+      "detail": "follow-up inserted: network_delay on paymentservice {'latency_ms': 100, 'jitter_ms': 0}",
+      "transcript": "ai/20261011-073920-adapter.json"
+    },
+    {
+      "after_run": "20261011-073920-network_delay-paymentservice",
+      "action": "continue",
+      "reason": "The paymentservice delay completed with no errors or guard breaches; checkout was the only affected flow and slowed 5.51× (peak p95 117.8 ms), while the prediction correctly anticipated its impact and slowdown but overpredicted errors. The remaining paymentservice pod_failure test probes a distinct failure class and the checkout dependency, complementing the memory_stress and network_delay runs.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-074036-adapter.json"
+    }
+  ],
+  "skipped": []
+}

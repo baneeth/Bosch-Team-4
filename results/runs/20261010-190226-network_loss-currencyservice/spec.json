@@ -1,0 +1,61 @@
+{
+  "spec": {
+    "type": "network_loss",
+    "target": "currencyservice",
+    "params": {
+      "loss_pct": 5,
+      "correlation_pct": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "currencyservice is a single-replica shared dependency of frontend and checkoutservice, with reach across home, product, view_cart, and checkout. A low, uncorrelated loss rate probes partial failure and retry behavior without starting with a full outage.",
+    "hypothesis": "Some currency calls may retry or fail, causing low errors or moderate latency increases in dependent flows; at this intensity the guard should not need to abort.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "low",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-190226-network-loss-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-190226-network_loss-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "currencyservice is a single-replica shared dependency of frontend and checkoutservice, with reach across home, product, view_cart, and checkout. A low, uncorrelated loss rate probes partial failure and retry behavior without starting with a full outa"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "30s",
+      "action": "loss",
+      "direction": "to",
+      "loss": {
+        "loss": "5",
+        "correlation": "0"
+      }
+    }
+  }
+}

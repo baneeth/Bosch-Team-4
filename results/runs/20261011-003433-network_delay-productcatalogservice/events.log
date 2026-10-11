@@ -1,0 +1,5 @@
+2026-10-11T00:34:33.161+00:00 run 20261011-003433-network_delay-productcatalogservice: network_delay on productcatalogservice for 60s {'latency_ms': 500, 'jitter_ms': 0}
+2026-10-11T00:34:33.166+00:00 guard: abort if error rate > 20% or p95 > 300ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T00:34:33.206+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T00:34:33.245+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T00:34:43.254+00:00 ABORTED: manual abort (Ctrl-C) (before injection)

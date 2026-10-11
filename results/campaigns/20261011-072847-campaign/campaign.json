@@ -1,0 +1,48 @@
+{
+  "campaign_id": "20261011-072847-campaign",
+  "plan_id": "20261011-072841-plan",
+  "started_at": "2026-10-11T07:28:47+00:00",
+  "ended_at": "2026-10-11T07:30:04+00:00",
+  "status": "stopped: stopped by `chaos-agent abort`",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "cartservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica with a 128 Mi limit, reach 1.0 across all five flows, and is shared by frontend and checkoutservice on the revenue path. A prior 110 MB cartservice stress run caused errors across all flows, was guard-aborted, and restarted the pod, so this is a directly shopper-visible, high-blast-radius resource-exhaustion demonstration. The validator accepted this configuration.",
+        "hypothesis": "The 110 MB allocation will exhaust cartservice's memory headroom, causing an OOM/restart and failures or severe latency across cart-dependent shopper flows; the safety guard will likely remove the fault before 30 seconds elapse.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-072847-memory_stress-cartservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 55% > 20%",
+      "recovery_s": 41.0,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 1127.5,
+      "prediction": "confirmed"
+    }
+  ],
+  "decisions": [],
+  "skipped": []
+}

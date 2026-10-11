@@ -1,0 +1,80 @@
+{
+  "plan_id": "20261011-073302-plan",
+  "created_at": "2026-10-11T07:33:02+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run the cartservice pod kill first because its single replica serves every shopper flow, then wait for the pod to be Ready and flows to return to baseline before testing paymentservice. The two experiments cover different catalog failure classes (recovery and errors) and use different services; a third class cannot fit the exact two-experiment budget.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, is shared by frontend and checkoutservice, and reaches all five flows. Prior 30-second cartservice pod-kill runs visibly affected all flows, with high errors and recovery taking about 22–31 seconds. Validator accepted this configuration.",
+        "hypothesis": "While cartservice is unavailable and being replaced, shoppers will see errors across the shop; after the replacement becomes Ready, flows will recover. The experiment should complete while exposing the blast radius and recovery time.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the live shopper impact and Kubernetes recovery time when the single cartservice replica is killed."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked second because paymentservice is a single replica on the revenue-critical checkout path, but its map reach is limited to checkout, reducing the blast radius compared with cartservice. Prior paymentservice pod-failure runs visibly affected checkout and reached a 21–25% peak error rate; a short guard abort is expected and useful for measuring this failure. Validator accepted this configuration.",
+        "hypothesis": "Checkout attempts will fail while paymentservice is unavailable, while the other flows should remain usable. The error guard may remove the fault before its full 30-second duration.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure how paymentservice unavailability affects checkout and whether the safety guard contains the shopper-visible errors."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Add a third experiment from a third failure class.",
+      "why_not": "The plan is constrained to exactly two experiments, so it cannot cover three distinct catalog failure classes while assigning one class to each experiment."
+    },
+    {
+      "idea": "Add 300 ms network delay to productcatalogservice.",
+      "why_not": "Prior evidence shows even 100 ms caused roughly 700 ms page latency through sequential calls; 300 ms risks tripping the p95 guard rather than providing a controlled slowdown demonstration."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery"
+  ],
+  "transcript": "ai/20261011-073302-planner.json",
+  "note": null
+}

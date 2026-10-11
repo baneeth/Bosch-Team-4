@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "currencyservice",
+    "params": {
+      "latency_ms": 10,
+      "jitter_ms": 0
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "currencyservice is a single-replica shared dependency with reach 0.8, including the checkout path. A prior 50 ms delay produced a 528 ms peak p95 and affected home, product, view_cart, and checkout; 10 ms tests a substantially milder intensity expected to reveal propagation without simply repeating the severe slowdown.",
+    "hypothesis": "A 10 ms delay will increase latency in flows that call currencyservice, but should stay below the p95 guard and produce no material errors.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-044857-network-delay-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-044857-network_delay-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "currencyservice is a single-replica shared dependency with reach 0.8, including the checkout path. A prior 50 ms delay produced a 528 ms peak p95 and affected home, product, view_cart, and checkout; 10 ms tests a substantially milder intensity expect"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "45s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "10ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

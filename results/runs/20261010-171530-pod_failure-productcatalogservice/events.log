@@ -1,0 +1,13 @@
+2026-10-10T17:15:30.068+00:00 run 20261010-171530-pod_failure-productcatalogservice: pod_failure on productcatalogservice for 30s {}
+2026-10-10T17:15:30.069+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T17:15:30.103+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T17:15:30.122+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T17:15:50.141+00:00 pre-check ok: 60 requests, 0% errors, p95 14ms
+2026-10-10T17:15:50.148+00:00 INJECTED PodChaos/ca-20261010-171530-pod-failure-productcatalogservice
+2026-10-10T17:15:50.261+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T17:15:53.242+00:00 ABORT guard: error rate 60% > 20% -> removing PodChaos/ca-20261010-171530-pod-failure-productcatalogservice
+2026-10-10T17:15:53.757+00:00 fault removed in 0.5s
+2026-10-10T17:15:53.758+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T17:16:02.783+00:00 steady state restored: recovery 2.0s after the fault ended
+2026-10-10T17:16:02.798+00:00 prediction confirmed (4/4 aspects matched)
+2026-10-10T17:16:08.844+00:00 ABORTED: guard: error rate 60% > 20%

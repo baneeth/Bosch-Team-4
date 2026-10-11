@@ -1,0 +1,213 @@
+{
+  "campaign_id": "20261011-052531-campaign",
+  "plan_id": "20261011-052531-plan",
+  "started_at": "2026-10-11T05:25:31+00:00",
+  "ended_at": "2026-10-11T05:30:45+00:00",
+  "status": "stopped: budget used (5 experiments)",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "paymentservice",
+        "params": {
+          "size_mb": 124,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single replica on the checkout path with a 128Mi memory limit, and no memory-stress run has targeted it. A 124MB allocation probes near-limit OOM behavior; a prior 124MB checkoutservice test produced checkout errors and an abort, so this short test is deliberately first and closely monitored.",
+        "hypothesis": "The allocation is likely to exhaust paymentservice memory, causing a restart and checkout failures while other flows remain available.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-052532-memory_stress-paymentservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 20.0,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "paymentservice",
+        "params": {
+          "size_mb": 128,
+          "workers": 1
+        },
+        "duration_s": 20,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "The prior 124 MB paymentservice run showed no memory-pressure evidence or checkout errors, despite its 128 MiB limit. This distinct, maximum-size probe tests whether the limit boundary changes that result; the validator confirms it is within policy.",
+        "hypothesis": "The larger allocation may cause measurable checkout slowdown, but given the prior run's low observed memory peak, expect the test to complete without errors or a guard abort.",
+        "prediction": {
+          "affected_flows": [],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "adapter",
+        "combined_with": []
+      },
+      "run_id": "20261011-052639-memory_stress-paymentservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 35.1,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "shippingservice",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is a single replica shared by checkoutservice and frontend, with reach across view_cart and checkout and a place on the revenue path. A prior pod kill caused no observed user impact, but that brief recovery test does not establish how callers behave when the service stays unavailable; this short outage tests that gap.",
+        "hypothesis": "Unavailable shipping calls will impair view_cart and checkout, potentially causing timeouts or errors; the guard may stop the outage early if user impact is high.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-052737-pod_failure-shippingservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 24% > 20%",
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.2353,
+      "peak_p95_ms": 779.3,
+      "prediction": "partly"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_loss",
+        "target": "paymentservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single-replica checkout dependency, and there is no prior network-loss test for it. Past 5% packet-loss tests on currencyservice and cartservice completed without errors but showed substantial slowdown, making low, uncorrelated loss a useful checkout-specific test below the most destructive loss levels.",
+        "hypothesis": "Retries or transport delays will slow checkout, while a 5% loss rate is unlikely to produce sustained checkout errors or breach the guard.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-052825-network_loss-paymentservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 84.2,
+      "prediction": "partly"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "cpu_stress",
+        "target": "checkoutservice",
+        "params": {
+          "workers": 1,
+          "load": 50
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single replica on the revenue path with a 200m CPU limit; no CPU-stress run has targeted it. The 50% load setting is a bounded slowdown probe, while prior cartservice CPU stress was interrupted externally and does not answer checkoutservice's CPU sensitivity.",
+        "hypothesis": "Moderate CPU contention will make checkout slower, but should not cause errors or push p95 near the 1500ms guard limit at this intensity.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-052935-cpu_stress-checkoutservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 72.4,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-052532-memory_stress-paymentservice",
+      "action": "insert_followup",
+      "reason": "The 124 MB paymentservice test completed with no errors, no restarts, and no guard breaches; paymentservice peaked at only 33.7 MiB while checkout p95 reached 40.2 ms (1.86× baseline). That strongly refutes the predicted memory exhaustion, so a one-step increase to 128 MB can check whether the allocation produces measurable pressure before moving on to the shipping outage.",
+      "applied": true,
+      "detail": "follow-up inserted: memory_stress on paymentservice {'size_mb': 128, 'workers': 1}",
+      "transcript": "ai/20261011-052639-adapter.json"
+    },
+    {
+      "after_run": "20261011-052639-memory_stress-paymentservice",
+      "action": "continue",
+      "reason": "The 128 MB paymentservice test completed with no errors or guard breaches; memory peaked at only 67.3 MiB, while checkout p95 reached 2.96× baseline. This confirms the memory-test prediction, and the planned shippingservice outage probes a distinct failure class and caller behavior.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-052737-adapter.json"
+    },
+    {
+      "after_run": "20261011-052737-pod_failure-shippingservice",
+      "action": "continue",
+      "reason": "The shippingservice outage was aborted after 2.6 seconds when peak errors reached 23.5%, with checkout errors and home latency about 30× baseline; the observed home impact also differed from the predicted view_cart impact. The remaining paymentservice packet-loss test probes a distinct, lower-intensity failure mode on the checkout path, and it passed the validator.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-052825-adapter.json"
+    },
+    {
+      "after_run": "20261011-052825-network_loss-paymentservice",
+      "action": "continue",
+      "reason": "The 5% paymentservice packet-loss run completed with no errors or guard breaches, but checkout p95 slowed 3.85×; the observed slowdown was moderate, below the predicted severe band. The planned checkoutservice CPU-stress test remains a useful, distinct probe of checkout-path sensitivity.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-052935-adapter.json"
+    },
+    {
+      "after_run": "20261011-052935-cpu_stress-checkoutservice",
+      "action": "continue",
+      "reason": "The checkoutservice CPU-stress run completed with no errors or guard breaches, but checkout slowed 3.27× while CPU throttling peaked at 100%. The remaining paymentservice pod kill probes a distinct, still-unmeasured recovery behavior after its network-loss test, so the plan remains useful.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-053045-adapter.json"
+    }
+  ],
+  "skipped": []
+}

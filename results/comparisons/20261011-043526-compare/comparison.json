@@ -1,0 +1,101 @@
+{
+  "comparison_id": "20261011-043526-compare",
+  "created_at": "2026-10-11T04:35:26+00:00",
+  "ended_at": "2026-10-11T04:40:22+00:00",
+  "flags": [
+    "cart-redundancy"
+  ],
+  "other_flags": [],
+  "specs": [
+    {
+      "type": "pod_kill",
+      "target": "cartservice",
+      "params": {
+        "grace_period_s": 0
+      },
+      "duration_s": 30,
+      "max_error_rate": null,
+      "max_p95_ms": null,
+      "reason": "fix-and-rerun verify experiment",
+      "hypothesis": null,
+      "prediction": null,
+      "origin": "manual",
+      "combined_with": []
+    }
+  ],
+  "repeat": 1,
+  "status": "completed",
+  "baselines": {
+    "off": {
+      "p50_ms": 9.7,
+      "p95_ms": 17.5,
+      "error_rate": 0.0,
+      "requests": 237
+    },
+    "on": {
+      "p50_ms": 9.4,
+      "p95_ms": 18.5,
+      "error_rate": 0.0,
+      "requests": 237
+    }
+  },
+  "runs": [
+    {
+      "arm": "off",
+      "repeat": 1,
+      "key": "pod_kill:cartservice:grace_period_s=0:30s",
+      "run_id": "20261011-043646-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "peak_error_rate": 1.0,
+      "impact_error_rate": 0.8899,
+      "availability": 0.1101,
+      "peak_p95_ms": 1005.0,
+      "slowdown": 68.52,
+      "recovery_s": 28.6,
+      "pod_ready_s": 22.6,
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ]
+    },
+    {
+      "arm": "on",
+      "repeat": 1,
+      "key": "pod_kill:cartservice:grace_period_s=0:30s",
+      "run_id": "20261011-043931-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "peak_error_rate": 0.0,
+      "impact_error_rate": 0.0,
+      "availability": 1.0,
+      "peak_p95_ms": 1048.0,
+      "slowdown": 47.23,
+      "recovery_s": 2.1,
+      "pod_ready_s": 22.1,
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart"
+      ]
+    }
+  ],
+  "anchors": {
+    "off": {
+      "services": {
+        "cartservice": 34.6
+      },
+      "overall": 34.6
+    },
+    "on": {
+      "services": {
+        "cartservice": 81.7
+      },
+      "overall": 81.7
+    }
+  },
+  "ai": {}
+}

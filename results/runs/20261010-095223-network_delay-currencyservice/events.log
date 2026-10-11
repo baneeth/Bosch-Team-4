@@ -1,0 +1,11 @@
+2026-10-10T09:52:23.493+00:00 run 20261010-095223-network_delay-currencyservice: network_delay on currencyservice for 60s {'latency_ms': 50, 'jitter_ms': 0}
+2026-10-10T09:52:23.498+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T09:52:23.607+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T09:52:43.625+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T09:52:43.644+00:00 INJECTED NetworkChaos/ca-20261010-095223-network-delay-currencyservice
+2026-10-10T09:52:43.749+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T09:53:43.798+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T09:53:43.799+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T09:53:50.822+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T09:53:51.334+00:00 cleaned up NetworkChaos/ca-20261010-095223-network-delay-currencyservice
+2026-10-10T09:53:57.425+00:00 COMPLETED

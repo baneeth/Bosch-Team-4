@@ -1,0 +1,59 @@
+{
+  "spec": {
+    "type": "network_loss",
+    "target": "paymentservice",
+    "params": {
+      "loss_pct": 5,
+      "correlation_pct": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "paymentservice is a single-replica checkout dependency, and there is no prior network-loss test for it. Past 5% packet-loss tests on currencyservice and cartservice completed without errors but showed substantial slowdown, making low, uncorrelated loss a useful checkout-specific test below the most destructive loss levels.",
+    "hypothesis": "Retries or transport delays will slow checkout, while a 5% loss rate is unlikely to produce sustained checkout errors or breach the guard.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-052825-network-loss-paymentservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-052825-network_loss-paymentservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "paymentservice is a single-replica checkout dependency, and there is no prior network-loss test for it. Past 5% packet-loss tests on currencyservice and cartservice completed without errors but showed substantial slowdown, making low, uncorrelated lo"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "paymentservice"
+        }
+      },
+      "duration": "30s",
+      "action": "loss",
+      "direction": "to",
+      "loss": {
+        "loss": "5",
+        "correlation": "0"
+      }
+    }
+  }
+}

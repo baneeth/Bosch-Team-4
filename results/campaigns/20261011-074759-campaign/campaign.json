@@ -1,0 +1,47 @@
+{
+  "campaign_id": "20261011-074759-campaign",
+  "plan_id": "20261011-074754-plan",
+  "started_at": "2026-10-11T07:47:59+00:00",
+  "ended_at": "2026-10-11T07:48:57+00:00",
+  "status": "stopped: stopped by `chaos-agent abort`",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, a shared dependency of checkoutservice and frontend, and has reach across all five flows. Prior 30-second cartservice pod-kill runs showed errors across all flows and recovery around 22–31 seconds, making this a direct test of both the shopper-visible error blast radius and recovery.",
+        "hypothesis": "With the only cartservice pod terminated, shoppers will see errors across the shop until Kubernetes replaces it; all flows depend on cartservice directly or through checkout. The fault should complete and recovery should take tens of seconds.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-074759-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 24.6,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 5003.3,
+      "prediction": "confirmed"
+    }
+  ],
+  "decisions": [],
+  "skipped": []
+}

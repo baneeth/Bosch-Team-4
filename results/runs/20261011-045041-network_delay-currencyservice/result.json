@@ -1,0 +1,279 @@
+{
+  "run_id": "20261011-045041-network_delay-currencyservice",
+  "spec": {
+    "type": "network_delay",
+    "target": "currencyservice",
+    "params": {
+      "latency_ms": 5,
+      "jitter_ms": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Follow up the unexpected severe slowdown at 10 ms: timeline p95 was around 112 ms early in the fault but later spiked, with a 912.1 ms run peak and no errors. A lower, brief delay probes whether the latency amplification has a dose-response.",
+    "hypothesis": "At 5 ms, currencyservice-dependent flows will remain error-free and show less slowdown than at 10 ms, likely with moderate rather than severe worst-flow slowdown.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "status": "COMPLETED",
+  "abort_reason": null,
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-11T04:50:41.820+00:00",
+  "injected_at": "2026-10-11T04:51:01.895+00:00",
+  "fault_ended_at": "2026-10-11T04:51:32.027+00:00",
+  "fault_duration_s": 30.1,
+  "recovery_s": 0.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 64.6,
+  "impact_error_rate": 0.0,
+  "impact_p95_ms": 62.9,
+  "availability": 1.0,
+  "affected_flows": [],
+  "guard_breaches": [],
+  "worst_flow": "home",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.9,
+        "p95_ms": 17.1,
+        "p99_ms": 77.0
+      },
+      "impact": {
+        "count": 24,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 62.1,
+        "p95_ms": 67.0,
+        "p99_ms": 71.8
+      },
+      "p95_factor": 3.92
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.9,
+        "p95_ms": 14.0,
+        "p99_ms": 20.0
+      },
+      "impact": {
+        "count": 24,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 19.0,
+        "p95_ms": 22.3,
+        "p99_ms": 24.6
+      },
+      "p95_factor": 1.59
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.6,
+        "p95_ms": 6.6,
+        "p99_ms": 8.2
+      },
+      "impact": {
+        "count": 24,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 5.3,
+        "p99_ms": 7.0
+      },
+      "p95_factor": 0.8
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.9,
+        "p95_ms": 15.3,
+        "p99_ms": 18.7
+      },
+      "impact": {
+        "count": 24,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 24.5,
+        "p95_ms": 26.2,
+        "p99_ms": 27.9
+      },
+      "p95_factor": 1.71
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 13.7,
+        "p95_ms": 21.6,
+        "p99_ms": 35.0
+      },
+      "impact": {
+        "count": 22,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 28.5,
+        "p95_ms": 32.8,
+        "p99_ms": 34.6
+      },
+      "p95_factor": 1.52
+    }
+  },
+  "prediction_check": {
+    "verdict": "partly",
+    "matched": 3,
+    "total": 4,
+    "observed": {
+      "affected_flows": [],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "details": [
+      "affected flows: predicted ['add_to_cart', 'home', 'product', 'view_cart'], observed [] -> MISS",
+      "error band: predicted none, observed none -> match",
+      "slowdown band: predicted moderate, observed moderate -> match",
+      "outcome: predicted COMPLETED, observed COMPLETED -> match"
+    ]
+  },
+  "flags": [],
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 1.3,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 96.3
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.024,
+      "cpu_peak_pct_of_limit": 7.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 47.0
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.006,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 4.2,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.5
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.028,
+      "cpu_peak_cores": 0.03,
+      "cpu_peak_pct_of_limit": 14.9,
+      "throttled_peak_pct": 1.3,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 34.8
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 1.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.9
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.058,
+      "cpu_peak_pct_of_limit": 28.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 14.8
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 0.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 80.9
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 33.0
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.017,
+      "cpu_peak_cores": 0.022,
+      "cpu_peak_pct_of_limit": 10.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.5
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.019,
+      "cpu_peak_pct_of_limit": 9.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 32.6
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.003,
+      "cpu_peak_pct_of_limit": 2.6,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 10.3
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 2.1,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.3
+    }
+  },
+  "node_cpu_baseline_pct": 17.8,
+  "node_cpu_peak_pct": 20.0,
+  "load": null,
+  "notes": []
+}

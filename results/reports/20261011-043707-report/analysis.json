@@ -1,0 +1,475 @@
+{
+  "report_id": "20261011-043707-report",
+  "created_at": "2026-10-11T04:37:07+00:00",
+  "scope": "20261011-042647-campaign",
+  "run_ids": [
+    "20261011-042647-pod_failure-checkoutservice",
+    "20261011-042745-memory_stress-checkoutservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 64.2,
+  "overall_anchor": 66.4,
+  "grade": "D",
+  "services": [
+    {
+      "service": "adservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 0.7,
+      "justification": "Untested. Its single replica implies limited redundancy, but its reach is limited to home and product and it is not on the checkout path. Scores are held near the posture anchor in the absence of measured impact."
+    },
+    {
+      "service": "cartservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. It is a single replica on all listed flows and is shared by frontend and checkoutservice, making it business-critical; no run measured its behavior, so impact dimensions remain estimates near the anchor."
+    },
+    {
+      "service": "currencyservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Untested. It is a single replica called by both frontend and checkoutservice and is on the checkout path. Its broad dependency role raises its business importance, but there are no direct impact measurements."
+    },
+    {
+      "service": "emailservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.2,
+      "justification": "Untested. It is a single replica used by checkoutservice, with listed reach limited to checkout. Impact dimensions are estimates near the anchor, not measured outcomes."
+    },
+    {
+      "service": "frontend",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested directly, but it is the single-replica entrypoint for every user flow. Checkout errors during the checkoutservice runs demonstrate user-visible flow impact, not a measured frontend failure; other dimensions remain near the anchor."
+    },
+    {
+      "service": "paymentservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Untested. It is a single replica on the checkout path, but the experiments targeted checkoutservice and provide no direct paymentservice impact measurements."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested in the supplied runs. It is a single replica and a shared dependency across the listed flows, including checkout; its scores therefore remain estimates near the anchor."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.2,
+      "justification": "Untested. It is a single replica and is not on the checkout path according to the dependency map. No user impact was measured for this service."
+    },
+    {
+      "service": "redis-cart",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. It is a single stateful replica holding cart data and lies on the checkout path, so its dependency risk is high; no experiment measured its availability or recovery."
+    },
+    {
+      "service": "shippingservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "Untested. It is a single replica used by checkoutservice and frontend for listed flows. Scores for impact dimensions are estimates near the anchor."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 65.0,
+        "recovery": 90.0,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 60.4,
+        "latency": 70.9,
+        "recovery": 92.5,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "score": 64.2,
+      "anchor_score": 66.4,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Runs 20261011-042647-pod_failure-checkoutservice and 20261011-042745-memory_stress-checkoutservice showed severe checkout errors, with 8.03x checkout p95 in the pod-failure run and recovery in 4 s and 9 s respectively. Scores stay within 15 points of the anchors; containment remains at the low 30 anchor because checkout broke, although other measured flows were unaffected."
+    }
+  ],
+  "coverage": {
+    "experiments": 2,
+    "types": [
+      "memory_stress",
+      "pod_failure"
+    ],
+    "failure_classes": [
+      "errors",
+      "resource exhaustion"
+    ]
+  },
+  "predictions": {
+    "confirmed": 0,
+    "partly": 2,
+    "refuted": 0
+  },
+  "ai": {
+    "summary": "Both experiments exposed checkoutservice as a single point of failure: checkout requests failed heavily during a sustained pod outage and during near-limit memory stress. The impact was confined to checkout, while the other measured flows remained error-free; the guard stopped both experiments after 6.6 seconds of fault exposure. Adding a second checkoutservice replica addresses the availability weakness, while increasing its memory limit addresses the separate restart observed under memory stress. All services are single-replica deployments, but only checkoutservice was exercised in these runs, so scores for the other services are posture- and dependency-based estimates.",
+    "findings": [
+      {
+        "title": "A single checkoutservice replica makes checkout unavailable during a pod outage",
+        "severity": "high",
+        "services": [
+          "checkoutservice",
+          "frontend"
+        ],
+        "evidence_runs": [
+          "20261011-042647-pod_failure-checkoutservice"
+        ],
+        "evidence": "Baseline checkout p95 was 21.6 ms with 0% errors. During the run, checkout had 87.5% errors (7/8 requests) and a p95 of 173.5 ms (8.03x baseline); the run-level impact error rate was 17.07%, with a 20% peak. The fault was active for 6.6 s before the 15% error guard aborted it; checkoutservice restarted twice and recovery was 4 s. Home, product, add_to_cart, and view_cart each had 0% errors.",
+        "root_cause": "checkoutservice has one replica and is the sole service handling the checkout RPC path. When that pod is unavailable, frontend checkout calls have no alternate instance, so checkout fails even though unrelated flows remain available.",
+        "fix": {
+          "target": "checkoutservice",
+          "action": "scale_replicas",
+          "replicas": 2
+        },
+        "fix_rationale": "A second stateless checkoutservice replica provides an alternate instance if one pod becomes unavailable, addressing the single point of failure shown by the pod-failure run.",
+        "expected_improvement": "On rerun, a failure affecting one replica should no longer cause most checkout requests to fail; checkout error rate should fall substantially and ideally remain below the 15% guard, with less checkout latency impact. Other flows should remain unaffected.",
+        "verify_with": {
+          "type": "pod_failure",
+          "target": "checkoutservice",
+          "duration_s": 15,
+          "params": {}
+        }
+      },
+      {
+        "title": "Near-limit memory stress restarts the only checkoutservice pod and interrupts checkout",
+        "severity": "high",
+        "services": [
+          "checkoutservice",
+          "frontend"
+        ],
+        "evidence_runs": [
+          "20261011-042745-memory_stress-checkoutservice"
+        ],
+        "evidence": "checkoutservice had a 128 Mi memory limit. With 124 MB stress allocation and one worker, checkout had 100% errors (12/12 requests), one checkoutservice restart, and 9 s recovery; the fault was active for 6.6 s before the 15% error guard aborted it. Run-level impact error rate was 19.35%, with a 21% peak. The reported checkout p95 was 2.5 ms, but this was alongside 100% checkout errors and is not evidence of successful low-latency checkout. Other measured flows had 0% errors.",
+        "root_cause": "The stress allocation was close to the pod's 128 Mi memory limit and coincided with a restart. Because checkoutservice has only one replica, that restart removed all checkout capacity for the interval. The run supports a memory-headroom weakness, though it does not independently confirm the exact termination reason.",
+        "fix": {
+          "target": "checkoutservice",
+          "action": "set_resources",
+          "cpu_limit_millicores": 200,
+          "memory_limit_mib": 256
+        },
+        "fix_rationale": "Raising the memory limit from 128 Mi to 256 Mi gives the service additional headroom for the tested allocation, reducing the likelihood that near-limit memory use restarts the pod. The CPU limit stays at its current 200m because these runs did not indicate CPU pressure.",
+        "expected_improvement": "With the same 124 MB stress, checkoutservice should avoid a memory-related restart and checkout errors should decrease substantially; the other flows should remain unaffected.",
+        "verify_with": {
+          "type": "memory_stress",
+          "target": "checkoutservice",
+          "duration_s": 20,
+          "params": {
+            "size_mb": 124,
+            "workers": 1
+          }
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 0.7,
+        "justification": "Untested. Its single replica implies limited redundancy, but its reach is limited to home and product and it is not on the checkout path. Scores are held near the posture anchor in the absence of measured impact."
+      },
+      {
+        "service": "cartservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. It is a single replica on all listed flows and is shared by frontend and checkoutservice, making it business-critical; no run measured its behavior, so impact dimensions remain estimates near the anchor."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 60,
+        "latency": 65,
+        "recovery": 90,
+        "containment": 30,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Runs 20261011-042647-pod_failure-checkoutservice and 20261011-042745-memory_stress-checkoutservice showed severe checkout errors, with 8.03x checkout p95 in the pod-failure run and recovery in 4 s and 9 s respectively. Scores stay within 15 points of the anchors; containment remains at the low 30 anchor because checkout broke, although other measured flows were unaffected."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Untested. It is a single replica called by both frontend and checkoutservice and is on the checkout path. Its broad dependency role raises its business importance, but there are no direct impact measurements."
+      },
+      {
+        "service": "emailservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.2,
+        "justification": "Untested. It is a single replica used by checkoutservice, with listed reach limited to checkout. Impact dimensions are estimates near the anchor, not measured outcomes."
+      },
+      {
+        "service": "frontend",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested directly, but it is the single-replica entrypoint for every user flow. Checkout errors during the checkoutservice runs demonstrate user-visible flow impact, not a measured frontend failure; other dimensions remain near the anchor."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Untested. It is a single replica on the checkout path, but the experiments targeted checkoutservice and provide no direct paymentservice impact measurements."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested in the supplied runs. It is a single replica and a shared dependency across the listed flows, including checkout; its scores therefore remain estimates near the anchor."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.2,
+        "justification": "Untested. It is a single replica and is not on the checkout path according to the dependency map. No user impact was measured for this service."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. It is a single stateful replica holding cart data and lies on the checkout path, so its dependency risk is high; no experiment measured its availability or recovery."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "Untested. It is a single replica used by checkoutservice and frontend for listed flows. Scores for impact dimensions are estimates near the anchor."
+      }
+    ],
+    "score_explanation": "All services have one replica, readiness and liveness probes, and CPU and memory limits, giving a posture score of 60 under the stated rubric. For untested impact dimensions, scores are kept at 60 because the experiments provide no service-specific evidence to justify further deviation; dependency reach and business role are reflected primarily in criticality weights. checkoutservice scores reflect its measured checkout errors, 8.03x worst flow p95 in the pod-failure run, short 4–9 s recovery, and the fact that other measured flows stayed error-free. Weights are capped at 3.0: the entrypoint, cart and product/catalog paths, and checkout-critical services receive higher weight, while optional or limited-reach services such as ads and recommendations receive lower weight.",
+    "planner_review": "The planner correctly identified checkout as the affected flow and predicted that both experiments would abort; both runs did abort after the error guard was breached. For pod failure, its error-band prediction was recorded as a miss, even though the observed checkout flow had 87.5% errors and the run reached a 20% peak error rate; the planner also missed the observed slowdown. For memory stress, it correctly predicted high errors and the affected flow, but predicted moderate slowdown when the reported p95 did not show one; that p95 coincided with 100% checkout errors. Overall, predictions captured the scope and guarded outcome, but were inconsistent on the severity and latency signals.",
+    "limitations": [
+      "The system runs on a single-node Kubernetes environment, so results do not establish resilience to node or cluster failure.",
+      "Only checkoutservice was targeted; other service scores' impact dimensions are estimates based on posture and dependencies, not measured resilience.",
+      "Experiments were short, and the guard stopped each fault after 6.6 seconds, limiting evidence about longer outages and sustained recovery.",
+      "Checkout flow samples were small (8 requests in the pod-failure run and 12 in the memory-stress run); percentages and p95 values are therefore sensitive to individual requests.",
+      "The memory-stress run showed a restart during near-limit allocation, but the supplied measurements do not independently establish the precise termination cause."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261011-043707-analyst.json"
+  ]
+}

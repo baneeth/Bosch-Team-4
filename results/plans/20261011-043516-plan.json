@@ -1,0 +1,117 @@
+{
+  "plan_id": "20261011-043516-plan",
+  "created_at": "2026-10-11T04:35:16+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "First probe whether near-limit memory pressure can destabilize a checkout dependency, then test a controlled packet-loss failure on the revenue path and CPU sensitivity in the all-flow cart service. These cover resource exhaustion, errors/latency, and slowdown while avoiding repeated experiments whose outcomes are already well established.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "shippingservice",
+        "params": {
+          "size_mb": 120,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is a single replica with a 128Mi memory limit and serves view_cart and checkout. A prior 100MB stress run completed without user impact; 120MB tests closer to the limit for a short duration and answers whether that apparent headroom persists.",
+        "hypothesis": "At 120MB, memory pressure may cause shippingservice to become unavailable or restart, affecting checkout and possibly view_cart; the guard may stop the experiment if errors exceed its threshold.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does shippingservice tolerate memory pressure near its container limit, or does it OOM/restart and disrupt its user flows?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "cpu_stress",
+        "target": "cartservice",
+        "params": {
+          "workers": 1,
+          "load": 40
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "cartservice is a single replica with a 300m CPU limit, is shared by checkoutservice and frontend, and has reach across all five flows. A prior 80% CPU-stress run was externally interrupted after 16 seconds and showed substantial slowdown without errors, so this lower controlled load tests sensitivity without simply repeating that intensity.",
+        "hypothesis": "CPU contention will slow flows that call cartservice, potentially most of the shop, but at 40% load should remain below the safety guard and produce few or no errors.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How much does moderate CPU contention in the shared cart service propagate across the shop before it causes errors or guard-level latency?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_loss",
+        "target": "paymentservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single replica on the checkout path, so this isolates a revenue-critical dependency without exposing every flow. Past runs tested paymentservice unavailability, but not partial packet loss; the low-loss setting also differs from the already-tested 5% currencyservice loss.",
+        "hypothesis": "A small amount of packet loss may trigger retries and slow checkout, but should not cause broad shop impact or exceed the default guard thresholds during this short run.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does partial network impairment of paymentservice turn into checkout errors or retries and latency, even when the service is not fully unavailable?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat a frontend traffic spike around 100–300 users",
+      "why_not": "Past runs already characterize this range: 100–150 users completed with substantial slowdown, while repeated 300-user runs approached or crossed the 1500ms guard."
+    },
+    {
+      "idea": "Add 100ms network delay to productcatalogservice",
+      "why_not": "Repeated runs show this affects all five flows with roughly 700ms p95; it is already known, and higher intensities have repeatedly tripped the guard."
+    },
+    {
+      "idea": "Make redis-cart or cartservice unavailable",
+      "why_not": "Prior redis-cart failure and cartservice pod-kill runs already show severe, broad impact and rapid guard activation or long recovery; repeating these would add little to the current learning goals."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-043515-planner.json",
+  "note": null
+}

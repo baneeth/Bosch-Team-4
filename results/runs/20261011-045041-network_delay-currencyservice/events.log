@@ -1,0 +1,13 @@
+2026-10-11T04:50:41.822+00:00 run 20261011-045041-network_delay-currencyservice: network_delay on currencyservice for 30s {'latency_ms': 5, 'jitter_ms': 0}
+2026-10-11T04:50:41.823+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T04:50:41.848+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T04:50:41.865+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T04:51:01.887+00:00 pre-check ok: 59 requests, 0% errors, p95 15ms
+2026-10-11T04:51:01.895+00:00 INJECTED NetworkChaos/ca-20261011-045041-network-delay-currencyservice
+2026-10-11T04:51:02.006+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T04:51:32.027+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T04:51:32.028+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T04:51:34.048+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T04:51:34.557+00:00 cleaned up NetworkChaos/ca-20261011-045041-network-delay-currencyservice
+2026-10-11T04:51:34.574+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T04:51:40.625+00:00 COMPLETED

@@ -1,0 +1,13 @@
+2026-10-11T05:27:37.347+00:00 run 20261011-052737-pod_failure-shippingservice: pod_failure on shippingservice for 15s {}
+2026-10-11T05:27:37.348+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T05:27:37.380+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T05:27:37.397+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T05:27:57.420+00:00 pre-check ok: 57 requests, 0% errors, p95 196ms
+2026-10-11T05:27:57.428+00:00 INJECTED PodChaos/ca-20261011-052737-pod-failure-shippingservice
+2026-10-11T05:27:57.509+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T05:27:59.504+00:00 ABORT guard: error rate 24% > 20% -> removing PodChaos/ca-20261011-052737-pod-failure-shippingservice
+2026-10-11T05:28:00.024+00:00 fault removed in 0.5s
+2026-10-11T05:28:00.025+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T05:28:07.050+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T05:28:07.066+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T05:28:13.114+00:00 ABORTED: guard: error rate 24% > 20%

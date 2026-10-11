@@ -1,0 +1,600 @@
+{
+  "namespace": "boutique",
+  "generated_at": "2026-10-11T07:49:00+00:00",
+  "nodes": {
+    "adservice": {
+      "name": "adservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "300m",
+      "memory_limit": "300Mi",
+      "depends_on": [],
+      "callers": [
+        "frontend"
+      ],
+      "fan_in": 1,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": false,
+      "stateful": false,
+      "risk": "medium",
+      "risk_reasons": [
+        "single replica (no redundancy)"
+      ],
+      "targetable": true,
+      "dependents": [
+        "frontend"
+      ],
+      "reach_flows": [
+        "home",
+        "product"
+      ],
+      "reach": 0.4
+    },
+    "cartservice": {
+      "name": "cartservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "300m",
+      "memory_limit": "128Mi",
+      "depends_on": [
+        "redis-cart"
+      ],
+      "callers": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "fan_in": 2,
+      "fan_out": 1,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "shared dependency of 2 services (checkoutservice, frontend)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 1.0
+    },
+    "checkoutservice": {
+      "name": "checkoutservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [
+        "productcatalogservice",
+        "shippingservice",
+        "paymentservice",
+        "emailservice",
+        "currencyservice",
+        "cartservice"
+      ],
+      "callers": [
+        "frontend"
+      ],
+      "fan_in": 1,
+      "fan_out": 6,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "medium",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "frontend"
+      ],
+      "reach_flows": [
+        "checkout"
+      ],
+      "reach": 0.2
+    },
+    "currencyservice": {
+      "name": "currencyservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [],
+      "callers": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "fan_in": 2,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "shared dependency of 2 services (checkoutservice, frontend)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "home",
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 0.8
+    },
+    "emailservice": {
+      "name": "emailservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [],
+      "callers": [
+        "checkoutservice"
+      ],
+      "fan_in": 1,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "medium",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "checkout"
+      ],
+      "reach": 0.2
+    },
+    "frontend": {
+      "name": "frontend",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [
+        "productcatalogservice",
+        "currencyservice",
+        "cartservice",
+        "recommendationservice",
+        "shippingservice",
+        "checkoutservice",
+        "adservice"
+      ],
+      "callers": [],
+      "fan_in": 0,
+      "fan_out": 7,
+      "is_entrypoint": true,
+      "on_checkout_path": false,
+      "stateful": false,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "entrypoint: every user request passes through it"
+      ],
+      "targetable": true,
+      "dependents": [],
+      "reach_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 1.0
+    },
+    "loadgenerator": {
+      "name": "loadgenerator",
+      "exists": true,
+      "role": "traffic",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": false,
+      "liveness_probe": false,
+      "cpu_limit": "500m",
+      "memory_limit": "512Mi",
+      "depends_on": [
+        "frontend"
+      ],
+      "callers": [],
+      "fan_in": 0,
+      "fan_out": 1,
+      "is_entrypoint": false,
+      "on_checkout_path": false,
+      "stateful": false,
+      "risk": "low",
+      "risk_reasons": [],
+      "targetable": false,
+      "dependents": [],
+      "reach_flows": [],
+      "reach": 0.0
+    },
+    "paymentservice": {
+      "name": "paymentservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [],
+      "callers": [
+        "checkoutservice"
+      ],
+      "fan_in": 1,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "medium",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "checkout"
+      ],
+      "reach": 0.2
+    },
+    "productcatalogservice": {
+      "name": "productcatalogservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [],
+      "callers": [
+        "checkoutservice",
+        "frontend",
+        "recommendationservice"
+      ],
+      "fan_in": 3,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "shared dependency of 3 services (checkoutservice, frontend, recommendationservice)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend",
+        "recommendationservice"
+      ],
+      "reach_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 1.0
+    },
+    "recommendationservice": {
+      "name": "recommendationservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "450Mi",
+      "depends_on": [
+        "productcatalogservice"
+      ],
+      "callers": [
+        "frontend"
+      ],
+      "fan_in": 1,
+      "fan_out": 1,
+      "is_entrypoint": false,
+      "on_checkout_path": false,
+      "stateful": false,
+      "risk": "medium",
+      "risk_reasons": [
+        "single replica (no redundancy)"
+      ],
+      "targetable": true,
+      "dependents": [
+        "frontend"
+      ],
+      "reach_flows": [
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 0.6
+    },
+    "redis-cart": {
+      "name": "redis-cart",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "125m",
+      "memory_limit": "256Mi",
+      "depends_on": [],
+      "callers": [
+        "cartservice"
+      ],
+      "fan_in": 1,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": true,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "stateful: holds cart data",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "cartservice",
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 1.0
+    },
+    "shippingservice": {
+      "name": "shippingservice",
+      "exists": true,
+      "role": "app",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "readiness_probe": true,
+      "liveness_probe": true,
+      "cpu_limit": "200m",
+      "memory_limit": "128Mi",
+      "depends_on": [],
+      "callers": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "fan_in": 2,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": true,
+      "stateful": false,
+      "risk": "high",
+      "risk_reasons": [
+        "single replica (no redundancy)",
+        "shared dependency of 2 services (checkoutservice, frontend)",
+        "on the checkout (revenue) path"
+      ],
+      "targetable": true,
+      "dependents": [
+        "checkoutservice",
+        "frontend"
+      ],
+      "reach_flows": [
+        "view_cart",
+        "checkout"
+      ],
+      "reach": 0.4
+    },
+    "shoppingassistantservice": {
+      "name": "shoppingassistantservice",
+      "exists": false,
+      "role": "app",
+      "replicas": 0,
+      "ready_replicas": 0,
+      "readiness_probe": false,
+      "liveness_probe": false,
+      "cpu_limit": null,
+      "memory_limit": null,
+      "depends_on": [],
+      "callers": [
+        "frontend"
+      ],
+      "fan_in": 1,
+      "fan_out": 0,
+      "is_entrypoint": false,
+      "on_checkout_path": false,
+      "stateful": false,
+      "risk": "low",
+      "risk_reasons": [],
+      "targetable": false,
+      "dependents": [],
+      "reach_flows": [],
+      "reach": 0.0
+    }
+  },
+  "edges": [
+    {
+      "source": "cartservice",
+      "target": "redis-cart",
+      "port": 6379,
+      "env_var": "REDIS_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "productcatalogservice",
+      "port": 3550,
+      "env_var": "PRODUCT_CATALOG_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "shippingservice",
+      "port": 50051,
+      "env_var": "SHIPPING_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "paymentservice",
+      "port": 50051,
+      "env_var": "PAYMENT_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "emailservice",
+      "port": 5000,
+      "env_var": "EMAIL_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "currencyservice",
+      "port": 7000,
+      "env_var": "CURRENCY_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "checkoutservice",
+      "target": "cartservice",
+      "port": 7070,
+      "env_var": "CART_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "productcatalogservice",
+      "port": 3550,
+      "env_var": "PRODUCT_CATALOG_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "currencyservice",
+      "port": 7000,
+      "env_var": "CURRENCY_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "cartservice",
+      "port": 7070,
+      "env_var": "CART_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "recommendationservice",
+      "port": 8080,
+      "env_var": "RECOMMENDATION_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "shippingservice",
+      "port": 50051,
+      "env_var": "SHIPPING_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "checkoutservice",
+      "port": 5050,
+      "env_var": "CHECKOUT_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "adservice",
+      "port": 9555,
+      "env_var": "AD_SERVICE_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "frontend",
+      "target": "shoppingassistantservice",
+      "port": 80,
+      "env_var": "SHOPPING_ASSISTANT_SERVICE_ADDR",
+      "dangling": true
+    },
+    {
+      "source": "loadgenerator",
+      "target": "frontend",
+      "port": 80,
+      "env_var": "FRONTEND_ADDR",
+      "dangling": false
+    },
+    {
+      "source": "recommendationservice",
+      "target": "productcatalogservice",
+      "port": 3550,
+      "env_var": "PRODUCT_CATALOG_SERVICE_ADDR",
+      "dangling": false
+    }
+  ],
+  "warnings": [
+    "frontend references shoppingassistantservice:80 (SHOPPING_ASSISTANT_SERVICE_ADDR) but no such Service/Deployment exists"
+  ]
+}

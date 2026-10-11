@@ -1,0 +1,58 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "checkoutservice",
+    "params": {
+      "size_mb": 112,
+      "workers": 1
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "checkoutservice is a single-replica service on the revenue path with a 128Mi memory limit and six downstream dependencies. The 112MB allocation deliberately tests whether memory pressure causes OOM/restart behavior, while limiting expected user impact to checkout.",
+    "hypothesis": "The allocation may exhaust the checkout container's memory and interrupt checkout requests; other flows should remain available, and the guard may stop the experiment if checkout is sufficiently impaired.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-190036-memory-stress-checkoutservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-190036-memory_stress-checkoutservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "checkoutservice is a single-replica service on the revenue path with a 128Mi memory limit and six downstream dependencies. The 112MB allocation deliberately tests whether memory pressure causes OOM/restart behavior, while limiting expected user impac"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "checkoutservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "112MB"
+        }
+      }
+    }
+  }
+}

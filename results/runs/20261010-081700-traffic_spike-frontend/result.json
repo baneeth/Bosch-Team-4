@@ -1,0 +1,243 @@
+{
+  "run_id": "20261010-081700-traffic_spike-frontend",
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 150,
+      "ramp_s": 20
+    },
+    "duration_s": 50,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "dashboard check",
+    "hypothesis": null
+  },
+  "status": "COMPLETED",
+  "abort_reason": null,
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-10T08:17:00.200+00:00",
+  "injected_at": "2026-10-10T08:17:20.264+00:00",
+  "fault_ended_at": "2026-10-10T08:18:13.916+00:00",
+  "fault_duration_s": 53.7,
+  "recovery_s": 0.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 1013.7,
+  "guard_breaches": [],
+  "worst_flow": "add_to_cart",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.4,
+        "p95_ms": 12.5,
+        "p99_ms": 26.4
+      },
+      "impact": {
+        "count": 36,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 405.2,
+        "p95_ms": 793.0,
+        "p99_ms": 796.9
+      },
+      "p95_factor": 63.44
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.7,
+        "p95_ms": 10.2,
+        "p99_ms": 13.9
+      },
+      "impact": {
+        "count": 36,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 186.6,
+        "p95_ms": 564.3,
+        "p99_ms": 690.5
+      },
+      "p95_factor": 55.32
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 4.4,
+        "p99_ms": 4.9
+      },
+      "impact": {
+        "count": 34,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 62.8,
+        "p95_ms": 486.4,
+        "p99_ms": 674.1
+      },
+      "p95_factor": 110.55
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.8,
+        "p95_ms": 10.0,
+        "p99_ms": 11.4
+      },
+      "impact": {
+        "count": 34,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 209.3,
+        "p95_ms": 986.3,
+        "p99_ms": 1022.3
+      },
+      "p95_factor": 98.63
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.6,
+        "p95_ms": 16.8,
+        "p99_ms": 21.7
+      },
+      "impact": {
+        "count": 32,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 209.9,
+        "p95_ms": 712.7,
+        "p99_ms": 782.5
+      },
+      "p95_factor": 42.42
+    }
+  },
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.032,
+      "cpu_peak_pct_of_limit": 10.7,
+      "throttled_peak_pct": 2.1,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 97.8
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.006,
+      "cpu_peak_cores": 0.075,
+      "cpu_peak_pct_of_limit": 25.1,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 54.2
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": 0.018,
+      "cpu_peak_pct_of_limit": 9.1,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.4
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.01,
+      "cpu_peak_cores": 0.116,
+      "cpu_peak_pct_of_limit": 57.9,
+      "throttled_peak_pct": 9.6,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 38.0
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.012,
+      "cpu_peak_cores": 0.197,
+      "cpu_peak_pct_of_limit": 98.7,
+      "throttled_peak_pct": 97.5,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 23.9
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 50.9
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": 0.006,
+      "cpu_peak_pct_of_limit": 2.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 32.7
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.061,
+      "cpu_peak_pct_of_limit": 30.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.3
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.005,
+      "cpu_peak_cores": 0.122,
+      "cpu_peak_pct_of_limit": 60.9,
+      "throttled_peak_pct": 28.9,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 33.7
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.007,
+      "cpu_peak_pct_of_limit": 5.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 7.1
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.013,
+      "cpu_peak_pct_of_limit": 6.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.1
+    }
+  },
+  "node_cpu_baseline_pct": 13.1,
+  "node_cpu_peak_pct": 30.8,
+  "load": {
+    "users_target": 150,
+    "users_at_stop": null,
+    "requests": 4848,
+    "rps": 91.5,
+    "failed_rate": 0.0,
+    "p95_ms": 784.4,
+    "max_vus": 150
+  },
+  "notes": []
+}

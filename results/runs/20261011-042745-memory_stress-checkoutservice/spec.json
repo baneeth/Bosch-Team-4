@@ -1,0 +1,59 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "checkoutservice",
+    "params": {
+      "size_mb": 124,
+      "workers": 1
+    },
+    "duration_s": 20,
+    "max_error_rate": 0.15,
+    "max_p95_ms": null,
+    "reason": "checkoutservice has a 128 Mi memory limit and is a single replica on the revenue path. A prior 112 MB stress run completed without impact, leaving the near-limit behavior untested; productcatalogservice did OOM at 124 MB, showing that near-limit allocation can reveal a sharp threshold. The stricter error guard bounds the impact if checkoutservice is OOM-killed.",
+    "hypothesis": "A 124 MB allocation is likely to push checkoutservice over its container limit, causing an OOM/restart and checkout errors; other flows should be largely unaffected because this service is specific to checkout.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "moderate",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261011-042745-memory-stress-checkoutservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-042745-memory_stress-checkoutservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "checkoutservice has a 128 Mi memory limit and is a single replica on the revenue path. A prior 112 MB stress run completed without impact, leaving the near-limit behavior untested; productcatalogservice did OOM at 124 MB, showing that near-limit allo"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "checkoutservice"
+        }
+      },
+      "duration": "20s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "124MB"
+        }
+      }
+    }
+  }
+}

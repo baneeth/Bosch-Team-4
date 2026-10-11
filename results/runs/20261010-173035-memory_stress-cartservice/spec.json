@@ -1,0 +1,62 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "cartservice",
+    "params": {
+      "size_mb": 110,
+      "workers": 1
+    },
+    "duration_s": 15,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Rank 2: cartservice is a single replica with a 128Mi memory limit, is shared by frontend and checkoutservice, and reaches every flow. A short 110MB allocation probes the documented near-limit/OOM behavior on a critical service; the target is stressed directly, and an abort if users are hurt is expected.",
+    "hypothesis": "The allocation may cause severe contention or an OOM restart of cartservice, disrupting cart-dependent flows until the service recovers.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-173035-memory-stress-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-173035-memory_stress-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Rank 2: cartservice is a single replica with a 128Mi memory limit, is shared by frontend and checkoutservice, and reaches every flow. A short 110MB allocation probes the documented near-limit/OOM behavior on a critical service; the target is stressed"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "15s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "110MB"
+        }
+      }
+    }
+  }
+}

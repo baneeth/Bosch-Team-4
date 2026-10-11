@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "currencyservice",
+    "params": {
+      "latency_ms": 5,
+      "jitter_ms": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Follow up the unexpected severe slowdown at 10 ms: timeline p95 was around 112 ms early in the fault but later spiked, with a 912.1 ms run peak and no errors. A lower, brief delay probes whether the latency amplification has a dose-response.",
+    "hypothesis": "At 5 ms, currencyservice-dependent flows will remain error-free and show less slowdown than at 10 ms, likely with moderate rather than severe worst-flow slowdown.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-045041-network-delay-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-045041-network_delay-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Follow up the unexpected severe slowdown at 10 ms: timeline p95 was around 112 ms early in the fault but later spiked, with a 912.1 ms run peak and no errors. A lower, brief delay probes whether the latency amplification has a dose-response."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "30s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "5ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

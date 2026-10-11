@@ -1,0 +1,13 @@
+2026-10-11T04:26:47.918+00:00 run 20261011-042647-pod_failure-checkoutservice: pod_failure on checkoutservice for 15s {}
+2026-10-11T04:26:47.918+00:00 guard: abort if error rate > 15% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T04:26:47.953+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T04:26:47.971+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T04:27:07.989+00:00 pre-check ok: 60 requests, 0% errors, p95 20ms
+2026-10-11T04:27:07.997+00:00 INJECTED PodChaos/ca-20261011-042647-pod-failure-checkoutservice
+2026-10-11T04:27:08.092+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T04:27:14.073+00:00 ABORT guard: error rate 20% > 15% -> removing PodChaos/ca-20261011-042647-pod-failure-checkoutservice
+2026-10-11T04:27:14.586+00:00 fault removed in 0.5s
+2026-10-11T04:27:14.587+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T04:27:25.619+00:00 steady state restored: recovery 4.0s after the fault ended
+2026-10-11T04:27:25.641+00:00 prediction partly (2/4 aspects matched)
+2026-10-11T04:27:31.702+00:00 ABORTED: guard: error rate 20% > 15%

@@ -1,0 +1,33 @@
+{
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 200,
+      "ramp_s": 30,
+      "think_ms": 1000,
+      "checkout_pct": 20
+    },
+    "duration_s": 90,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "The frontend is a single-replica entrypoint for every user request and has a 200m CPU limit. Prior 150-user spikes visibly slowed all five flows while completing without errors; repeated 300-user spikes crossed the p95 guard. At 200 users this probes frontend resource pressure between those observed levels, on a different service and with a different fault type from the cartservice kill.",
+    "hypothesis": "The increased concurrency should cause noticeable latency across the user flows as the single frontend handles the load, but should remain below the guard threshold at this intensity. Prior spikes suggest errors are less likely than broad slowdown.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "k6",
+  "script": "load.js"
+}

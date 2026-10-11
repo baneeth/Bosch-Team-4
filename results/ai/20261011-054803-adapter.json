@@ -1,0 +1,60 @@
+{
+  "agent": "adapter",
+  "model": "gpt-6-luna",
+  "effort": "medium",
+  "seconds": 14.2,
+  "error": null,
+  "instructions": "You are the adapter of an AI-driven chaos-engineering campaign against Online Boutique (Kubernetes, Chaos Mesh).\nA plan of ranked experiments is being executed one by one with a deterministic safety guard. After each run you\nsee the result and decide what happens next:\n- continue: the plan still makes sense.\n- modify_next: the next planned experiment should change (e.g. the last run showed the intensity is too high and\n  would only trip the guard, or a parameter should be adjusted to answer the question better). Give the full\n  replacement experiment.\n- insert_followup: the last run revealed something worth probing right away (e.g. a surprising error spread, a\n  refuted prediction, a dependency that broke). Give the experiment; it runs next. Use this sparingly.\n- stop: the remaining experiments would teach little (the questions are already answered) or are clearly too\n  risky given what was just learned.\nFacts you can rely on: code only asks you AFTER it has verified the shop is healthy again (\"shop_now\": all\nworkloads available and user flows back within baseline tolerance). The last run's timeline may still end in\nRECOVERING samples because its 5 s rolling window lags - that is not a reason to stop. If the shop had not\nrecovered, code would already have stopped the campaign. Guard aborts, errors and restarts during an experiment are\nthe findings we are looking for, not reasons to stop.\nRules: experiments must respect the per-type caps and AI policy (verify with check_experiment); don't repeat an\nexperiment that already ran with the same parameters; keep failure-class coverage in mind (the campaign should\ncover at least 3 classes). Base the decision on the measured facts and cite them in the reason.\n",
+  "input": "{\n \"plan_strategy\": \"Run a short, stateful-service recovery test first, followed by a bounded cart-service outage and a lower-intensity checkout-path slowdown. This covers recovery, errors, and slowdown while prioritizing single-replica dependencies with broad shopper impact; the shipping delay is last because prior tests suggest it remains far below the p95 guard.\",\n \"shop_now\": \"healthy: checked by code after the run - all workloads available and the probe within baseline tolerance for 3 checks in a row (5s after the run ended)\",\n \"last_run\": {\n  \"run_id\": \"20261011-054629-network_delay-shippingservice\",\n  \"type\": \"network_delay\",\n  \"target\": \"shippingservice\",\n  \"params\": {\n   \"latency_ms\": 15,\n   \"jitter_ms\": 5\n  },\n  \"duration_s\": 45,\n  \"origin\": \"planner\",\n  \"status\": \"COMPLETED\",\n  \"abort_reason\": null,\n  \"peak_error_rate\": 0.0,\n  \"impact_error_rate\": 0.0,\n  \"peak_p95_ms\": 62.3,\n  \"slowdown_factor\": 3.01,\n  \"affected_flows\": [],\n  \"worst_flow\": \"checkout\",\n  \"recovery_s\": 0.0,\n  \"pod_ready_s\": null,\n  \"pod_restarts\": {},\n  \"fault_active_s\": 45.2,\n  \"prediction\": {\n   \"verdict\": \"partly\",\n   \"details\": [\n    \"affected flows: predicted ['checkout'], observed [] -> MISS\",\n    \"error band: predicted none, observed none -> match\",\n    \"slowdown band: predicted moderate, observed moderate -> match\",\n    \"outcome: predicted COMPLETED, observed COMPLETED -> match\"\n   ]\n  },\n  \"thresholds\": {\n   \"max_error_rate\": 0.2,\n   \"max_p95_ms\": 1500.0\n  },\n  \"reason\": \"shippingservice is a single-replica high-risk dependency used by checkoutservice and frontend, with reach 0.4 on view_cart and checkout. Prior delays of 20 ms plus 5 ms jitter and 40 ms plus 5 ms jitter affected checkout without errors (p95 79.7 ms and 139.8 ms respectively); this lower intensity probes shopper-visible slowdown below the guard threshold.\",\n  \"hypothesis\": \"Checkout will slow moderately, while errors remain negligible and p95 stays well below 1500 ms; prior observations suggest the impact will be concentrated in checkout rather than view_cart.\",\n  \"flow_impact\": {\n   \"home\": {\n    \"baseline_p95_ms\": 17.1,\n    \"p95_ms\": 19.5,\n    \"p95_factor\": 1.14,\n    \"error_rate\": 0.0,\n    \"requests\": 36\n   },\n   \"product\": {\n    \"baseline_p95_ms\": 14.0,\n    \"p95_ms\": 13.8,\n    \"p95_factor\": 0.99,\n    \"error_rate\": 0.0,\n    \"requests\": 36\n   },\n   \"add_to_cart\": {\n    \"baseline_p95_ms\": 6.6,\n    \"p95_ms\": 4.4,\n    \"p95_factor\": 0.67,\n    \"error_rate\": 0.0,\n    \"requests\": 36\n   },\n   \"view_cart\": {\n    \"baseline_p95_ms\": 15.3,\n    \"p95_ms\": 32.4,\n    \"p95_factor\": 2.12,\n    \"error_rate\": 0.0,\n    \"requests\": 36\n   },\n   \"checkout\": {\n    \"baseline_p95_ms\": 21.6,\n    \"p95_ms\": 65.0,\n    \"p95_factor\": 3.01,\n    \"error_rate\": 0.0,\n    \"requests\": 33\n   }\n  },\n  \"resources_top\": {\n   \"frontend\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.046,\n    \"cpu_peak_cores\": 0.052,\n    \"cpu_peak_pct_of_limit\": 25.9,\n    \"throttled_peak_pct\": 0.8,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 14.8\n   },\n   \"currencyservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_peak_cores\": 0.027,\n    \"cpu_peak_pct_of_limit\": 13.6,\n    \"throttled_peak_pct\": 0.7,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 34.8\n   },\n   \"productcatalogservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_baseline_cores\": 0.017,\n    \"cpu_peak_cores\": 0.022,\n    \"cpu_peak_pct_of_limit\": 10.9,\n    \"throttled_peak_pct\": 0.0,\n    \"memory_limit_mib\": 128.0,\n    \"memory_peak_mib\": 9.4\n   },\n   \"recommendationservice\": {\n    \"cpu_limit_cores\": 0.2,\n    \"cpu_peak_cores\": 0.02,\n    \"cpu_peak_pct_of_limit\": 10.0,\n    \"throttled_peak_pct\": 0.0,\n    \"memory_limit_mib\": 450.0,\n    \"memory_peak_mib\": 33.0\n   }\n  },\n  \"vm_cpu_pct\": {\n   \"before\": 18.9,\n   \"peak\": 19.6\n  },\n  \"guard_breaches\": [],\n  \"notes\": []\n },\n \"campaign_so_far\": [\n  {\n   \"run_id\": \"20261011-054423-pod_kill-redis-cart\",\n   \"type\": \"pod_kill\",\n   \"target\": \"redis-cart\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"refuted\"\n  },\n  {\n   \"run_id\": \"20261011-054520-pod_failure-cartservice\",\n   \"type\": \"pod_failure\",\n   \"target\": \"cartservice\",\n   \"status\": \"ABORTED\",\n   \"prediction\": \"partly\"\n  },\n  {\n   \"run_id\": \"20261011-054629-network_delay-shippingservice\",\n   \"type\": \"network_delay\",\n   \"target\": \"shippingservice\",\n   \"status\": \"COMPLETED\",\n   \"prediction\": \"partly\"\n  }\n ],\n \"remaining_plan\": [],\n \"followups_left\": 2,\n \"ai_policy\": [\n  \"no pod_kill / pod_failure on frontend (that is a total outage, not an experiment)\",\n  \"pod_failure and network_loss last at most 60 s\",\n  \"traffic_spike at most 300 users\",\n  \"guard thresholds may only be made stricter than the defaults (lower max_error_rate / max_p95_ms)\",\n  \"no duplicate experiments (same type, target and parameters)\"\n ]\n}",
+  "steps": [
+    {
+      "tool": "get_run",
+      "arguments": "{\"run_id\":\"20261011-054629-network_delay-shippingservice\"}"
+    },
+    {
+      "tool_output": "{\"run_id\": \"20261011-054629-network_delay-shippingservice\", \"type\": \"network_delay\", \"target\": \"shippingservice\", \"params\": {\"latency_ms\": 15, \"jitter_ms\": 5}, \"duration_s\": 45, \"origin\": \"planner\", \"status\": \"COMPLETED\", \"abort_reason\": null, \"peak_error_rate\": 0.0, \"impact_error_rate\": 0.0, \"peak_p95_ms\": 62.3, \"slowdown_factor\": 3.01, \"affected_flows\": [], \"worst_flow\": \"checkout\", \"recovery_s\": 0.0, \"pod_ready_s\": null, \"pod_restarts\": {}, \"fault_active_s\": 45.2, \"prediction\": {\"verdict\": \"partly\", \"details\": [\"affected flows: predicted ['checkout'], observed [] -> MISS\", \"error band: predicted none, observed none -> match\", \"slowdown band: predicted moderate, observed moderate -> match\", \"outcome: predicted COMPLETED, observed COMPLETED -> match\"]}, \"thresholds\": {\"max_error_rate\": 0.2, \"max_p95_ms\": 1500.0}, \"reason\": \"shippingservice is a single-replica high-risk dependency used by checkoutservice and frontend, with reach 0.4 on view_cart and checkout. Prior delays of 20 ms plus 5 ms jitter and 40 ms plus 5 ms jitter affected checkout without errors (p95 79.7 ms and 139.8 ms respectively); this lower intensity probes shopper-visible slowdown below the guard threshold.\", \"hypothesis\": \"Checkout will slow moderately, while errors remain negligible and p95 stays well below 1500 ms; prior observations suggest the impact will be concentrated in checkout rather than view_cart.\", \"flow_impact\": {\"home\": {\"baseline_p95_ms\": 17.1, \"p95_ms\": 19.5, \"p95_factor\": 1.14, \"error_rate\": 0.0, \"requests\": 36}, \"product\": {\"baseline_p95_ms\": 14.0, \"p95_ms\": 13.8, \"p95_factor\": 0.99, \"error_rate\": 0.0, \"requests\": 36}, \"add_to_cart\": {\"baseline_p95_ms\": 6.6, \"p95_ms\": 4.4, \"p95_factor\": 0.67, \"error_rate\": 0.0, \"requests\": 36}, \"view_cart\": {\"baseline_p95_ms\": 15.3, \"p95_ms\": 32.4, \"p95_factor\": 2.12, \"error_rate\": 0.0, \"requests\": 36}, \"checkout\": {\"baseline_p95_ms\": 21.6, \"p95_ms\": 65.0, \"p95_factor\": 3.01, \"error_rate\": 0.0, \"requests\": 33}}, \"resources_top\": {\"frontend\": {\"c..."
+    },
+    {
+      "tool": "check_experiment",
+      "arguments": "{\"type\":\"network_loss\",\"target\":\"shippingservice\",\"duration_s\":30,\"params_json\":\"{\\\"loss_pct\\\":5,\\\"correlation_pct\\\":25}\",\"max_error_rate\":null,\"max_p95_ms\":null}"
+    },
+    {
+      "tool_output": "OK: within hard caps and AI policy"
+    }
+  ],
+  "usage": {
+    "requests": 3,
+    "input_tokens": 14259,
+    "output_tokens": 1143,
+    "total_tokens": 15402
+  },
+  "output": {
+    "action": "insert_followup",
+    "reason": "The 15 ms delay completed with no errors and no guard breaches, but checkout p95 rose 3.01\u00d7 (21.6\u219265.0 ms) and view_cart 2.12\u00d7, despite the reported affected_flows being empty. A bounded packet-loss test can probe whether this dependency\u2019s impact is latency-only or also causes shopper-visible errors; the validator confirms it is within caps and policy.",
+    "experiment": {
+      "experiment": {
+        "type": "network_loss",
+        "target": "shippingservice",
+        "duration_s": 30,
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 25
+        }
+      },
+      "max_error_rate": null,
+      "max_p95_ms": null,
+      "reason": "Follow up on the measured checkout and view_cart latency increases with a low, bounded loss rate against shippingservice, a single-replica dependency used by checkoutservice and frontend. This tests a distinct network fault mode without repeating the completed delay parameters.",
+      "hypothesis": "At 5% packet loss, checkout may show moderate slowdown and possibly a low error rate due to retries; broad failures or a guard abort are not expected at this bounded intensity.",
+      "prediction": {
+        "affected_flows": [
+          "checkout",
+          "view_cart"
+        ],
+        "error_band": "low",
+        "slowdown_band": "moderate",
+        "outcome": "COMPLETED"
+      },
+      "learning_goal": "Does modest packet loss on shippingservice turn the observed checkout/view_cart latency sensitivity into shopper-visible errors?"
+    }
+  }
+}

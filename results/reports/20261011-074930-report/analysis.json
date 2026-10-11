@@ -1,0 +1,444 @@
+{
+  "report_id": "20261011-074930-report",
+  "created_at": "2026-10-11T07:49:30+00:00",
+  "scope": "20261011-074759-campaign",
+  "run_ids": [
+    "20261011-074759-pod_kill-cartservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 30.2,
+  "overall_anchor": 30.0,
+  "grade": "F",
+  "services": [
+    {
+      "service": "cartservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 13.0,
+        "recovery": 80.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 12.5,
+        "recovery": 79.5,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "score": 30.2,
+      "anchor_score": 30.0,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "In 20261011-074759-pod_kill-cartservice, impact error rate was 96.55%, all five flows were affected, checkout p95 reached 5003.2 ms, and recovery took 24.6 s. It has one replica, probes, and resource limits."
+    },
+    {
+      "service": "adservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.0,
+      "justification": "Untested. Its single replica gives a posture score of 60; it is called by frontend on home and product, but is not on the checkout path. No service-specific impact was measured."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Untested directly. It has one replica and is on the revenue path; the cartservice run showed checkout errors and a 5003.2 ms p95 when its cart dependency was killed, but does not isolate checkoutservice behavior."
+    },
+    {
+      "service": "currencyservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Untested. Its single replica gives a posture score of 60; it is shared by frontend and checkoutservice and is on the checkout path. No currencyservice fault was measured."
+    },
+    {
+      "service": "emailservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.5,
+      "justification": "Untested. Its single replica gives a posture score of 60; its mapped reach is limited to checkout. No emailservice fault was measured."
+    },
+    {
+      "service": "frontend",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested directly. It is the single-replica entrypoint for all flows; the cartservice run recorded a 3.6 s unresponsive period and broad flow errors, but does not isolate a frontend fault."
+    },
+    {
+      "service": "paymentservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.5,
+      "justification": "Untested. Its single replica gives a posture score of 60; it is on the checkout path but has limited mapped reach. No paymentservice fault was measured."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. Its single replica gives a posture score of 60; it is shared by frontend, checkoutservice, and recommendationservice with reach across all flows. No productcatalogservice fault was measured."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.5,
+      "justification": "Untested. Its single replica gives a posture score of 60; its mapped impact is narrower than the entrypoint and checkout dependencies. No recommendationservice fault was measured."
+    },
+    {
+      "service": "redis-cart",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. Its single-replica posture is 60; it is stateful and underpins cartservice and all mapped shopping flows. The cartservice pod-kill did not test Redis failure behavior."
+    },
+    {
+      "service": "shippingservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "Untested. Its single replica gives a posture score of 60; its mapped reach is view_cart and checkout. No shippingservice fault was measured."
+    }
+  ],
+  "coverage": {
+    "experiments": 1,
+    "types": [
+      "pod_kill"
+    ],
+    "failure_classes": [
+      "recovery"
+    ]
+  },
+  "predictions": {
+    "confirmed": 1,
+    "partly": 0,
+    "refuted": 0
+  },
+  "ai": {
+    "summary": "The cartservice pod-kill caused a broad, severe shopper-facing outage: all five flows were affected, and 96.55% of requests failed during impact. Checkout p95 reached 5003.2 ms versus a 21.6 ms baseline, while other flows also had 100% error rates in the sampled requests. The main demonstrated weakness is that cartservice is a single point of failure shared across every flow. The planner correctly predicted the affected flows, severity bands, and run outcome.",
+    "findings": [
+      {
+        "title": "Single cartservice replica creates a shop-wide outage when the pod is killed",
+        "severity": "critical",
+        "services": [
+          "cartservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-074759-pod_kill-cartservice"
+        ],
+        "evidence": "Killing the sole cartservice pod affected home, product, add_to_cart, view_cart, and checkout. Overall impact error rate was 96.55% and peak error rate was 100%; home, product, add_to_cart, and view_cart each had 100% errors in 12 requests, while checkout had 80% errors in 10 requests and p95 5003.2 ms versus 21.6 ms baseline (231.63x). Recovery was 24.6 s; the frontend was reported unresponsive for 3.6 s, and the p95 guard breached 1500 ms. The fault was an instantaneous pod kill, so the guard reported breaches rather than aborting it.",
+        "root_cause": "cartservice has one replica and is a shared dependency for frontend and checkoutservice. With that sole pod unavailable, requests across the dependent shopping flows could not rely on cart operations; there was no surviving replica to serve requests during replacement and readiness recovery.",
+        "fix": {
+          "target": "cartservice",
+          "action": "scale_replicas",
+          "replicas": 3
+        },
+        "fix_rationale": "cartservice is stateless according to the dependency map, so scaling it to three replicas adds redundancy. A single pod kill should then leave other replicas available to serve callers instead of taking cart-dependent flows offline while Kubernetes replaces the only pod.",
+        "expected_improvement": "Re-running the pod kill should no longer produce a shop-wide outage: most requests should succeed through surviving cartservice replicas, checkout should avoid the observed multi-second p95 spike, and recovery should be faster or not user-visible.",
+        "verify_with": {
+          "type": "pod_kill",
+          "target": "cartservice",
+          "duration_s": 30,
+          "params": {
+            "grace_period_s": 0
+          }
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.0,
+        "justification": "Untested. Its single replica gives a posture score of 60; it is called by frontend on home and product, but is not on the checkout path. No service-specific impact was measured."
+      },
+      {
+        "service": "cartservice",
+        "availability": 0,
+        "latency": 13,
+        "recovery": 80,
+        "containment": 50,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "In 20261011-074759-pod_kill-cartservice, impact error rate was 96.55%, all five flows were affected, checkout p95 reached 5003.2 ms, and recovery took 24.6 s. It has one replica, probes, and resource limits."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Untested directly. It has one replica and is on the revenue path; the cartservice run showed checkout errors and a 5003.2 ms p95 when its cart dependency was killed, but does not isolate checkoutservice behavior."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Untested. Its single replica gives a posture score of 60; it is shared by frontend and checkoutservice and is on the checkout path. No currencyservice fault was measured."
+      },
+      {
+        "service": "emailservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.5,
+        "justification": "Untested. Its single replica gives a posture score of 60; its mapped reach is limited to checkout. No emailservice fault was measured."
+      },
+      {
+        "service": "frontend",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested directly. It is the single-replica entrypoint for all flows; the cartservice run recorded a 3.6 s unresponsive period and broad flow errors, but does not isolate a frontend fault."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.5,
+        "justification": "Untested. Its single replica gives a posture score of 60; it is on the checkout path but has limited mapped reach. No paymentservice fault was measured."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. Its single replica gives a posture score of 60; it is shared by frontend, checkoutservice, and recommendationservice with reach across all flows. No productcatalogservice fault was measured."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.5,
+        "justification": "Untested. Its single replica gives a posture score of 60; its mapped impact is narrower than the entrypoint and checkout dependencies. No recommendationservice fault was measured."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. Its single-replica posture is 60; it is stateful and underpins cartservice and all mapped shopping flows. The cartservice pod-kill did not test Redis failure behavior."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "Untested. Its single replica gives a posture score of 60; its mapped reach is view_cart and checkout. No shippingservice fault was measured."
+      }
+    ],
+    "score_explanation": "The tested cartservice scores follow the supplied anchor dimensions, rounded to integers: the run showed near-total request failure, a multi-second checkout p95, and recovery in about 25 seconds. For untested services, availability, latency, recovery, and containment are held at 60 as conservative, anchor-proximate estimates rather than measured results; posture is 60 for the mapped single-replica services with readiness and liveness probes and CPU/memory limits. Criticality weights are constrained to 0.5–3: the entrypoint and broad-reach cart/product dependencies receive the highest weights, checkout-path dependencies are next, and narrower or less central services receive lower weights.",
+    "planner_review": "The prediction was confirmed for the only run: the predicted and observed affected-flow sets matched, the high error and severe slowdown bands matched, and the run completed as predicted. The hypothesis also correctly anticipated a single-pod dependency outage and recovery taking tens of seconds. The planner's success here is evidence for this cartservice pod-kill scenario only, not for other fault types or services.",
+    "limitations": [
+      "Only one experiment was run, and it tested a cartservice pod kill; other services, fault types, and traffic conditions remain untested.",
+      "The environment is a single-node Kubernetes deployment, so these results do not establish resilience to node or zone failures.",
+      "Per-flow samples during the run were small (10–12 requests), and the baseline was also a short probe; measured rates and percentiles may be noisy.",
+      "The cartservice failure affected dependent flows, but this run does not isolate the behavior of each caller or prove the behavior of Redis, other dependencies, or fallback mechanisms."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261011-074930-analyst.json"
+  ]
+}

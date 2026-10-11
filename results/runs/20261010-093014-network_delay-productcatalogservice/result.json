@@ -1,0 +1,247 @@
+{
+  "run_id": "20261010-093014-network_delay-productcatalogservice",
+  "spec": {
+    "type": "network_delay",
+    "target": "productcatalogservice",
+    "params": {
+      "latency_ms": 500
+    },
+    "duration_s": 60,
+    "max_error_rate": null,
+    "max_p95_ms": 300.0,
+    "reason": null,
+    "hypothesis": null
+  },
+  "status": "ABORTED",
+  "abort_reason": "guard: p95 622ms > 300ms",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 300.0
+  },
+  "started_at": "2026-10-10T09:30:14.785+00:00",
+  "injected_at": "2026-10-10T09:30:34.850+00:00",
+  "fault_ended_at": "2026-10-10T09:30:38.440+00:00",
+  "fault_duration_s": 3.6,
+  "recovery_s": 0.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 1368.3,
+  "guard_breaches": [
+    "p95 576ms > 300ms"
+  ],
+  "worst_flow": "product",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.5,
+        "p95_ms": 12.9,
+        "p99_ms": 14.0
+      },
+      "impact": {
+        "count": 4,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 514.4,
+        "p95_ms": 714.3,
+        "p99_ms": 742.0
+      },
+      "p95_factor": 55.37
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.8,
+        "p95_ms": 11.2,
+        "p99_ms": 18.6
+      },
+      "impact": {
+        "count": 4,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 1196.5,
+        "p95_ms": 1612.6,
+        "p99_ms": 1671.2
+      },
+      "p95_factor": 143.98
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 4.3,
+        "p99_ms": 4.9
+      },
+      "impact": {
+        "count": 4,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 4.4,
+        "p95_ms": 5.4,
+        "p99_ms": 5.5
+      },
+      "p95_factor": 1.26
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 95,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.0,
+        "p95_ms": 10.7,
+        "p99_ms": 11.0
+      },
+      "impact": {
+        "count": 0,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "p99_ms": null
+      },
+      "p95_factor": null
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.9,
+        "p95_ms": 17.0,
+        "p99_ms": 21.0
+      },
+      "impact": {
+        "count": 0,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "p99_ms": null
+      },
+      "p95_factor": null
+    }
+  },
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 98.0
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.01,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 2.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 54.0
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.003,
+      "cpu_peak_pct_of_limit": 1.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.9
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.013,
+      "cpu_peak_cores": 0.012,
+      "cpu_peak_pct_of_limit": 5.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 37.6
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.7
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.021,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 16.4
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 52.7
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.001,
+      "cpu_peak_pct_of_limit": 0.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 32.6
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.007,
+      "cpu_peak_cores": 0.009,
+      "cpu_peak_pct_of_limit": 4.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.3
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.008,
+      "cpu_peak_cores": 0.01,
+      "cpu_peak_pct_of_limit": 5.0,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 32.7
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 1.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 6.9
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 7.8
+    }
+  },
+  "node_cpu_baseline_pct": 12.5,
+  "node_cpu_peak_pct": 12.5,
+  "load": null,
+  "notes": [
+    "kill switch took 0.5s from decision to fault removed"
+  ]
+}

@@ -1,0 +1,11 @@
+2026-10-11T06:11:32.461+00:00 run 20261011-061132-traffic_spike-frontend: traffic_spike on frontend for 90s {'users': 200, 'ramp_s': 30, 'think_ms': 1000, 'checkout_pct': 20}
+2026-10-11T06:11:32.462+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T06:11:32.492+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T06:11:52.512+00:00 pre-check ok: 59 requests, 0% errors, p95 16ms
+2026-10-11T06:11:52.518+00:00 INJECTED k6 traffic spike (200 users)
+2026-10-11T06:13:06.753+00:00 ABORT guard: p95 1578ms > 1500ms -> removing k6 traffic spike (200 users) at ~200 users
+2026-10-11T06:13:07.155+00:00 fault removed in 0.4s
+2026-10-11T06:13:07.156+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T06:13:14.178+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T06:13:14.194+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T06:13:20.245+00:00 ABORTED: guard: p95 1578ms > 1500ms

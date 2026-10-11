@@ -1,0 +1,231 @@
+{
+  "campaign_id": "20261011-044550-campaign",
+  "plan_id": "20261011-044550-plan",
+  "started_at": "2026-10-11T04:45:50+00:00",
+  "ended_at": "2026-10-11T04:51:53+00:00",
+  "status": "stopped: adapter: The 5 ms currencyservice delay completed with 0% errors and no guard breaches, but home p95 remained around 62–64 ms in the timeline (67 ms overall, 3.92× baseline); the predicted affected-flow set was also missed. Together with the prior 10 ms run’s 912.1 ms peak, this answers the slowdown probe, and there are no planned experiments left that justify using the remaining follow-up.",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "network_loss",
+        "target": "cartservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single-replica, high-risk dependency shared by frontend and checkoutservice, with reach across all five flows. A prior 20% loss test caused p95 to reach 1571 ms and was stopped by the guard after 6.6 seconds, with no errors; 5% probes whether a milder loss rate degrades flows below that threshold.",
+        "hypothesis": "A small amount of packet loss will add tail latency to cart-dependent flows, but is less likely than the prior 20% test to cross the p95 guard; errors should remain uncommon.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-044550-network_loss-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 123.7,
+      "prediction": "partly"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "currencyservice",
+        "params": {
+          "size_mb": 112,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single-replica, high-risk shared dependency on the checkout path, reaching home, product, view_cart, and checkout; its memory limit is 128Mi. There are no currencyservice memory-stress results, and prior tests varied by service: 110 MB caused cartservice OOM behavior, while 110 MB on productcatalogservice did not. This short near-limit test probes the service-specific exhaustion threshold.",
+        "hypothesis": "A 112 MB allocation may exhaust currencyservice’s available memory, causing errors and possibly a restart in flows that call it; the guard should limit the duration of any disruption.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-044700-memory_stress-currencyservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 73.9,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "pod_kill",
+        "target": "currencyservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice has one replica, serves four flows, and is on the checkout path. A prior 15-second pod_failure test on this service reached a 40% peak error rate and was aborted; pod_kill is a distinct recovery test that measures replacement and the user impact during the restart.",
+        "hypothesis": "Requests using currencyservice will fail briefly while Kubernetes replaces the pod, then recover; flows that do not call it should remain usable.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-044800-pod_kill-currencyservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.8,
+      "peak_p95_ms": 15.2,
+      "prediction": "partly"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "network_delay",
+        "target": "currencyservice",
+        "params": {
+          "latency_ms": 10,
+          "jitter_ms": 0
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single-replica shared dependency with reach 0.8, including the checkout path. A prior 50 ms delay produced a 528 ms peak p95 and affected home, product, view_cart, and checkout; 10 ms tests a substantially milder intensity expected to reveal propagation without simply repeating the severe slowdown.",
+        "hypothesis": "A 10 ms delay will increase latency in flows that call currencyservice, but should stay below the p95 guard and produce no material errors.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-044857-network_delay-currencyservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 7.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 912.1,
+      "prediction": "partly"
+    },
+    {
+      "rank": 5,
+      "spec": {
+        "type": "network_delay",
+        "target": "currencyservice",
+        "params": {
+          "latency_ms": 5,
+          "jitter_ms": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Follow up the unexpected severe slowdown at 10 ms: timeline p95 was around 112 ms early in the fault but later spiked, with a 912.1 ms run peak and no errors. A lower, brief delay probes whether the latency amplification has a dose-response.",
+        "hypothesis": "At 5 ms, currencyservice-dependent flows will remain error-free and show less slowdown than at 10 ms, likely with moderate rather than severe worst-flow slowdown.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "adapter",
+        "combined_with": []
+      },
+      "run_id": "20261011-045041-network_delay-currencyservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 64.6,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-044550-network_loss-cartservice",
+      "action": "continue",
+      "reason": "The 5% cartservice packet-loss run completed with no errors or guard breaches, but slowdown was severe: add_to_cart reached 10.83× baseline p95 and checkout 9.3×, contrary to the predicted moderate slowdown and flow spread. The planned 15-second currencyservice memory-stress test remains a useful, distinct probe of resource exhaustion.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-044700-adapter.json"
+    },
+    {
+      "after_run": "20261011-044700-memory_stress-currencyservice",
+      "action": "continue",
+      "reason": "The 112 MB memory stress completed without errors, restarts, or guard breaches, refuting the predicted exhaustion/abort; it did produce a 4.24× worst-flow slowdown (product). The planned pod_kill remains a distinct recovery test for single-replica currencyservice, and its impact is worth measuring despite the prior pod_failure abort.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-044800-adapter.json"
+    },
+    {
+      "after_run": "20261011-044800-pod_kill-currencyservice",
+      "action": "continue",
+      "reason": "The currencyservice pod kill caused high errors across home, product, view_cart, and checkout (80% peak; 66.7% impact), with the pod ready in 12.2 s; the guard breach was reported because an instantaneous kill cannot be undone. The planned 10 ms delay is a distinct, lower-intensity probe of slowdown propagation, and it passed the validator.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-044857-adapter.json"
+    },
+    {
+      "after_run": "20261011-044857-network_delay-currencyservice",
+      "action": "insert_followup",
+      "reason": "The 10 ms currencyservice delay caused no errors or guard breach, but contradicted the predicted moderate slowdown: add_to_cart reached 894.1 ms p95 (135.47× baseline), and the run peaked at 912.1 ms. A 5 ms probe will test whether this severe tail-latency amplification persists at lower intensity; the shop has since recovered.",
+      "applied": true,
+      "detail": "follow-up inserted: network_delay on currencyservice {'latency_ms': 5, 'jitter_ms': 0}",
+      "transcript": "ai/20261011-045041-adapter.json"
+    },
+    {
+      "after_run": "20261011-045041-network_delay-currencyservice",
+      "action": "stop",
+      "reason": "The 5 ms currencyservice delay completed with 0% errors and no guard breaches, but home p95 remained around 62–64 ms in the timeline (67 ms overall, 3.92× baseline); the predicted affected-flow set was also missed. Together with the prior 10 ms run’s 912.1 ms peak, this answers the slowdown probe, and there are no planned experiments left that justify using the remaining follow-up.",
+      "applied": true,
+      "detail": "campaign stopped by the adapter",
+      "transcript": "ai/20261011-045153-adapter.json"
+    }
+  ],
+  "skipped": []
+}

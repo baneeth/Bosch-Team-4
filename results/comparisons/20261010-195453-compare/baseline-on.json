@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-10-10T19:59:39+00:00",
+  "duration_s": 60.0,
+  "overall": {
+    "count": 236,
+    "errors": 0,
+    "error_rate": 0.0,
+    "p50_ms": 9.1,
+    "p95_ms": 17.6,
+    "p99_ms": 200.7
+  },
+  "flows": {
+    "home": {
+      "count": 48,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 10.0,
+      "p95_ms": 13.6,
+      "p99_ms": 99.4
+    },
+    "product": {
+      "count": 48,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 8.7,
+      "p95_ms": 147.3,
+      "p99_ms": 581.1
+    },
+    "add_to_cart": {
+      "count": 48,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 3.3,
+      "p95_ms": 4.4,
+      "p99_ms": 6.7
+    },
+    "view_cart": {
+      "count": 48,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 8.6,
+      "p95_ms": 17.5,
+      "p99_ms": 21.3
+    },
+    "checkout": {
+      "count": 44,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 12.6,
+      "p95_ms": 20.4,
+      "p99_ms": 20.9
+    }
+  }
+}

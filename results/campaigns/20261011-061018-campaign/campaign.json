@@ -1,0 +1,103 @@
+{
+  "campaign_id": "20261011-061018-campaign",
+  "plan_id": "20261011-061014-plan",
+  "started_at": "2026-10-11T06:10:18+00:00",
+  "ended_at": "2026-10-11T06:13:36+00:00",
+  "status": "stopped: budget used (2 experiments)",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first for its broad, high-risk blast radius: cartservice has one replica, reach 1.0 across home, product, add_to_cart, view_cart, and checkout, and is shared by frontend and checkoutservice on the revenue path. Prior cartservice kills affected all five flows, with impact error rates around 83–96% and recovery around 22–31 seconds, making this a direct live-site test of errors and replacement recovery.",
+        "hypothesis": "While Kubernetes replaces the sole cartservice pod, requests depending on cart operations will fail or slow across the shop; after the replacement becomes ready, flows should recover. The fault is expected to complete while making the outage plainly visible to shoppers.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-061018-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 29.1,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 88.7,
+      "prediction": "partly"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 200,
+          "ramp_s": 30,
+          "think_ms": 1000,
+          "checkout_pct": 20
+        },
+        "duration_s": 90,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "The frontend is a single-replica entrypoint for every user request and has a 200m CPU limit. Prior 150-user spikes visibly slowed all five flows while completing without errors; repeated 300-user spikes crossed the p95 guard. At 200 users this probes frontend resource pressure between those observed levels, on a different service and with a different fault type from the cartservice kill.",
+        "hypothesis": "The increased concurrency should cause noticeable latency across the user flows as the single frontend handles the load, but should remain below the guard threshold at this intensity. Prior spikes suggest errors are less likely than broad slowdown.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-061132-traffic_spike-frontend",
+      "status": "ABORTED",
+      "abort_reason": "guard: p95 1578ms > 1500ms",
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 1578.5,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-061018-pod_kill-cartservice",
+      "action": "continue",
+      "reason": "The cartservice kill completed and exposed high impact errors across all five flows (97.41% overall; peak 100%), with the pod ready in 23.1 s and recovery in 29.1 s. The predicted severe slowdown was not observed (slowdown factor 0.61; flow p95s were below baseline), but the planned, policy-checked 200-user frontend spike is a distinct test of resource-driven slowdown on another service; the shop is confirmed healthy again.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-061132-adapter.json"
+    },
+    {
+      "after_run": "20261011-061132-traffic_spike-frontend",
+      "action": "insert_followup",
+      "reason": "The frontend spike aborted at p95 1578.5 ms after affecting all five flows, with 97.7% peak CPU throttling and no errors; this exposed frontend saturation but not the cartservice network-failure behavior in the campaign strategy. A short, moderate packet-loss test on cartservice probes that distinct failure class and helps bring coverage to three classes.",
+      "applied": true,
+      "detail": "follow-up inserted: network_loss on cartservice {'loss_pct': 10, 'correlation_pct': 25}",
+      "transcript": "ai/20261011-061336-adapter.json"
+    }
+  ],
+  "skipped": []
+}

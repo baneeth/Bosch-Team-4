@@ -1,0 +1,266 @@
+{
+  "run_id": "20261010-184456-traffic_spike-frontend",
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 150,
+      "ramp_s": 30
+    },
+    "duration_s": 90,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "fix-and-rerun verify experiment",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual"
+  },
+  "status": "COMPLETED",
+  "abort_reason": null,
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-10T18:44:56.907+00:00",
+  "injected_at": "2026-10-10T18:45:16.958+00:00",
+  "fault_ended_at": "2026-10-10T18:46:50.596+00:00",
+  "fault_duration_s": 93.6,
+  "recovery_s": 1.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 1157.0,
+  "impact_error_rate": 0.0,
+  "impact_p95_ms": 661.2,
+  "availability": 1.0,
+  "affected_flows": [
+    "home",
+    "product",
+    "add_to_cart",
+    "view_cart",
+    "checkout"
+  ],
+  "guard_breaches": [],
+  "worst_flow": "home",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 48,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.9,
+        "p95_ms": 11.8,
+        "p99_ms": 102.4
+      },
+      "impact": {
+        "count": 60,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 397.1,
+        "p95_ms": 781.6,
+        "p99_ms": 820.5
+      },
+      "p95_factor": 66.24
+    },
+    "product": {
+      "baseline": {
+        "count": 48,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.2,
+        "p95_ms": 11.1,
+        "p99_ms": 11.7
+      },
+      "impact": {
+        "count": 60,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 298.4,
+        "p95_ms": 562.0,
+        "p99_ms": 827.5
+      },
+      "p95_factor": 50.63
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 48,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.3,
+        "p95_ms": 4.4,
+        "p99_ms": 5.3
+      },
+      "impact": {
+        "count": 60,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 86.0,
+        "p95_ms": 273.8,
+        "p99_ms": 501.5
+      },
+      "p95_factor": 62.23
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 48,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.8,
+        "p95_ms": 11.1,
+        "p99_ms": 12.2
+      },
+      "impact": {
+        "count": 59,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 298.8,
+        "p95_ms": 689.5,
+        "p99_ms": 769.5
+      },
+      "p95_factor": 62.12
+    },
+    "checkout": {
+      "baseline": {
+        "count": 46,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.0,
+        "p95_ms": 14.4,
+        "p99_ms": 16.6
+      },
+      "impact": {
+        "count": 59,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 254.1,
+        "p95_ms": 507.4,
+        "p99_ms": 1196.2
+      },
+      "p95_factor": 35.24
+    }
+  },
+  "prediction_check": null,
+  "flags": [],
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.022,
+      "cpu_peak_pct_of_limit": 7.3,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 102.7
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.085,
+      "cpu_peak_pct_of_limit": 28.4,
+      "throttled_peak_pct": 1.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 50.0
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.005,
+      "cpu_peak_cores": 0.021,
+      "cpu_peak_pct_of_limit": 10.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.2
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.018,
+      "cpu_peak_cores": 0.126,
+      "cpu_peak_pct_of_limit": 63.0,
+      "throttled_peak_pct": 12.3,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 38.1
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.01,
+      "cpu_peak_pct_of_limit": 4.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.1
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.026,
+      "cpu_peak_cores": 0.197,
+      "cpu_peak_pct_of_limit": 98.3,
+      "throttled_peak_pct": 96.7,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 21.6
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.005,
+      "cpu_peak_pct_of_limit": 0.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 68.3
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": 0.007,
+      "cpu_peak_pct_of_limit": 3.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 31.7
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.012,
+      "cpu_peak_cores": 0.064,
+      "cpu_peak_pct_of_limit": 32.0,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.4
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.011,
+      "cpu_peak_cores": 0.13,
+      "cpu_peak_pct_of_limit": 65.0,
+      "throttled_peak_pct": 43.1,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 33.1
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 6.6,
+      "throttled_peak_pct": 1.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 9.5
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.015,
+      "cpu_peak_pct_of_limit": 7.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.6
+    }
+  },
+  "node_cpu_baseline_pct": 12.8,
+  "node_cpu_peak_pct": 31.2,
+  "load": {
+    "users_target": 150,
+    "users_at_stop": null,
+    "requests": 8775,
+    "rps": 94.4,
+    "failed_rate": 0.0,
+    "p95_ms": 707.9,
+    "max_vus": 150
+  },
+  "notes": []
+}

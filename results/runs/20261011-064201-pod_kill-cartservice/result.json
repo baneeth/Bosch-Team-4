@@ -1,0 +1,295 @@
+{
+  "run_id": "20261011-064201-pod_kill-cartservice",
+  "spec": {
+    "type": "pod_kill",
+    "target": "cartservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because cartservice is a single replica, has high risk, is shared by frontend and checkoutservice, and reaches all five flows. Prior cartservice pod kills affected all flows with peak errors near 90–100% and recovery around 22–31 seconds, making this the broadest shopper-visible test.",
+    "hypothesis": "The killed cartservice pod will cause visible errors across shopping and checkout flows until Kubernetes replaces it; recovery will take tens of seconds. The brief outage is expected to complete rather than be stopped by the guard, consistent with prior cartservice pod-kill runs.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "status": "COMPLETED",
+  "abort_reason": null,
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-11T06:42:01.241+00:00",
+  "injected_at": "2026-10-11T06:42:21.333+00:00",
+  "fault_ended_at": "2026-10-11T06:42:21.333+00:00",
+  "fault_duration_s": 0.0,
+  "recovery_s": 27.6,
+  "pod_ready_s": 22.6,
+  "peak_error_rate": 1.0,
+  "peak_p95_ms": 711.7,
+  "impact_error_rate": 0.9048,
+  "impact_p95_ms": 21.2,
+  "availability": 0.0952,
+  "affected_flows": [
+    "home",
+    "product",
+    "add_to_cart",
+    "view_cart",
+    "checkout"
+  ],
+  "guard_breaches": [
+    "error rate 30% > 20%"
+  ],
+  "worst_flow": "view_cart",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.9,
+        "p95_ms": 17.1,
+        "p99_ms": 77.0
+      },
+      "impact": {
+        "count": 23,
+        "errors": 20,
+        "error_rate": 0.8696,
+        "p50_ms": 3.6,
+        "p95_ms": 20.4,
+        "p99_ms": 21.2
+      },
+      "p95_factor": 1.19
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.9,
+        "p95_ms": 14.0,
+        "p99_ms": 20.0
+      },
+      "impact": {
+        "count": 22,
+        "errors": 20,
+        "error_rate": 0.9091,
+        "p50_ms": 3.4,
+        "p95_ms": 10.5,
+        "p99_ms": 498.2
+      },
+      "p95_factor": 0.75
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.6,
+        "p95_ms": 6.6,
+        "p99_ms": 8.2
+      },
+      "impact": {
+        "count": 20,
+        "errors": 19,
+        "error_rate": 0.95,
+        "p50_ms": 2.7,
+        "p95_ms": 53.3,
+        "p99_ms": 806.4
+      },
+      "p95_factor": 8.08
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.9,
+        "p95_ms": 15.3,
+        "p99_ms": 18.7
+      },
+      "impact": {
+        "count": 20,
+        "errors": 16,
+        "error_rate": 0.8,
+        "p50_ms": 2.8,
+        "p95_ms": 431.6,
+        "p99_ms": 599.0
+      },
+      "p95_factor": 28.21
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 13.7,
+        "p95_ms": 21.6,
+        "p99_ms": 35.0
+      },
+      "impact": {
+        "count": 20,
+        "errors": 20,
+        "error_rate": 1.0,
+        "p50_ms": 2.7,
+        "p95_ms": 4.5,
+        "p99_ms": 5.1
+      },
+      "p95_factor": 0.21
+    }
+  },
+  "prediction_check": {
+    "verdict": "confirmed",
+    "matched": 4,
+    "total": 4,
+    "observed": {
+      "affected_flows": [
+        "add_to_cart",
+        "checkout",
+        "home",
+        "product",
+        "view_cart"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "details": [
+      "affected flows: predicted ['add_to_cart', 'checkout', 'home', 'product', 'view_cart'], observed ['add_to_cart', 'checkout', 'home', 'product', 'view_cart'] -> match",
+      "error band: predicted high, observed high -> match",
+      "slowdown band: predicted severe, observed severe -> match",
+      "outcome: predicted COMPLETED, observed COMPLETED -> match"
+    ]
+  },
+  "flags": [],
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.001,
+      "cpu_peak_pct_of_limit": 0.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 98.9
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.069,
+      "cpu_peak_pct_of_limit": 23.2,
+      "throttled_peak_pct": 68.4,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 27.0
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.005,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 3.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.2
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.027,
+      "cpu_peak_cores": 0.013,
+      "cpu_peak_pct_of_limit": 6.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.8
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 1.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.2
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.041,
+      "cpu_peak_pct_of_limit": 20.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 15.2
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 86.8
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 32.2
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.019,
+      "cpu_peak_cores": 0.013,
+      "cpu_peak_pct_of_limit": 6.3,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.4
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 4.2,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 32.9
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 1.6,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 6.2
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 1.1,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.0
+    }
+  },
+  "node_cpu_baseline_pct": 20.5,
+  "node_cpu_peak_pct": 20.4,
+  "load": null,
+  "notes": [
+    "Instant fault: aborting cannot undo a pod kill, so during recovery the guard reports breaches instead of aborting."
+  ]
+}

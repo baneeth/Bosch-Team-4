@@ -1,0 +1,50 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "emailservice",
+    "params": {},
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "emailservice has one replica and is on the checkout path, but its reach is limited to checkout. A prior 30-second paymentservice failure affected checkout with 16.67% impact and 23.8ms peak p95, completing despite a 21% peak error rate; this tests whether email failure behaves similarly.",
+    "hypothesis": "Checkout may return errors while emailservice is unavailable, while the other four flows remain healthy; the limited flow reach may keep the guard from aborting.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "none",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-173649-pod-failure-emailservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-173649-pod_failure-emailservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "emailservice has one replica and is on the checkout path, but its reach is limited to checkout. A prior 30-second paymentservice failure affected checkout with 16.67% impact and 23.8ms peak p95, completing despite a 21% peak error rate; this tests wh"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "emailservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-failure"
+    }
+  }
+}

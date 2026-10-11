@@ -1,0 +1,54 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "currencyservice",
+    "params": {},
+    "duration_s": 15,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "currencyservice is a single replica and a shared dependency of frontend and checkoutservice, reaching home, product, view_cart, and checkout. Its latency and packet-loss behavior have been tested, but an outright short outage has not; the short duration bounds this error-class blast-radius test.",
+    "hypothesis": "Taking currencyservice unavailable will cause errors in flows that need currency conversion; the broad reach makes a guard abort plausible, while failed RPCs may fail fast rather than create sustained slowdown.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "none",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-203618-pod-failure-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203618-pod_failure-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "currencyservice is a single replica and a shared dependency of frontend and checkoutservice, reaching home, product, view_cart, and checkout. Its latency and packet-loss behavior have been tested, but an outright short outage has not; the short durat"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "15s",
+      "action": "pod-failure"
+    }
+  }
+}

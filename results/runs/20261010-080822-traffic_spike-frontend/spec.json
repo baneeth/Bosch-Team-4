@@ -1,0 +1,17 @@
+{
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 500,
+      "ramp_s": 90
+    },
+    "duration_s": 150,
+    "max_error_rate": 0.5,
+    "max_p95_ms": 5000.0,
+    "reason": "load test: how does it break (guard at hard caps)",
+    "hypothesis": null
+  },
+  "engine": "k6",
+  "script": "load.js"
+}

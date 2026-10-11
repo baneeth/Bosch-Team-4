@@ -1,0 +1,52 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "productcatalogservice",
+    "params": {
+      "latency_ms": 100
+    },
+    "duration_s": 40,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": null,
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-001758-network-delay-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-001758-network_delay-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "manual run"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "40s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "100ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

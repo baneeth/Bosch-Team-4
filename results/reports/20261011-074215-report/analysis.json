@@ -1,0 +1,450 @@
+{
+  "report_id": "20261011-074215-report",
+  "created_at": "2026-10-11T07:42:15+00:00",
+  "scope": "20261011-073800-campaign",
+  "run_ids": [
+    "20261011-073801-memory_stress-cartservice",
+    "20261011-073920-network_delay-paymentservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 62.3,
+  "overall_anchor": 60.7,
+  "grade": "D",
+  "services": [
+    {
+      "service": "cartservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 89.0,
+        "recovery": 79.0,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 89.9,
+        "recovery": 79.2,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "score": 47.0,
+      "anchor_score": 47.3,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "In 20261011-073801-memory_stress-cartservice, errors affected every flow (95.0–100%), the pod restarted once, and recovery took 25 seconds; the anchor dimensions are retained. It is a single-replica, shared checkout-path service with a 128 Mi memory limit."
+    },
+    {
+      "service": "frontend",
+      "tested": false,
+      "dimensions": {
+        "availability": 45.0,
+        "latency": 60.0,
+        "recovery": 75.0,
+        "containment": 45.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 56.2,
+      "anchor_score": 60.0,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "The entrypoint's flows all failed at 95.0–100% during 20261011-073801-memory_stress-cartservice, and the reported overall peak p95 was 121.6 ms; recovery was about 25 seconds. These estimates reflect indirect impact from the cart dependency, not an isolated frontend fault; the frontend itself has one replica with probes and limits."
+    },
+    {
+      "service": "adservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 0.8,
+      "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits, giving the static posture score of 60; there is no direct run evidence to move the other dimensions from the neutral estimate."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 45.0,
+        "latency": 75.0,
+        "recovery": 75.0,
+        "containment": 45.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Not directly faulted, but the checkout flow had 95.0% errors and 58.1 ms p95 (2.69x baseline) during 20261011-073801-memory_stress-cartservice, with the run recovering in about 25 seconds. These are conservative, indirect flow-impact estimates; its static posture is one replica with probes and limits."
+    },
+    {
+      "service": "currencyservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits; no run isolates this service, so the other dimensions remain at the neutral estimate."
+    },
+    {
+      "service": "emailservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.0,
+      "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; there is no direct experimental evidence to adjust the neutral performance estimates."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; the cartservice run does not isolate product-catalog behavior, so the neutral estimate is retained."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 0.8,
+      "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits; no direct run evidence supports changing the neutral performance estimates."
+    },
+    {
+      "service": "redis-cart",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. It is a single-replica stateful cart dependency with probes and resource limits; neither run directly faults Redis, so performance dimensions remain estimates."
+    },
+    {
+      "service": "shippingservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.8,
+      "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; no run isolates this service, so the neutral performance estimate is retained."
+    },
+    {
+      "service": "paymentservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 77.0,
+        "recovery": 100.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 77.4,
+        "recovery": 100.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "score": 85.2,
+      "anchor_score": 85.3,
+      "grade": "B",
+      "weight": 2.0,
+      "justification": "In 20261011-073920-network_delay-paymentservice, checkout p95 rose from 21.6 ms to 119.1 ms (5.51x), but error rate remained 0% and recovery was immediate. The anchor dimensions are retained; the single-replica posture remains 60."
+    }
+  ],
+  "coverage": {
+    "experiments": 2,
+    "types": [
+      "memory_stress",
+      "network_delay"
+    ],
+    "failure_classes": [
+      "resource exhaustion",
+      "slowdown"
+    ]
+  },
+  "predictions": {
+    "confirmed": 0,
+    "partly": 2,
+    "refuted": 0
+  },
+  "ai": {
+    "summary": "A 110 MB memory stress on the single-replica cartservice caused near-total failures across all five shopper flows; the test guard stopped the fault, but the service took about 25 seconds to recover. This is the principal resilience weakness because cartservice is shared across the shop and checkout path. A 100 ms paymentservice network delay slowed checkout to 119.1 ms p95, but caused no errors and affected no other flow. The two runs provide limited coverage and do not establish resilience under traffic spikes or pod failures.",
+    "findings": [
+      {
+        "title": "Cartservice memory pressure causes near-total shop outage",
+        "severity": "critical",
+        "services": [
+          "cartservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-073801-memory_stress-cartservice"
+        ],
+        "evidence": "With a 110 MB allocation against cartservice's 128 Mi limit, impact error rate was 97.35%, peak error rate reached 100%, and all five flows were affected: home 95.8%, product 100%, add_to_cart 100%, view_cart 95.5%, and checkout 95.0% errors. The pod restarted once; the guard aborted after an error-rate breach, the fault was active for 3.6 seconds, and recovery took 25 seconds. Peak p95 was 121.6 ms (2.69x the reported baseline); the harness kill switch removed the fault 0.5 seconds after its decision, but errors persisted during recovery.",
+        "root_cause": "The 128 Mi single cartservice pod has no replica redundancy. Memory pressure caused a restart and made the shared cart dependency unavailable to frontend and checkoutservice, propagating failures across all five flows. The test guard stopped the injected fault, but there was no service-level failover to contain the shopper impact.",
+        "fix": {
+          "target": "cartservice",
+          "action": "set_resources",
+          "cpu_limit_millicores": 300,
+          "memory_limit_mib": 256
+        },
+        "fix_rationale": "Increasing cartservice memory from 128 Mi to 256 Mi provides headroom for the injected allocation and normal process usage, addressing the observed memory-pressure/restart mechanism without changing the current CPU limit.",
+        "expected_improvement": "On rerun, the 110 MB allocation should be less likely to exceed the container limit; expect no OOM-related restart, substantially fewer errors across the five flows, and faster recovery. The experiment should not trigger the error-rate guard.",
+        "verify_with": {
+          "type": "memory_stress",
+          "target": "cartservice",
+          "duration_s": 30,
+          "params": {
+            "size_mb": 110,
+            "workers": 1
+          }
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 0.8,
+        "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits, giving the static posture score of 60; there is no direct run evidence to move the other dimensions from the neutral estimate."
+      },
+      {
+        "service": "cartservice",
+        "availability": 0,
+        "latency": 89,
+        "recovery": 79,
+        "containment": 30,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "In 20261011-073801-memory_stress-cartservice, errors affected every flow (95.0–100%), the pod restarted once, and recovery took 25 seconds; the anchor dimensions are retained. It is a single-replica, shared checkout-path service with a 128 Mi memory limit."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 45,
+        "latency": 75,
+        "recovery": 75,
+        "containment": 45,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Not directly faulted, but the checkout flow had 95.0% errors and 58.1 ms p95 (2.69x baseline) during 20261011-073801-memory_stress-cartservice, with the run recovering in about 25 seconds. These are conservative, indirect flow-impact estimates; its static posture is one replica with probes and limits."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits; no run isolates this service, so the other dimensions remain at the neutral estimate."
+      },
+      {
+        "service": "emailservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.0,
+        "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; there is no direct experimental evidence to adjust the neutral performance estimates."
+      },
+      {
+        "service": "frontend",
+        "availability": 45,
+        "latency": 60,
+        "recovery": 75,
+        "containment": 45,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "The entrypoint's flows all failed at 95.0–100% during 20261011-073801-memory_stress-cartservice, and the reported overall peak p95 was 121.6 ms; recovery was about 25 seconds. These estimates reflect indirect impact from the cart dependency, not an isolated frontend fault; the frontend itself has one replica with probes and limits."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 100,
+        "latency": 77,
+        "recovery": 100,
+        "containment": 50,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "In 20261011-073920-network_delay-paymentservice, checkout p95 rose from 21.6 ms to 119.1 ms (5.51x), but error rate remained 0% and recovery was immediate. The anchor dimensions are retained; the single-replica posture remains 60."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; the cartservice run does not isolate product-catalog behavior, so the neutral estimate is retained."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 0.8,
+        "justification": "Untested. The dependency map shows one replica with readiness and liveness probes and CPU/memory limits; no direct run evidence supports changing the neutral performance estimates."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. It is a single-replica stateful cart dependency with probes and resource limits; neither run directly faults Redis, so performance dimensions remain estimates."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.8,
+        "justification": "Untested. It has one replica with readiness and liveness probes and CPU/memory limits; no run isolates this service, so the neutral performance estimate is retained."
+      }
+    ],
+    "score_explanation": "Posture is 60 for each mapped deployment: each has one replica, readiness and liveness probes, and CPU/memory limits. For untested services, null anchor dimensions are estimated at the neutral 60 and should not be read as measured performance. Checkoutservice and frontend availability, latency, recovery, and containment reflect indirect user-flow impact during the cartservice run, kept within 15 points of the neutral estimate; they are not evidence of isolated faults in those services. Tested cartservice and paymentservice dimensions stay at their supplied anchors. Criticality is highest for the entrypoint, cart path, and shared/core product and cart data services; optional ads and recommendations receive lower weights.",
+    "planner_review": "Both runs were rated partly correct. For cartservice, the predicted affected flows, high error band, and abort outcome matched, but the predicted severe slowdown missed the observed 2.69x slowdown band. For paymentservice, the affected checkout flow, moderate slowdown, and completed outcome matched; the predicted low error band missed because observed errors were zero. Overall, predictions captured scope and run outcome reasonably well, while the cart slowdown estimate was off. Coverage is only two runs: resource exhaustion and network delay.",
+    "limitations": [
+      "The system runs on a single-node Kubernetes VM; results do not establish behavior across nodes or zones.",
+      "Runs were short (30 seconds), with roughly 20 requests per flow in the measured windows, so estimates are sensitive to a small probe and may miss intermittent behavior.",
+      "Only memory stress on cartservice and network delay on paymentservice were tested; there was no traffic-spike, pod-failure, network-loss, or direct Redis experiment.",
+      "Several service scores are untested estimates based on posture and dependency-map facts; frontend and checkoutservice impact scores are indirect flow-level observations from the cartservice run.",
+      "shoppingassistantservice is referenced by frontend but marked missing in the dependency map."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261011-074215-analyst.json"
+  ]
+}

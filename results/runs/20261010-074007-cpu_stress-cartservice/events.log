@@ -1,0 +1,11 @@
+2026-10-10T07:40:07.452+00:00 run 20261010-074007-cpu_stress-cartservice: cpu_stress on cartservice for 120s {'workers': 1, 'load': 80}
+2026-10-10T07:40:07.456+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T07:40:07.499+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T07:40:27.520+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T07:40:27.538+00:00 INJECTED StressChaos/ca-20261010-074007-cpu-stress-cartservice
+2026-10-10T07:40:27.663+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T07:40:43.570+00:00 ABORT kill switch: chaos resource was deleted externally -> deleting StressChaos/ca-20261010-074007-cpu-stress-cartservice
+2026-10-10T07:40:43.576+00:00 fault reverted and resource removed in 0.0s
+2026-10-10T07:40:43.576+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T07:40:45.601+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T07:40:45.624+00:00 ABORTED: kill switch: chaos resource was deleted externally

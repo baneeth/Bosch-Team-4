@@ -1,0 +1,20 @@
+{
+  "agent": "ai-check",
+  "model": "gpt-6-luna",
+  "effort": null,
+  "seconds": 2.8,
+  "error": null,
+  "instructions": "Reply ok=true and a 5-word note.",
+  "input": "ping",
+  "steps": [],
+  "usage": {
+    "requests": 1,
+    "input_tokens": 63,
+    "output_tokens": 91,
+    "total_tokens": 154
+  },
+  "output": {
+    "ok": true,
+    "note": "Ping received; the system responds."
+  }
+}

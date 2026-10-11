@@ -1,0 +1,547 @@
+{
+  "report_id": "20261011-045324-report",
+  "created_at": "2026-10-11T04:53:24+00:00",
+  "scope": "20261011-044550-campaign",
+  "run_ids": [
+    "20261011-044550-network_loss-cartservice",
+    "20261011-044700-memory_stress-currencyservice",
+    "20261011-044800-pod_kill-currencyservice",
+    "20261011-044857-network_delay-currencyservice",
+    "20261011-045041-network_delay-currencyservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 59.9,
+  "overall_anchor": 61.5,
+  "grade": "F",
+  "services": [
+    {
+      "service": "currencyservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 22.0,
+        "recovery": 94.0,
+        "containment": 43.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 21.8,
+        "recovery": 94.2,
+        "containment": 42.5,
+        "posture": 60.0
+      },
+      "score": 34.6,
+      "anchor_score": 34.5,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "Scores follow the supplied anchors. In 20261011-044800-pod_kill-currencyservice, sampled checkout and view_cart errors were 100% and peak error rate was 80%; in 20261011-044857-network_delay-currencyservice, add_to_cart p95 reached 894.1 ms with no errors."
+    },
+    {
+      "service": "adservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 0.8,
+      "justification": "Untested. Scores are estimates near the posture anchor: it has one replica but readiness/liveness probes and resource limits; its mapped reach is limited to home and product."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.8,
+      "justification": "Untested directly. Estimates stay at the posture anchor; the service is a single-replica checkout-path service with probes and resource limits, and its dependencies include currencyservice and cartservice."
+    },
+    {
+      "service": "emailservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.3,
+      "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica service with probes and limits, and the dependency map places it on the checkout path."
+    },
+    {
+      "service": "frontend",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested as a fault target. Scores are estimates near the posture anchor; it is the single-replica entrypoint with probes and limits, and currencyservice and cartservice faults affected its user-facing flows."
+    },
+    {
+      "service": "paymentservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica checkout-path dependency with probes and resource limits."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested as a fault target. Estimates stay near the posture anchor; it is a single-replica service with probes and limits and is mapped across all five flows."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.2,
+      "justification": "Untested. Scores are estimates near the posture anchor; it is single-replica with probes and limits, and its mapped reach is less than the core cart and product services."
+    },
+    {
+      "service": "redis-cart",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica stateful cart dependency with probes and limits, but no direct Redis fault was run."
+    },
+    {
+      "service": "shippingservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "Untested. Scores are estimates near the posture anchor; it is single-replica with probes and limits, and the dependency map places it in view-cart and checkout flows."
+    },
+    {
+      "service": "cartservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 65.0,
+        "recovery": 100.0,
+        "containment": 80.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 65.7,
+        "recovery": 100.0,
+        "containment": 80.0,
+        "posture": 60.0
+      },
+      "score": 85.2,
+      "anchor_score": 85.4,
+      "grade": "B",
+      "weight": 3.0,
+      "justification": "In 20261011-044550-network_loss-cartservice, no errors occurred and recovery_s was 0, but add_to_cart and checkout p95 reached 10.83x and 9.3x baseline. Scores follow the supplied anchors; its single-replica posture remains 60."
+    }
+  ],
+  "coverage": {
+    "experiments": 5,
+    "types": [
+      "memory_stress",
+      "network_delay",
+      "network_loss",
+      "pod_kill"
+    ],
+    "failure_classes": [
+      "errors",
+      "recovery",
+      "resource exhaustion",
+      "slowdown"
+    ]
+  },
+  "predictions": {
+    "confirmed": 0,
+    "partly": 4,
+    "refuted": 1
+  },
+  "ai": {
+    "summary": "The clearest user-impacting weakness is currencyservice’s single-replica failure mode: a pod kill produced 100% errors in sampled view-cart and checkout requests and high errors in home and product. Delaying currencyservice also caused substantial, error-free tail latency, while 5% packet loss to cartservice slowed add-to-cart and checkout. A near-limit memory test on currencyservice caused measurable but sub-74 ms p95 latency without errors or restarts. Recommendations focus on adding currencyservice redundancy and bounding dependency-call latency; results are limited to five short experiments on a single node.",
+    "findings": [
+      {
+        "title": "Currencyservice pod loss interrupts checkout and other dependent flows",
+        "severity": "high",
+        "services": [
+          "currencyservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-044800-pod_kill-currencyservice"
+        ],
+        "evidence": "With the sole currencyservice pod killed, impact_error_rate was 66.67% and peak_error_rate reached 80%. Sampled error rates were 100% for view_cart (8/8) and checkout (8/8), 66.7% for home and product (8/12 each), and 0% for add_to_cart. The replacement pod became ready in 12.2 s; the timeline showed 40–80% errors from t+5.2 s through t+12.2 s, and the guard reported a 40% error-rate breach. The run's recovery_s field is 0.0, so pod readiness should not be treated as a measured user-recovery time.",
+        "root_cause": "currencyservice is a single-replica dependency shared by frontend and checkoutservice. When that only pod is unavailable, requests on dependent flows fail rather than being served by a healthy replica.",
+        "fix": {
+          "target": "currencyservice",
+          "action": "scale_replicas",
+          "replicas": 2
+        },
+        "fix_rationale": "A second stateless currencyservice replica removes the single-pod availability point of failure and gives callers another instance during a pod restart, provided the disruption is scoped to one replica.",
+        "expected_improvement": "During a repeat pod-kill test, checkout and other currency-dependent flows should have substantially fewer failed requests while the killed pod is replaced; readiness of the replacement should no longer determine whether all currency requests can succeed.",
+        "verify_with": {
+          "type": "pod_kill",
+          "target": "currencyservice",
+          "duration_s": 30,
+          "params": {
+            "grace_period_s": 0
+          }
+        }
+      },
+      {
+        "title": "Currencyservice delay is amplified into severe user-facing tail latency",
+        "severity": "medium",
+        "services": [
+          "currencyservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-044857-network_delay-currencyservice",
+          "20261011-045041-network_delay-currencyservice"
+        ],
+        "evidence": "With 10 ms added latency for 45 s, the run peak p95 was 912.1 ms and the worst flow, add_to_cart, reached 894.1 ms (135.47x its 6.6 ms baseline); home reached 471.1 ms, product 460.8 ms, and view_cart 242.8 ms. Checkout reached 59.2 ms. There were no errors and recovery_s was 7 s. At 5 ms added latency, there were also no errors; home reached 67.0 ms (3.92x baseline), while checkout reached 32.8 ms. The 10 ms run timeline shows p95 rising from about 112 ms early in the fault to 570.6 ms at t+40.1 s and 912.1 ms during recovery.",
+        "root_cause": "The observed user-flow latency grows far beyond the injected delay when calls traverse currencyservice. This is consistent with latency amplification in dependent request paths, but the experiment did not include traces that establish whether serialization, retries, or another call-path behavior is responsible.",
+        "fix": {
+          "target": "frontend",
+          "action": "code_change",
+          "change": "Set an explicit 250 ms end-to-end deadline for frontend calls to currencyservice, do not retry beyond that budget, and use a cached exchange rate for display-only currency formatting when the deadline expires; keep checkout conversion fail-fast rather than using a stale rate."
+        },
+        "fix_rationale": "The catalog identifies deadlines, bounded retries, and graceful degradation as mitigations for latency amplification. A bounded budget and display-only fallback should keep slow currency responses from consuming excessive time in user-facing flows without silently using stale values for checkout.",
+        "expected_improvement": "On rerun, display flows should avoid the near-second p95 tail and use cached formatting when currencyservice exceeds the budget. Checkout should return a bounded response rather than waiting through an excessive tail; a controlled timeout may replace some slow successes.",
+        "verify_with": {
+          "type": "network_delay",
+          "target": "currencyservice",
+          "duration_s": 45,
+          "params": {
+            "latency_ms": 10,
+            "jitter_ms": 0
+          }
+        }
+      },
+      {
+        "title": "Cartservice packet loss substantially slows cart updates and checkout",
+        "severity": "medium",
+        "services": [
+          "cartservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-044550-network_loss-cartservice"
+        ],
+        "evidence": "At 5% packet loss for 30 s, add_to_cart p95 was 71.5 ms versus a 6.6 ms baseline (10.83x), and checkout p95 was 200.9 ms versus 21.6 ms (9.3x). Product p95 was 47.1 ms (3.36x); no flow recorded errors, the run peak p95 was 123.7 ms, and recovery_s was 0.",
+        "root_cause": "Cart operations depend on cartservice, and packet loss on its traffic produced large latency increases in cart-dependent flows. The run does not establish whether retries or another client-side behavior contributed to the tail.",
+        "fix": {
+          "target": "frontend",
+          "action": "code_change",
+          "change": "Set a 250 ms gRPC deadline on frontend calls to cartservice and stop retries when that budget is exhausted."
+        },
+        "fix_rationale": "A bounded client-call budget addresses the catalog's latency-amplification and missing-timeout weakness, limiting how long cartservice packet loss can delay the frontend.",
+        "expected_improvement": "On repeat, add_to_cart and checkout p95 should remain bounded by the call budget rather than growing into a long tail; any deadline-triggered failures should be explicit and bounded instead of slow responses.",
+        "verify_with": {
+          "type": "network_loss",
+          "target": "cartservice",
+          "duration_s": 30,
+          "params": {
+            "loss_pct": 5,
+            "correlation_pct": 0
+          }
+        }
+      },
+      {
+        "title": "Near-limit currencyservice memory stress causes moderate latency increase",
+        "severity": "low",
+        "services": [
+          "currencyservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-044700-memory_stress-currencyservice"
+        ],
+        "evidence": "A 112 MB allocation for 15 s against currencyservice's 128 Mi limit completed without errors, pod restarts, or guard breaches. Run peak p95 was 73.9 ms (4.24x the 17.5 ms implied by the run's slowdown factor); flow p95s were 54.4 ms for home, 59.4 ms for product, 37.0 ms for view_cart, and 43.9 ms for checkout. The run reported no affected_flows and recovery_s was 0.",
+        "root_cause": "The near-limit memory allocation coincided with moderate latency increases, consistent with reduced memory headroom under pressure. The run did not report currencyservice's measured memory peak, so it does not establish that the service approached its limit or that memory pressure alone caused the latency.",
+        "fix": {
+          "target": "currencyservice",
+          "action": "set_resources",
+          "cpu_limit_millicores": 200,
+          "memory_limit_mib": 256
+        },
+        "fix_rationale": "Increasing the memory limit gives the service more headroom during memory pressure; the catalog identifies resource increases as a mitigation for memory-pressure effects. This is a cautious mitigation rather than a demonstrated OOM correction, since no OOM or restart occurred.",
+        "expected_improvement": "The same allocation should produce less latency impact and continue without errors or restarts. Confirm the change does not create unacceptable memory pressure on the single-node host.",
+        "verify_with": {
+          "type": "memory_stress",
+          "target": "currencyservice",
+          "duration_s": 15,
+          "params": {
+            "size_mb": 112,
+            "workers": 1
+          }
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 0.8,
+        "justification": "Untested. Scores are estimates near the posture anchor: it has one replica but readiness/liveness probes and resource limits; its mapped reach is limited to home and product."
+      },
+      {
+        "service": "cartservice",
+        "availability": 100,
+        "latency": 65,
+        "recovery": 100,
+        "containment": 80,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "In 20261011-044550-network_loss-cartservice, no errors occurred and recovery_s was 0, but add_to_cart and checkout p95 reached 10.83x and 9.3x baseline. Scores follow the supplied anchors; its single-replica posture remains 60."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.8,
+        "justification": "Untested directly. Estimates stay at the posture anchor; the service is a single-replica checkout-path service with probes and resource limits, and its dependencies include currencyservice and cartservice."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 0,
+        "latency": 22,
+        "recovery": 94,
+        "containment": 43,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Scores follow the supplied anchors. In 20261011-044800-pod_kill-currencyservice, sampled checkout and view_cart errors were 100% and peak error rate was 80%; in 20261011-044857-network_delay-currencyservice, add_to_cart p95 reached 894.1 ms with no errors."
+      },
+      {
+        "service": "emailservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.3,
+        "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica service with probes and limits, and the dependency map places it on the checkout path."
+      },
+      {
+        "service": "frontend",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested as a fault target. Scores are estimates near the posture anchor; it is the single-replica entrypoint with probes and limits, and currencyservice and cartservice faults affected its user-facing flows."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica checkout-path dependency with probes and resource limits."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested as a fault target. Estimates stay near the posture anchor; it is a single-replica service with probes and limits and is mapped across all five flows."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.2,
+        "justification": "Untested. Scores are estimates near the posture anchor; it is single-replica with probes and limits, and its mapped reach is less than the core cart and product services."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Untested. Scores are estimates near the posture anchor; it is a single-replica stateful cart dependency with probes and limits, but no direct Redis fault was run."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "Untested. Scores are estimates near the posture anchor; it is single-replica with probes and limits, and the dependency map places it in view-cart and checkout flows."
+      }
+    ],
+    "score_explanation": "For tested dimensions, scores stay at or within rounding distance of the supplied anchors; posture is 60 for every scored service because each has one replica, probes, and resource limits. All untested dimensions are estimated at 60, close to their anchor posture score, rather than presented as measured resilience. Criticality weights emphasize the entrypoint and revenue/cart path (frontend, cartservice, currencyservice, productcatalogservice, and redis-cart) and reduce weight for optional or narrower-reach services such as ads and recommendations. Weights are capped at 3 as requested, even where the anchor defaults were higher.",
+    "planner_review": "The planner correctly anticipated broad currencyservice impact and high errors for pod kill, but predicted the run would abort; the instant pod kill completed and the guard instead reported breaches during recovery. It predicted the direction of currencyservice latency effects, but underestimated the 10 ms delay's severity: add_to_cart reached 894.1 ms p95, while the 5 ms follow-up showed lower but still noticeable latency. The cartservice packet-loss prediction matched the absence of errors and completion, but missed which flows were affected and underestimated the slowdown. The currencyservice memory-stress prediction was refuted on errors and abort outcome: there were no errors or restarts, although moderate slowdown occurred.",
+    "limitations": [
+      "The system runs on a single Kubernetes node, so results do not establish resilience to node, network, or storage failure and resource changes may compete for host capacity.",
+      "Experiments were brief and used small flow samples; per-flow counts ranged from 8 to 40 in the fault runs, so tail percentiles and error rates are uncertain.",
+      "Only five experiments were provided, concentrated on currencyservice and cartservice; most services and fault types remain untested.",
+      "No distributed traces or complete target-service resource measurements were available to identify the internal cause of latency amplification or confirm memory headroom during the stress run.",
+      "The pod-kill run reports pod readiness at 12.2 s but recovery_s as 0.0; timeline observations show errors during that interval, so exact user recovery time is not established."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261011-045324-analyst.json"
+  ]
+}

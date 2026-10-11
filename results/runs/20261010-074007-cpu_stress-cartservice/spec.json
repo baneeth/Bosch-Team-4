@@ -1,0 +1,48 @@
+{
+  "spec": {
+    "type": "cpu_stress",
+    "target": "cartservice",
+    "params": {
+      "workers": 1,
+      "load": 80
+    },
+    "duration_s": 120,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "A5 acceptance: manual abort",
+    "hypothesis": null
+  },
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-074007-cpu-stress-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-074007-cpu_stress-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "A5 acceptance: manual abort"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "120s",
+      "stressors": {
+        "cpu": {
+          "workers": 1,
+          "load": 80
+        }
+      }
+    }
+  }
+}

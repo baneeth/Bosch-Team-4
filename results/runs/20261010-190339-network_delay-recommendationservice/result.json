@@ -1,0 +1,56 @@
+{
+  "run_id": "20261010-190339-network_delay-recommendationservice",
+  "spec": {
+    "type": "network_delay",
+    "target": "recommendationservice",
+    "params": {
+      "latency_ms": 40,
+      "jitter_ms": 10
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "recommendationservice is a single-replica dependency reached by product, view_cart, and checkout. A 40ms delay is a bounded way to observe propagation on a non-entrypoint service, avoiding the known risk that +100ms on productcatalogservice compounds across sequential calls.",
+    "hypothesis": "Dependent flows will become moderately slower, but a single added delay of this size should stay well below the 1500ms p95 guard and should not cause errors.",
+    "prediction": {
+      "affected_flows": [
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner"
+  },
+  "status": "ABORTED",
+  "abort_reason": "manual abort (Ctrl-C) (before injection)",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-10T19:03:39.020+00:00",
+  "injected_at": null,
+  "fault_ended_at": null,
+  "fault_duration_s": null,
+  "recovery_s": null,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": null,
+  "impact_error_rate": null,
+  "impact_p95_ms": null,
+  "availability": null,
+  "affected_flows": [],
+  "guard_breaches": [],
+  "worst_flow": null,
+  "flow_impact": {},
+  "prediction_check": null,
+  "flags": [],
+  "pod_restarts": {},
+  "resources": {},
+  "node_cpu_baseline_pct": null,
+  "node_cpu_peak_pct": null,
+  "load": null,
+  "notes": []
+}

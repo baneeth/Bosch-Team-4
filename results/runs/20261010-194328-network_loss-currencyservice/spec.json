@@ -1,0 +1,49 @@
+{
+  "spec": {
+    "type": "network_loss",
+    "target": "currencyservice",
+    "params": {
+      "loss_pct": 20
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": null,
+    "hypothesis": null,
+    "companion_load": null
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-194328-network-loss-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-194328-network_loss-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "manual run"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "30s",
+      "action": "loss",
+      "direction": "to",
+      "loss": {
+        "loss": "20",
+        "correlation": "0"
+      }
+    }
+  }
+}

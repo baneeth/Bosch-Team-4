@@ -1,0 +1,57 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "paymentservice",
+    "params": {
+      "size_mb": 128,
+      "workers": 1
+    },
+    "duration_s": 20,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "The prior 124 MB paymentservice run showed no memory-pressure evidence or checkout errors, despite its 128 MiB limit. This distinct, maximum-size probe tests whether the limit boundary changes that result; the validator confirms it is within policy.",
+    "hypothesis": "The larger allocation may cause measurable checkout slowdown, but given the prior run's low observed memory peak, expect the test to complete without errors or a guard abort.",
+    "prediction": {
+      "affected_flows": [],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261011-052639-memory-stress-paymentservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-052639-memory_stress-paymentservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "The prior 124 MB paymentservice run showed no memory-pressure evidence or checkout errors, despite its 128 MiB limit. This distinct, maximum-size probe tests whether the limit boundary changes that result; the validator confirms it is within policy."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "paymentservice"
+        }
+      },
+      "duration": "20s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "128MB"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "adservice",
+    "params": {},
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "pod_kill smoke test",
+    "hypothesis": null
+  },
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-074206-pod-kill-adservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-074206-pod_kill-adservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "pod_kill smoke test"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "adservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

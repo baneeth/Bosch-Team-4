@@ -1,0 +1,147 @@
+{
+  "plan_id": "20261010-203453-plan",
+  "created_at": "2026-10-10T20:34:53+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Start with a short, near-limit memory test on the single-replica catalog service because it reaches every flow and may reveal OOM behavior that the earlier 64 MB test did not. Then test a brief currency-service outage for error blast radius, a moderate recommendation-service delay below the guard threshold, and a recommendation-service pod kill to measure recovery without repeating well-known high-impact tests.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "productcatalogservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because productcatalogservice is single-replica, has a 128 Mi memory limit, and reaches all five user flows. The earlier 64 MB stress run had no user-visible impact, while 110 MB tests near-limit behavior; cartservice with the same 128 Mi limit OOMed under 110 MB stress.",
+        "hypothesis": "Near-limit allocation may OOM or destabilize productcatalogservice, causing broad errors and severe latency until the guard removes the fault.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does productcatalogservice tolerate near-limit memory pressure, or does it OOM and disrupt the shop before the fault is removed?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "currencyservice",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single replica and a shared dependency of frontend and checkoutservice, reaching home, product, view_cart, and checkout. Its latency and packet-loss behavior have been tested, but an outright short outage has not; the short duration bounds this error-class blast-radius test.",
+        "hypothesis": "Taking currencyservice unavailable will cause errors in flows that need currency conversion; the broad reach makes a guard abort plausible, while failed RPCs may fail fast rather than create sustained slowdown.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Which user flows fail when the shared currency dependency is unavailable, and does the safety guard stop the outage promptly?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_delay",
+        "target": "recommendationservice",
+        "params": {
+          "latency_ms": 30,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice is single-replica and reaches product, view_cart, and checkout. Its earlier 40 ms delay attempt was aborted before injection, leaving its slowdown sensitivity unmeasured; 30 ms with modest jitter is a bounded probe, unlike the documented 100 ms catalog delay that drove all flows to roughly 700 ms.",
+        "hypothesis": "Added latency will slow flows that call recommendationservice, particularly product, without causing errors or approaching the 1500 ms guard limit.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How much does a modest recommendation-service delay propagate to its dependent user flows?"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "pod_kill",
+        "target": "recommendationservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice has one replica and reaches three flows, making it a useful recovery probe with a narrower expected blast radius than the all-flow entrypoint or shared cart dependency. A prior productcatalogservice kill coincided with a recommendationservice restart, but there is no direct recommendationservice kill run measuring its own replacement and user impact.",
+        "hypothesis": "Kubernetes should replace the killed pod; callers may see brief errors or latency while it restarts, then recover without a sustained guard breach.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How quickly does recommendationservice recover after pod loss, and do its callers experience a noticeable interruption?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat a 100 ms network delay on productcatalogservice.",
+      "why_not": "Multiple completed runs already show severe slowdown across all five flows, with p95 around 718–757 ms; this would repeat a well-established result."
+    },
+    {
+      "idea": "Repeat a 300-user traffic spike on frontend.",
+      "why_not": "Repeated runs already approach or cross the 1500 ms guard threshold with broad slowdown, so another run would add little overall-resilience insight."
+    },
+    {
+      "idea": "Repeat 20% network loss on cartservice.",
+      "why_not": "A prior run already tripped the p95 guard at 1571 ms after only 6.6 seconds, establishing a severe shared-dependency slowdown; the selected tests cover unmeasured behavior instead."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261010-203453-planner.json",
+  "note": null
+}

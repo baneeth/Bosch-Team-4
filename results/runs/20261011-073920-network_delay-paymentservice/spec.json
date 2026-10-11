@@ -1,0 +1,60 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "paymentservice",
+    "params": {
+      "latency_ms": 100,
+      "jitter_ms": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "This adds a network fault class alongside the cartservice memory stress and planned paymentservice pod failure, while probing the checkout dependency without repeating the memory test.",
+    "hypothesis": "Adding 100 ms of latency to paymentservice traffic will slow checkout, but should not cause widespread errors or trigger the safety guard.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "low",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-073920-network-delay-paymentservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-073920-network_delay-paymentservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "This adds a network fault class alongside the cartservice memory stress and planned paymentservice pod failure, while probing the checkout dependency without repeating the memory test."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "paymentservice"
+        }
+      },
+      "duration": "30s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "100ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

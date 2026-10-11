@@ -1,0 +1,172 @@
+{
+  "plan_id": "20261011-054313-plan",
+  "created_at": "2026-10-11T05:43:13+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Start with a bounded packet-loss test on cartservice, whose single replica is reached by every flow, then test the near-OOM boundary on the checkout path. Follow with a controlled cartservice CPU test and paymentservice pod kill to measure slowdown and recovery; finish with a low-latency cartservice delay test. These choices cover errors, resource exhaustion, recovery and slowdown while avoiding already well-characterized high-impact tests.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "network_loss",
+        "target": "cartservice",
+        "params": {
+          "loss_pct": 10,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Cartservice is a single replica with reach 1.0 across all five flows and is shared by frontend and checkoutservice. Prior 5% loss completed with no errors but severe relative slowdown; 20% loss exceeded the 1500 ms p95 guard. Testing 10% brackets that known boundary and maps the blast radius at an intermediate intensity.",
+        "hypothesis": "Partial packet loss will substantially slow cart-dependent requests, but at 10% it should remain below the p95 guard and cause few or no errors.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "At what packet-loss intensity does cartservice degradation become unsafe, and which user flows are affected before the guard intervenes?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "checkoutservice",
+        "params": {
+          "size_mb": 120,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Checkoutservice has one replica, is on the revenue path, and has a 128 Mi memory limit. Prior 112 MB stress completed without impact, while 124 MB caused checkout errors and a restart; 120 MB probes the narrow boundary below that observed failure point with a short duration.",
+        "hypothesis": "The allocation will create memory pressure close to the observed failure threshold, but should remain below the level that caused errors or an OOM restart at 124 MB.",
+        "prediction": {
+          "affected_flows": [],
+          "error_band": "none",
+          "slowdown_band": "none",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does checkoutservice tolerate memory stress just below its previously observed failure point, or is the exhaustion threshold lower than 124 MB?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "cpu_stress",
+        "target": "cartservice",
+        "params": {
+          "workers": 1,
+          "load": 40
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Cartservice is a single replica with 300m CPU limit and reach across all flows. A prior 80% CPU-stress run was externally interrupted after 16 seconds, so it did not provide a clean result; this lower-intensity, shorter test provides a controlled comparison without repeating its parameters.",
+        "hypothesis": "Moderate CPU contention will slow cart-dependent work, especially add-to-cart and checkout, but should not cause errors or trigger the guard.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "add_to_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does lower, sustained CPU contention on cartservice produce measurable user-facing slowdown, and how does it compare with the interrupted 80% run?"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "pod_kill",
+        "target": "paymentservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Paymentservice is a single replica on the checkout path. Prior pod_failure tests showed checkout-only errors during prolonged unavailability, but do not establish the user impact and recovery time for a Kubernetes pod replacement; this tests that distinct recovery question.",
+        "hypothesis": "Checkout may see a brief disruption while Kubernetes replaces the pod, but the replacement should recover without affecting the other flows or breaching the guard.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How long does checkout remain impaired after paymentservice pod loss, and does Kubernetes recovery restore it cleanly?"
+    },
+    {
+      "rank": 5,
+      "spec": {
+        "type": "network_delay",
+        "target": "cartservice",
+        "params": {
+          "latency_ms": 10,
+          "jitter_ms": 0
+        },
+        "duration_s": 40,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Cartservice is a single-replica shared dependency for all five flows, and there is no prior network-delay run targeting it. A 10 ms delay is deliberately small: the observed 100 ms delay on productcatalogservice caused roughly 700 ms page latency because of sequential calls, so a similarly large delay is not appropriate for this first cartservice latency probe.",
+        "hypothesis": "A small added delay will cause modest slowdown in cart-dependent flows while remaining comfortably below the p95 guard, with no errors.",
+        "prediction": {
+          "affected_flows": [
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How sensitively do cart-dependent flows respond to small added cartservice latency, and does the slowdown stay localized?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat the 100 ms productcatalogservice network-delay experiment",
+      "why_not": "Past runs repeatedly showed roughly 700 ms p95 across all flows; the result is already well established, and the Day-1 evidence warns that even this intensity produces substantial slowdown."
+    },
+    {
+      "idea": "Run pod_failure on redis-cart",
+      "why_not": "Prior short redis-cart failures made the frontend unresponsive and triggered the guard within seconds, so another outage-style test would add little learning while risking a broad user impact."
+    },
+    {
+      "idea": "Increase the frontend traffic spike to 300 users",
+      "why_not": "Repeated runs at 300 users crossed the 1500 ms p95 guard; this capacity limit is already well evidenced, and a repeat would mostly reproduce the same abort."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-054313-planner.json",
+  "note": null
+}

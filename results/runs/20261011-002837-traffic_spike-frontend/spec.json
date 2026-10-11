@@ -1,0 +1,20 @@
+{
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 100,
+      "ramp_s": 20
+    },
+    "duration_s": 50,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": null,
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual",
+    "combined_with": []
+  },
+  "engine": "k6",
+  "script": "load.js"
+}

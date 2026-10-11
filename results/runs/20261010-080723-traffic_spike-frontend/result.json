@@ -1,0 +1,245 @@
+{
+  "run_id": "20261010-080723-traffic_spike-frontend",
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 50,
+      "ramp_s": 10
+    },
+    "duration_s": 120,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "manual abort of load",
+    "hypothesis": null
+  },
+  "status": "ABORTED",
+  "abort_reason": "kill switch: load generator stopped before its scheduled end (exit code 105)",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-10T08:07:23.274+00:00",
+  "injected_at": "2026-10-10T08:07:43.331+00:00",
+  "fault_ended_at": "2026-10-10T08:08:00.361+00:00",
+  "fault_duration_s": 17.0,
+  "recovery_s": 0.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 88.1,
+  "guard_breaches": [],
+  "worst_flow": "checkout",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.4,
+        "p95_ms": 12.5,
+        "p99_ms": 26.4
+      },
+      "impact": {
+        "count": 16,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 11.9,
+        "p95_ms": 36.4,
+        "p99_ms": 77.5
+      },
+      "p95_factor": 2.91
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.7,
+        "p95_ms": 10.2,
+        "p99_ms": 13.9
+      },
+      "impact": {
+        "count": 15,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.1,
+        "p95_ms": 29.0,
+        "p99_ms": 42.5
+      },
+      "p95_factor": 2.84
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 4.4,
+        "p99_ms": 4.9
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 7.8,
+        "p99_ms": 8.7
+      },
+      "p95_factor": 1.77
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.8,
+        "p95_ms": 10.0,
+        "p99_ms": 11.4
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.1,
+        "p95_ms": 40.5,
+        "p99_ms": 44.3
+      },
+      "p95_factor": 4.05
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.6,
+        "p95_ms": 16.8,
+        "p99_ms": 21.7
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 18.4,
+        "p95_ms": 90.2,
+        "p99_ms": 90.4
+      },
+      "p95_factor": 5.37
+    }
+  },
+  "pod_restarts": {},
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.008,
+      "cpu_peak_cores": 0.019,
+      "cpu_peak_pct_of_limit": 6.4,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 95.8
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.0
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.011,
+      "cpu_peak_cores": 0.014,
+      "cpu_peak_pct_of_limit": 7.0,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.5
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.003,
+      "cpu_peak_pct_of_limit": 1.6,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.5
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.011,
+      "cpu_peak_cores": 0.113,
+      "cpu_peak_pct_of_limit": 56.3,
+      "throttled_peak_pct": 34.4,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 16.1
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": 0.003,
+      "cpu_peak_pct_of_limit": 0.6,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 49.9
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": null,
+      "cpu_peak_pct_of_limit": null,
+      "throttled_peak_pct": null,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 32.2
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": 0.047,
+      "cpu_peak_pct_of_limit": 23.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.4
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.006,
+      "cpu_peak_cores": 0.047,
+      "cpu_peak_pct_of_limit": 23.3,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 33.2
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.005,
+      "cpu_peak_pct_of_limit": 4.3,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 6.1
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.001,
+      "cpu_peak_cores": 0.007,
+      "cpu_peak_pct_of_limit": 3.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.0
+    }
+  },
+  "node_cpu_baseline_pct": 11.3,
+  "node_cpu_peak_pct": 25.3,
+  "load": {
+    "users_target": 50,
+    "users_at_stop": 50,
+    "requests": 562,
+    "rps": 34.9,
+    "failed_rate": 0.0,
+    "p95_ms": 65.9,
+    "max_vus": 50
+  },
+  "notes": [
+    "kill switch took 0.0s from decision to fault removed"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "cartservice",
+    "params": {},
+    "duration_s": 10,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "cartservice has one replica, is a shared dependency of checkoutservice and frontend, and reaches every user flow. Prior cartservice pod kills caused high errors across all flows; this brief unavailability test checks whether the error blast radius differs when the pod stays unavailable rather than being immediately replaced.",
+    "hypothesis": "With cartservice unavailable, cart operations and flows that call the frontend/cart path will fail; the guard is likely to abort before the full 10 seconds elapse.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-054520-pod-failure-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-054520-pod_failure-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "cartservice has one replica, is a shared dependency of checkoutservice and frontend, and reaches every user flow. Prior cartservice pod kills caused high errors across all flows; this brief unavailability test checks whether the error blast radius di"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "10s",
+      "action": "pod-failure"
+    }
+  }
+}

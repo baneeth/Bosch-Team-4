@@ -1,0 +1,146 @@
+{
+  "plan_id": "20261011-060630-plan",
+  "created_at": "2026-10-11T06:06:30+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Start with cartservice pod recovery, then test the high-reach product-catalog slowdown; both can affect shoppers across the site. Follow with the distinct checkout-error and frontend-load scenarios, using different services and four different failure classes overall.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, has high risk, and reaches all five flows as well as the checkout path. Prior cartservice pod-kill runs produced errors across all flows and roughly 22–24 seconds to pod readiness, making this a direct shopper-visible recovery test.",
+        "hypothesis": "Shoppers will see errors and severe latency across the flows while cartservice is unavailable; Kubernetes will replace the pod and the experiment will complete.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the customer impact and recovery time when the single cartservice replica is killed."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_delay",
+        "target": "productcatalogservice",
+        "params": {
+          "latency_ms": 300,
+          "jitter_ms": 0
+        },
+        "duration_s": 60,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "productcatalogservice is a single replica, has reach 1.0, and is on every flow and the checkout path. Past 100 ms delays affected all flows and raised p95 to about 716–757 ms; this 300 ms recipe is large enough to be shopper-visible, though the guard may abort if the slowdown exceeds its limit.",
+        "hypothesis": "All flows that call the catalog will become severely slower without necessarily returning errors; the high added latency may trip the p95 guard and abort injection.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "See how a stronger catalog latency fault propagates across user journeys and whether the safety guard limits exposure."
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single-replica dependency on the checkout revenue path. Past 30-second outages affected checkout, with peak error rate around 21% and runs sometimes aborted by the error guard; shoppers attempting checkout should see the failure.",
+        "hypothesis": "Checkout requests will error while other flows remain largely unaffected; the error rate is likely to exceed the guard threshold and abort the experiment.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the checkout blast radius and guard response when payment processing is unavailable."
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 200,
+          "ramp_s": 30,
+          "think_ms": 1000,
+          "checkout_pct": 20
+        },
+        "duration_s": 90,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "frontend is the single-replica entrypoint for every shopper request. Prior 100- and 150-user spikes slowed all flows, with peak p95 around 1.0–1.16 seconds; 200 users tests a more visible load while staying below the prior 300-user guard-triggering level.",
+        "hypothesis": "The frontend and its dependencies will slow across all flows under 200 concurrent shoppers, but are likely to remain below the 1500 ms p95 guard with no errors.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Determine how much additional shopper-visible latency appears between the previously tested 150-user load and the guard-sensitive 300-user load."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "memory_stress on cartservice at 110 MB",
+      "why_not": "Prior runs made failures visible across all flows but triggered the error guard and caused cartservice recovery; traffic_spike covers resource exhaustion here while using a different service from the cartservice recovery test."
+    },
+    {
+      "idea": "network_loss on cartservice at 20%",
+      "why_not": "A prior run already showed severe shopper-visible slowdown and was stopped by the p95 guard; the plan uses the checkout outage for the distinct error-class test instead."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-060630-planner.json",
+  "note": null
+}

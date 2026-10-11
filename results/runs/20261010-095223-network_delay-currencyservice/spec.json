@@ -1,0 +1,49 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "currencyservice",
+    "params": {
+      "latency_ms": 50
+    },
+    "duration_s": 60,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "AI choice - untested shared currency service on checkout path with 1 replica and 2 callers",
+    "hypothesis": null
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-095223-network-delay-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-095223-network_delay-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "AI choice - untested shared currency service on checkout path with 1 replica and 2 callers"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "60s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "50ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

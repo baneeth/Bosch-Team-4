@@ -1,0 +1,59 @@
+{
+  "spec": {
+    "type": "cpu_stress",
+    "target": "checkoutservice",
+    "params": {
+      "workers": 1,
+      "load": 50
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "checkoutservice is a single replica on the revenue path with a 200m CPU limit; no CPU-stress run has targeted it. The 50% load setting is a bounded slowdown probe, while prior cartservice CPU stress was interrupted externally and does not answer checkoutservice's CPU sensitivity.",
+    "hypothesis": "Moderate CPU contention will make checkout slower, but should not cause errors or push p95 near the 1500ms guard limit at this intensity.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261011-052935-cpu-stress-checkoutservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-052935-cpu_stress-checkoutservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "checkoutservice is a single replica on the revenue path with a 200m CPU limit; no CPU-stress run has targeted it. The 50% load setting is a bounded slowdown probe, while prior cartservice CPU stress was interrupted externally and does not answer chec"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "checkoutservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "cpu": {
+          "workers": 1,
+          "load": 50
+        }
+      }
+    }
+  }
+}

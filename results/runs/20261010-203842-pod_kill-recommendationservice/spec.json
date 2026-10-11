@@ -1,0 +1,56 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "recommendationservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "recommendationservice has one replica and reaches three flows, making it a useful recovery probe with a narrower expected blast radius than the all-flow entrypoint or shared cart dependency. A prior productcatalogservice kill coincided with a recommendationservice restart, but there is no direct recommendationservice kill run measuring its own replacement and user impact.",
+    "hypothesis": "Kubernetes should replace the killed pod; callers may see brief errors or latency while it restarts, then recover without a sustained guard breach.",
+    "prediction": {
+      "affected_flows": [
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "low",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-203842-pod-kill-recommendationservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203842-pod_kill-recommendationservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "recommendationservice has one replica and reaches three flows, making it a useful recovery probe with a narrower expected blast radius than the all-flow entrypoint or shared cart dependency. A prior productcatalogservice kill coincided with a recomme"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "recommendationservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

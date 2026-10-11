@@ -1,0 +1,13 @@
+2026-10-11T07:39:20.270+00:00 run 20261011-073920-network_delay-paymentservice: network_delay on paymentservice for 30s {'latency_ms': 100, 'jitter_ms': 0}
+2026-10-11T07:39:20.271+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T07:39:20.306+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T07:39:20.322+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T07:39:40.341+00:00 pre-check ok: 60 requests, 0% errors, p95 16ms
+2026-10-11T07:39:40.351+00:00 INJECTED NetworkChaos/ca-20261011-073920-network-delay-paymentservice
+2026-10-11T07:39:41.426+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T07:40:10.507+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T07:40:10.508+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T07:40:12.526+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T07:40:13.038+00:00 cleaned up NetworkChaos/ca-20261011-073920-network-delay-paymentservice
+2026-10-11T07:40:13.055+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T07:40:19.102+00:00 COMPLETED

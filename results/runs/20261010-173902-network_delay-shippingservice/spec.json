@@ -1,0 +1,60 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "shippingservice",
+    "params": {
+      "latency_ms": 40,
+      "jitter_ms": 5
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shippingservice is shared by frontend and checkoutservice and reaches view_cart and checkout. There is no prior shippingservice delay run; the 40ms injection tests a new dependency while staying far below the 1500ms guard limit. Past runs show 100ms on productcatalogservice severely slows all flows, so this uses a lower, bounded intensity.",
+    "hypothesis": "Added latency should measurably slow view_cart and checkout, but should not cause errors or approach the safety guard's p95 threshold.",
+    "prediction": {
+      "affected_flows": [
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-173902-network-delay-shippingservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-173902-network_delay-shippingservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shippingservice is shared by frontend and checkoutservice and reaches view_cart and checkout. There is no prior shippingservice delay run; the 40ms injection tests a new dependency while staying far below the 1500ms guard limit. Past runs show 100ms "
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "shippingservice"
+        }
+      },
+      "duration": "45s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "40ms",
+        "jitter": "5ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

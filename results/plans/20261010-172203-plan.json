@@ -1,0 +1,131 @@
+{
+  "plan_id": "20261010-172203-plan",
+  "created_at": "2026-10-10T17:22:03+00:00",
+  "source": "fallback",
+  "model": null,
+  "strategy": "Deterministic fallback (no AI): highest risk/reach services first, one experiment per failure class.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_failure",
+        "target": "productcatalogservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "highest risk + reach (100% of flows)",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "fallback"
+      },
+      "learning_goal": null
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_delay",
+        "target": "productcatalogservice",
+        "params": {
+          "latency_ms": 100
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shared dependency of 3 services",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "fallback"
+      },
+      "learning_goal": null
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 150,
+          "ramp_s": 30
+        },
+        "duration_s": 90,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "every request passes through the entrypoint",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "fallback"
+      },
+      "learning_goal": null
+    }
+  ],
+  "rejected": [
+    {
+      "type": "pod_kill",
+      "target": "cartservice",
+      "params": {},
+      "duration_s": 30,
+      "error": "over budget (3 experiments)"
+    },
+    {
+      "type": "network_loss",
+      "target": "cartservice",
+      "params": {
+        "loss_pct": 20
+      },
+      "duration_s": 45,
+      "error": "over budget (3 experiments)"
+    },
+    {
+      "type": "cpu_stress",
+      "target": "redis-cart",
+      "params": {
+        "workers": 1,
+        "load": 80
+      },
+      "duration_s": 45,
+      "error": "over budget (3 experiments)"
+    }
+  ],
+  "skipped_ideas": [],
+  "coverage": [
+    "errors",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": null,
+  "note": "AI planner unavailable: OPENAI_API_KEY is not set (put it in /home/ubuntu/chaos-agent/.env, chmod 600)"
+}

@@ -1,0 +1,46 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "productcatalogservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "fix-and-rerun verify experiment",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-184354-pod-kill-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-184354-pod_kill-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "fix-and-rerun verify experiment"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

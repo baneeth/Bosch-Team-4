@@ -1,0 +1,11 @@
+2026-10-10T09:17:23.766+00:00 run 20261010-091723-network_delay-productcatalogservice: network_delay on productcatalogservice for 60s {'latency_ms': 100, 'jitter_ms': 0}
+2026-10-10T09:17:23.770+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T09:17:23.805+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T09:17:43.824+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T09:17:43.844+00:00 INJECTED NetworkChaos/ca-20261010-091723-network-delay-productcatalogservice
+2026-10-10T09:17:44.941+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T09:18:43.988+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T09:18:43.989+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T09:18:50.015+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T09:18:50.527+00:00 cleaned up NetworkChaos/ca-20261010-091723-network-delay-productcatalogservice
+2026-10-10T09:18:56.590+00:00 COMPLETED

@@ -1,0 +1,13 @@
+2026-10-11T06:43:14.099+00:00 run 20261011-064314-pod_failure-paymentservice: pod_failure on paymentservice for 30s {}
+2026-10-11T06:43:14.099+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T06:43:14.123+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T06:43:14.138+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T06:43:34.160+00:00 pre-check ok: 60 requests, 0% errors, p95 15ms
+2026-10-11T06:43:34.168+00:00 INJECTED PodChaos/ca-20261011-064314-pod-failure-paymentservice
+2026-10-11T06:43:34.330+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T06:43:53.344+00:00 ABORT guard: error rate 25% > 20% -> removing PodChaos/ca-20261011-064314-pod-failure-paymentservice
+2026-10-11T06:43:53.854+00:00 fault removed in 0.5s
+2026-10-11T06:43:53.855+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T06:44:01.896+00:00 steady state restored: recovery 1.0s after the fault ended
+2026-10-11T06:44:01.915+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T06:44:07.960+00:00 ABORTED: guard: error rate 25% > 20%

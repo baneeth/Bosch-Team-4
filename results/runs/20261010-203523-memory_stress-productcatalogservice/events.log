@@ -1,0 +1,13 @@
+2026-10-10T20:35:23.316+00:00 run 20261010-203523-memory_stress-productcatalogservice: memory_stress on productcatalogservice for 15s {'size_mb': 110, 'workers': 1}
+2026-10-10T20:35:23.317+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T20:35:23.342+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T20:35:23.365+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T20:35:43.386+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T20:35:43.393+00:00 INJECTED StressChaos/ca-20261010-203523-memory-stress-productcatalogservice
+2026-10-10T20:35:43.569+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T20:35:58.480+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T20:35:58.480+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T20:36:00.500+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T20:36:01.011+00:00 cleaned up StressChaos/ca-20261010-203523-memory-stress-productcatalogservice
+2026-10-10T20:36:01.028+00:00 prediction refuted (0/4 aspects matched)
+2026-10-10T20:36:07.078+00:00 COMPLETED

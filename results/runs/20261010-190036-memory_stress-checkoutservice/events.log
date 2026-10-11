@@ -1,0 +1,13 @@
+2026-10-10T19:00:36.068+00:00 run 20261010-190036-memory_stress-checkoutservice: memory_stress on checkoutservice for 30s {'size_mb': 112, 'workers': 1}
+2026-10-10T19:00:36.069+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T19:00:36.098+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T19:00:36.113+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T19:00:56.131+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T19:00:56.138+00:00 INJECTED StressChaos/ca-20261010-190036-memory-stress-checkoutservice
+2026-10-10T19:00:57.191+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T19:01:26.216+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T19:01:26.217+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T19:01:28.284+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T19:01:28.794+00:00 cleaned up StressChaos/ca-20261010-190036-memory-stress-checkoutservice
+2026-10-10T19:01:28.810+00:00 prediction refuted (0/4 aspects matched)
+2026-10-10T19:01:34.850+00:00 COMPLETED

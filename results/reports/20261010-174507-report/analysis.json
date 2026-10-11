@@ -1,0 +1,647 @@
+{
+  "report_id": "20261010-174507-report",
+  "created_at": "2026-10-10T17:45:07+00:00",
+  "scope": "all",
+  "run_ids": [
+    "20261010-073737-network_delay-productcatalogservice",
+    "20261010-073913-network_delay-productcatalogservice",
+    "20261010-074007-cpu_stress-cartservice",
+    "20261010-074206-pod_kill-adservice",
+    "20261010-080318-traffic_spike-frontend",
+    "20261010-080539-traffic_spike-frontend",
+    "20261010-080723-traffic_spike-frontend",
+    "20261010-080822-traffic_spike-frontend",
+    "20261010-081700-traffic_spike-frontend",
+    "20261010-091723-network_delay-productcatalogservice",
+    "20261010-092840-network_delay-productcatalogservice",
+    "20261010-093014-network_delay-productcatalogservice",
+    "20261010-093052-traffic_spike-frontend",
+    "20261010-093222-traffic_spike-frontend",
+    "20261010-093357-traffic_spike-frontend",
+    "20261010-093538-traffic_spike-frontend",
+    "20261010-093715-traffic_spike-frontend",
+    "20261010-093819-network_delay-productcatalogservice",
+    "20261010-094605-traffic_spike-frontend",
+    "20261010-095223-network_delay-currencyservice",
+    "20261010-095651-traffic_spike-frontend",
+    "20261010-100804-traffic_spike-frontend",
+    "20261010-101701-pod_kill-productcatalogservice",
+    "20261010-101838-pod_kill-productcatalogservice",
+    "20261010-102446-pod_kill-productcatalogservice",
+    "20261010-102712-pod_kill-productcatalogservice",
+    "20261010-112233-pod_kill-productcatalogservice",
+    "20261010-170944-pod_failure-paymentservice",
+    "20261010-171055-network_loss-cartservice",
+    "20261010-171142-memory_stress-productcatalogservice",
+    "20261010-171530-pod_failure-productcatalogservice",
+    "20261010-171613-network_delay-productcatalogservice",
+    "20261010-171736-traffic_spike-frontend",
+    "20261010-171948-pod_kill-cartservice",
+    "20261010-172943-pod_failure-redis-cart",
+    "20261010-173035-memory_stress-cartservice",
+    "20261010-173550-memory_stress-shippingservice",
+    "20261010-173649-pod_failure-emailservice",
+    "20261010-173821-pod_kill-checkoutservice",
+    "20261010-173902-network_delay-shippingservice",
+    "20261010-174035-network_delay-shippingservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 60.9,
+  "overall_anchor": 61.6,
+  "grade": "D",
+  "services": [
+    {
+      "service": "cartservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 8.0,
+        "recovery": 55.0,
+        "containment": 20.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 6.8,
+        "recovery": 65.0,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "score": 21.0,
+      "anchor_score": 23.7,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "Cartservice pod loss caused 90.08% impact errors and 31.1 s recovery, and 110 MB memory stress caused 97.19% impact errors with 42 s recovery (20261010-171948-pod_kill-cartservice; 20261010-173035-memory_stress-cartservice). These findings reinforce the anchor's very low availability and containment scores on an all-flows checkout-path service."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 0.0,
+        "recovery": 75.0,
+        "containment": 40.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 0.2,
+        "recovery": 81.2,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "score": 25.0,
+      "anchor_score": 27.3,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "A 100 ms delay produced up to 756.8 ms p95, while a pod kill caused 100% peak errors and roughly 5 s p95 in view_cart and checkout; one run also observed a non-target recommendationservice pod NotReady (20261010-171613-network_delay-productcatalogservice; 20261010-101701-pod_kill-productcatalogservice). User-flow recovery was 21.1 s in the pod-kill run."
+    },
+    {
+      "service": "redis-cart",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 7.0,
+        "recovery": 98.0,
+        "containment": 70.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 7.1,
+        "recovery": 98.3,
+        "containment": 70.0,
+        "posture": 60.0
+      },
+      "score": 34.4,
+      "anchor_score": 34.4,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "The short pod-failure run caused 100% home-flow errors in the observed sample, 5,003.7 ms peak p95, and a frontend unresponsive guard breach; recovery after fault removal was quick (20261010-172943-pod_failure-redis-cart). Cart-operation flows had no requests during the fault, so broader user impact is not directly measured."
+    },
+    {
+      "service": "frontend",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 4.0,
+        "recovery": 95.0,
+        "containment": 45.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 7.0,
+        "recovery": 100.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "score": 65.5,
+      "anchor_score": 67.8,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "Traffic runs retained zero reported errors but showed severe latency: at 500 users home p95 was 3,973 ms, with frontend at its CPU limit and 100% peak throttling (20261010-080822-traffic_spike-frontend). All flows pass through this single-replica entrypoint, so its latency and containment scores are low."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 75.0,
+        "latency": 75.0,
+        "recovery": 70.0,
+        "containment": 65.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 71.5,
+      "anchor_score": 60.0,
+      "grade": "C",
+      "weight": 1.5,
+      "justification": "This service has no direct experiment anchor; scores are estimated from its single-replica posture and dependency on productcatalogservice. A productcatalogservice pod-kill run reported recommendationservice NotReady, but no direct recommendation-flow measurements were supplied (20261010-101701-pod_kill-productcatalogservice)."
+    },
+    {
+      "service": "paymentservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 55.0,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 64.5,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 50.0,
+        "posture": 60.0
+      },
+      "score": 75.2,
+      "anchor_score": 78.6,
+      "grade": "C",
+      "weight": 2.8,
+      "justification": "During paymentservice failure, 83.3% of sampled checkout requests failed, despite low checkout p95 (20261010-170944-pod_failure-paymentservice). Availability is adjusted slightly below its anchor to reflect the severe checkout-flow error rate; other dimensions remain near the anchor."
+    },
+    {
+      "service": "currencyservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 38.0,
+        "recovery": 100.0,
+        "containment": 90.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 42.8,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "score": 79.5,
+      "anchor_score": 81.7,
+      "grade": "C",
+      "weight": 2.8,
+      "justification": "The 50 ms delay caused no errors but raised home p95 to 521.3 ms and checkout p95 to 168.8 ms (20261010-095223-network_delay-currencyservice). Latency is close to the anchor; containment is slightly lower because multiple user flows slowed."
+    },
+    {
+      "service": "shippingservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 65.0,
+        "recovery": 100.0,
+        "containment": 70.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 68.2,
+        "recovery": 100.0,
+        "containment": 75.0,
+        "posture": 60.0
+      },
+      "score": 84.2,
+      "anchor_score": 85.5,
+      "grade": "B",
+      "weight": 2.0,
+      "justification": "Memory stress caused no errors and only 1.6x checkout p95; injected delay caused checkout p95 of 141.0 ms at 40 ms latency and 81.9 ms at 20 ms latency (20261010-173550-memory_stress-shippingservice; 20261010-173902-network_delay-shippingservice; 20261010-174035-network_delay-shippingservice). Impact was concentrated on checkout and view_cart, so containment is modestly below the anchor."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 95.0,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 95.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "score": 93.8,
+      "anchor_score": 96.0,
+      "grade": "A",
+      "weight": 2.8,
+      "justification": "The checkoutservice pod-kill run reported no errors or latency impact, but collected zero checkout requests, so it is weak evidence for checkout availability (20261010-173821-pod_kill-checkoutservice). Scores stay close to the high anchor, with a caveat for that missing flow sample."
+    },
+    {
+      "service": "adservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 99.0,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 99.3,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "score": 95.8,
+      "anchor_score": 95.8,
+      "grade": "A",
+      "weight": 0.8,
+      "justification": "The pod-kill run had no flow errors and at most a 1.56x home p95 increase (20261010-074206-pod_kill-adservice). It is a single replica, but ads are optional and the measured user impact was minor."
+    },
+    {
+      "service": "emailservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 100.0,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 100.0,
+        "latency": 100.0,
+        "recovery": 100.0,
+        "containment": 100.0,
+        "posture": 60.0
+      },
+      "score": 96.0,
+      "anchor_score": 96.0,
+      "grade": "A",
+      "weight": 1.0,
+      "justification": "The 30 s pod-failure test had no flow errors and checkout p95 was 19.4 ms (20261010-173649-pod_failure-emailservice). Email is checkout-path infrastructure, but this run showed no measured shopper impact."
+    }
+  ],
+  "coverage": {
+    "experiments": 41,
+    "types": [
+      "cpu_stress",
+      "memory_stress",
+      "network_delay",
+      "network_loss",
+      "pod_failure",
+      "pod_kill",
+      "traffic_spike"
+    ],
+    "failure_classes": [
+      "errors",
+      "recovery",
+      "resource exhaustion",
+      "slowdown"
+    ]
+  },
+  "predictions": {
+    "confirmed": 6,
+    "partly": 3,
+    "refuted": 2
+  },
+  "ai": {
+    "summary": "Baseline traffic was healthy (0% errors; overall p95 13.8 ms), but faults exposed severe weaknesses in critical shared services and the single-replica frontend. Cartservice and productcatalogservice disruptions caused widespread failures, while frontend CPU throttling under load drove user-flow p95 into seconds. Injected delay and packet loss also produced extreme tail latency without necessarily causing errors. The scores reflect the measured impacts, the limited size of several probes, and the mostly single-replica posture.",
+    "findings": [
+      {
+        "title": "Cartservice loss causes broad shopping failure with slow recovery",
+        "severity": "critical",
+        "services": [
+          "cartservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261010-171948-pod_kill-cartservice",
+          "20261010-173035-memory_stress-cartservice"
+        ],
+        "evidence": "During the cartservice pod kill, peak error rate was 100%, impact error rate 90.08%, and user-flow recovery took 31.1 s; individual flow error rates were 83.3–100%. During 110 MB memory stress, impact error rate was 97.19%, cartservice restarted once, and recovery took 42 s. The service is a single replica and reaches all five flows.",
+        "root_cause": "Cartservice is a shared, single-replica dependency for frontend and checkoutservice. When its only pod is unavailable or impaired, there is no serving replica to contain the disruption, so cart, browsing, and checkout requests fail together.",
+        "fix": {
+          "target": "cartservice",
+          "action": "scale_replicas",
+          "replicas": 2
+        },
+        "fix_rationale": "Cartservice is stateless and can be scaled. A second replica gives callers a serving endpoint during a single-pod kill or restart, reducing the all-flows outage and dependence on replacement readiness.",
+        "expected_improvement": "A single cartservice pod disruption should no longer make most requests across all flows fail; user-flow recovery should be materially faster than the measured 31–42 s.",
+        "verify_with": {
+          "type": "pod_kill",
+          "target": "cartservice",
+          "duration_s": 30,
+          "params": {
+            "grace_period_s": 0
+          }
+        }
+      },
+      {
+        "title": "Product catalog pod loss breaks core flows and spreads to a dependent pod",
+        "severity": "high",
+        "services": [
+          "productcatalogservice",
+          "frontend",
+          "checkoutservice",
+          "recommendationservice"
+        ],
+        "evidence_runs": [
+          "20261010-101701-pod_kill-productcatalogservice",
+          "20261010-171530-pod_failure-productcatalogservice"
+        ],
+        "evidence": "In the pod-kill run, peak error rate was 100%; view_cart and checkout each had 100% flow errors and about 5,003 ms p95, while recovery took 21.1 s. The guard also reported a recommendationservice pod as NotReady. In the later pod-failure run, impact error rate was 59.09%, home and product each had at least 83.3% errors in the sampled requests, and the run aborted on a 60% error rate.",
+        "root_cause": "Productcatalogservice is a single replica shared by frontend, checkoutservice, and recommendationservice. Loss of that only replica leaves dependent flows without a catalog endpoint; observed disruption also coincided with a non-target recommendationservice pod becoming NotReady.",
+        "fix": {
+          "target": "productcatalogservice",
+          "action": "scale_replicas",
+          "replicas": 2
+        },
+        "fix_rationale": "This stateless service can be replicated. Keeping another catalog pod available should prevent one pod's loss from removing the shared dependency from every caller while Kubernetes replaces it.",
+        "expected_improvement": "A single catalog pod kill should cause fewer failed home, product, cart, and checkout requests, avoid a prolonged user-flow recovery, and reduce the chance that the disruption propagates to recommendationservice.",
+        "verify_with": {
+          "type": "pod_kill",
+          "target": "productcatalogservice",
+          "duration_s": 30,
+          "params": {
+            "grace_period_s": 0
+          }
+        }
+      },
+      {
+        "title": "Frontend CPU throttling makes all flows extremely slow under load",
+        "severity": "high",
+        "services": [
+          "frontend"
+        ],
+        "evidence_runs": [
+          "20261010-080318-traffic_spike-frontend",
+          "20261010-080822-traffic_spike-frontend",
+          "20261010-093538-traffic_spike-frontend"
+        ],
+        "evidence": "At 100 users, frontend CPU reached 97.6% of its 200m limit with 96.6% peak throttling; home p95 was 484.7 ms and checkout p95 395.8 ms. At 500 users, home p95 reached 3,973 ms and checkout 2,105 ms, while frontend CPU was at its limit with 100% throttling. At 300 users, repeated runs approached or breached the 1,500 ms guard threshold across flows.",
+        "root_cause": "The single frontend replica is the entrypoint for every request and its 200m CPU limit is the measured bottleneck. CPU saturation and throttling queue requests at the entrypoint, spreading latency across all user flows even though VM CPU remained around 30% at peak in the cited 500-user run.",
+        "fix": {
+          "target": "frontend",
+          "action": "set_resources",
+          "cpu_limit_millicores": 800,
+          "memory_limit_mib": 128
+        },
+        "fix_rationale": "The fix catalog identifies frontend CPU throttling as a capacity bottleneck. Raising its CPU limit gives the entrypoint room to process bursts rather than spending most of the run throttled; the memory limit is left unchanged because these runs did not show memory pressure.",
+        "expected_improvement": "Frontend CPU throttling should fall substantially under the same load, with lower p95 across home, product, cart, and checkout and fewer runs reaching the latency guard.",
+        "verify_with": {
+          "type": "traffic_spike",
+          "target": "frontend",
+          "duration_s": 90,
+          "params": {
+            "users": 100,
+            "ramp_s": 30,
+            "think_ms": 1000,
+            "checkout_pct": 20
+          }
+        }
+      },
+      {
+        "title": "Redis cart outage can leave the entrypoint unresponsive",
+        "severity": "high",
+        "services": [
+          "redis-cart",
+          "cartservice",
+          "frontend"
+        ],
+        "evidence_runs": [
+          "20261010-172943-pod_failure-redis-cart"
+        ],
+        "evidence": "The run aborted after 4.6 s of fault because the frontend was unresponsive for 4.2 s. Peak error rate was 66.7%, peak p95 was 5,003.7 ms, and the observed home-flow sample had 100% errors. The experiment did not collect requests for add_to_cart, view_cart, or checkout during the fault, so the observed impact is narrower than the dependency map's potential reach.",
+        "root_cause": "Redis-cart is a single stateful dependency behind cartservice. When it is unavailable, a cart-dependent call can hold up the frontend long enough to make the entrypoint unresponsive rather than failing quickly and isolating the affected cart function.",
+        "fix": {
+          "target": "frontend",
+          "action": "code_change",
+          "change": "Set a 250 ms gRPC deadline on frontend-to-cartservice calls; on deadline, return an explicit retryable cart-unavailable response and keep unrelated page content responsive. Do not report timed-out cart writes as successful."
+        },
+        "fix_rationale": "A bounded call prevents Redis unavailability from holding frontend requests for several seconds. Explicitly limiting the fallback to cart behavior preserves correct cart-write semantics while containing the stall.",
+        "expected_improvement": "The frontend should stop becoming unresponsive for multiple seconds during a Redis outage; cart operations may fail visibly and retryably, while unaffected page content should remain responsive.",
+        "verify_with": {
+          "type": "pod_failure",
+          "target": "redis-cart",
+          "duration_s": 15,
+          "params": {}
+        }
+      },
+      {
+        "title": "Loss and delay on critical RPC paths amplify user-facing tail latency",
+        "severity": "high",
+        "services": [
+          "frontend",
+          "productcatalogservice",
+          "currencyservice",
+          "shippingservice",
+          "cartservice"
+        ],
+        "evidence_runs": [
+          "20261010-171613-network_delay-productcatalogservice",
+          "20261010-095223-network_delay-currencyservice",
+          "20261010-173902-network_delay-shippingservice",
+          "20261010-171055-network_loss-cartservice"
+        ],
+        "evidence": "A 100 ms productcatalogservice delay produced p95 up to 756.8 ms (70.5x baseline) across all five flows. A 50 ms currencyservice delay produced home p95 521.3 ms (40.41x) and checkout p95 168.8 ms (9.93x). A 40 ms shippingservice delay produced checkout p95 141.0 ms (9.34x). With 20% cartservice packet loss, add_to_cart p95 reached 1,378 ms and view_cart 1,480.9 ms; the run aborted at 6.6 s after the p95 guard was breached.",
+        "root_cause": "User-facing requests wait on synchronous downstream RPCs. When a dependency is slow or packets are lost, that waiting amplifies the impairment into very large tail latency rather than bounding the call and containing the effect to the affected feature.",
+        "fix": {
+          "target": "frontend",
+          "action": "code_change",
+          "change": "Apply a 500 ms end-to-end budget to frontend calls to productcatalogservice, currencyservice, shippingservice, and cartservice; cancel calls when the budget expires, and render a bounded degraded response for optional product, currency, or shipping content. For cart operations, return a retryable failure rather than claiming success."
+        },
+        "fix_rationale": "The change bounds how long the entrypoint waits on these dependencies and prevents slow calls from consuming the user-facing request indefinitely. The explicit fallback behavior makes the timeout a containment mechanism rather than silently returning incorrect cart results.",
+        "expected_improvement": "Under the same delay and loss injections, frontend request p95 should be bounded near the configured budget instead of reaching 700–1,500 ms; optional-content degradation should not stall unrelated page rendering.",
+        "verify_with": {
+          "type": "network_delay",
+          "target": "productcatalogservice",
+          "duration_s": 45,
+          "params": {
+            "latency_ms": 100,
+            "jitter_ms": 0
+          }
+        }
+      },
+      {
+        "title": "Paymentservice unavailability makes checkout fail for most sampled checkout requests",
+        "severity": "high",
+        "services": [
+          "paymentservice",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261010-170944-pod_failure-paymentservice"
+        ],
+        "evidence": "During the 30 s paymentservice failure, checkout flow error rate was 83.3% over 24 requests; impact error rate was 16.67% and peak error rate 21%. Checkout p95 was 19.6 ms, so the dominant measured problem was failed checkout responses, not latency.",
+        "root_cause": "Paymentservice is a single-replica dependency on the revenue path. When its only pod is unavailable, checkoutservice has no alternate payment endpoint and checkout requests fail.",
+        "fix": {
+          "target": "paymentservice",
+          "action": "scale_replicas",
+          "replicas": 2
+        },
+        "fix_rationale": "Paymentservice is stateless and can be replicated. A second pod provides an endpoint during a single-pod disruption and addresses the measured single-replica failure mode.",
+        "expected_improvement": "A single paymentservice pod failure should produce substantially fewer checkout errors while the remaining replica serves requests.",
+        "verify_with": {
+          "type": "pod_failure",
+          "target": "paymentservice",
+          "duration_s": 30,
+          "params": {}
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 100,
+        "latency": 99,
+        "recovery": 100,
+        "containment": 100,
+        "posture": 60,
+        "criticality_weight": 0.8,
+        "justification": "The pod-kill run had no flow errors and at most a 1.56x home p95 increase (20261010-074206-pod_kill-adservice). It is a single replica, but ads are optional and the measured user impact was minor."
+      },
+      {
+        "service": "cartservice",
+        "availability": 0,
+        "latency": 8,
+        "recovery": 55,
+        "containment": 20,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Cartservice pod loss caused 90.08% impact errors and 31.1 s recovery, and 110 MB memory stress caused 97.19% impact errors with 42 s recovery (20261010-171948-pod_kill-cartservice; 20261010-173035-memory_stress-cartservice). These findings reinforce the anchor's very low availability and containment scores on an all-flows checkout-path service."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 95,
+        "latency": 100,
+        "recovery": 100,
+        "containment": 95,
+        "posture": 60,
+        "criticality_weight": 2.8,
+        "justification": "The checkoutservice pod-kill run reported no errors or latency impact, but collected zero checkout requests, so it is weak evidence for checkout availability (20261010-173821-pod_kill-checkoutservice). Scores stay close to the high anchor, with a caveat for that missing flow sample."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 100,
+        "latency": 38,
+        "recovery": 100,
+        "containment": 90,
+        "posture": 60,
+        "criticality_weight": 2.8,
+        "justification": "The 50 ms delay caused no errors but raised home p95 to 521.3 ms and checkout p95 to 168.8 ms (20261010-095223-network_delay-currencyservice). Latency is close to the anchor; containment is slightly lower because multiple user flows slowed."
+      },
+      {
+        "service": "emailservice",
+        "availability": 100,
+        "latency": 100,
+        "recovery": 100,
+        "containment": 100,
+        "posture": 60,
+        "criticality_weight": 1.0,
+        "justification": "The 30 s pod-failure test had no flow errors and checkout p95 was 19.4 ms (20261010-173649-pod_failure-emailservice). Email is checkout-path infrastructure, but this run showed no measured shopper impact."
+      },
+      {
+        "service": "frontend",
+        "availability": 100,
+        "latency": 4,
+        "recovery": 95,
+        "containment": 45,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Traffic runs retained zero reported errors but showed severe latency: at 500 users home p95 was 3,973 ms, with frontend at its CPU limit and 100% peak throttling (20261010-080822-traffic_spike-frontend). All flows pass through this single-replica entrypoint, so its latency and containment scores are low."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 55,
+        "latency": 100,
+        "recovery": 100,
+        "containment": 50,
+        "posture": 60,
+        "criticality_weight": 2.8,
+        "justification": "During paymentservice failure, 83.3% of sampled checkout requests failed, despite low checkout p95 (20261010-170944-pod_failure-paymentservice). Availability is adjusted slightly below its anchor to reflect the severe checkout-flow error rate; other dimensions remain near the anchor."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 0,
+        "latency": 0,
+        "recovery": 75,
+        "containment": 40,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "A 100 ms delay produced up to 756.8 ms p95, while a pod kill caused 100% peak errors and roughly 5 s p95 in view_cart and checkout; one run also observed a non-target recommendationservice pod NotReady (20261010-171613-network_delay-productcatalogservice; 20261010-101701-pod_kill-productcatalogservice). User-flow recovery was 21.1 s in the pod-kill run."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 75,
+        "latency": 75,
+        "recovery": 70,
+        "containment": 65,
+        "posture": 60,
+        "criticality_weight": 1.5,
+        "justification": "This service has no direct experiment anchor; scores are estimated from its single-replica posture and dependency on productcatalogservice. A productcatalogservice pod-kill run reported recommendationservice NotReady, but no direct recommendation-flow measurements were supplied (20261010-101701-pod_kill-productcatalogservice)."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 0,
+        "latency": 7,
+        "recovery": 98,
+        "containment": 70,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "The short pod-failure run caused 100% home-flow errors in the observed sample, 5,003.7 ms peak p95, and a frontend unresponsive guard breach; recovery after fault removal was quick (20261010-172943-pod_failure-redis-cart). Cart-operation flows had no requests during the fault, so broader user impact is not directly measured."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 100,
+        "latency": 65,
+        "recovery": 100,
+        "containment": 70,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "Memory stress caused no errors and only 1.6x checkout p95; injected delay caused checkout p95 of 141.0 ms at 40 ms latency and 81.9 ms at 20 ms latency (20261010-173550-memory_stress-shippingservice; 20261010-173902-network_delay-shippingservice; 20261010-174035-network_delay-shippingservice). Impact was concentrated on checkout and view_cart, so containment is modestly below the anchor."
+      }
+    ],
+    "score_explanation": "Scores remain within 15 points of the supplied anchors. I weighted the entrypoint and shared checkout/cart dependencies most heavily, while assigning less weight to ads, email, and recommendations because their measured or expected shopper impact is narrower. Untested recommendationservice dimensions are estimates based on its single-replica posture, optional-flow role, and dependency on productcatalogservice; checkoutservice's apparently clean pod-kill result is also treated cautiously because that run collected no checkout requests. Posture is 60 for each anchored service because each has one replica, probes, and configured resource limits.",
+    "planner_review": "The planner correctly predicted the broad impact, severe slowdown, and completion outcome for the productcatalogservice delay run (20261010-171613-network_delay-productcatalogservice), and correctly predicted the high-error abort for the productcatalogservice pod-failure run (20261010-171530-pod_failure-productcatalogservice) and the 150-user frontend traffic spike (20261010-171736-traffic_spike-frontend). Predictions were only partial for cartservice pod kill and Redis failure: affected flows matched for cartservice, but error and slowdown severity were underestimated; Redis impact was limited to the observed home sample rather than all predicted flows (20261010-171948-pod_kill-cartservice; 20261010-172943-pod_failure-redis-cart). The shippingservice memory-stress prediction was refuted because no affected flows or errors were observed, and the emailservice failure produced no checkout errors (20261010-173550-memory_stress-shippingservice; 20261010-173649-pod_failure-emailservice). Overall, dependency reach helped predict which areas could be affected, but severity estimates and sparse flow sampling remain important sources of uncertainty.",
+    "limitations": [
+      "The system ran on a single-node Kubernetes VM; these results do not establish multi-node or zone-failure resilience.",
+      "Baseline and per-flow probe volumes were small, and several disruption runs collected only a handful of requests or none for the flow of interest.",
+      "Experiments were short, and abrupt pod-kill tests can produce sampling variability; repeated productcatalogservice pod-kill outcomes differed substantially.",
+      "Traffic tests and failure injections were not a comprehensive capacity sweep, and some traffic runs ended by manual or guard abort.",
+      "The dependency map reports shoppingassistantservice as missing, so its behavior and contribution to user flows could not be assessed."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261010-174507-analyst.json"
+  ]
+}

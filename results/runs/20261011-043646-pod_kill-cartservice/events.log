@@ -1,0 +1,12 @@
+2026-10-11T04:36:46.975+00:00 run 20261011-043646-pod_kill-cartservice: pod_kill on cartservice for 30s {'grace_period_s': 0}
+2026-10-11T04:36:46.976+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T04:36:47.001+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T04:36:47.019+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T04:37:07.038+00:00 pre-check ok: 60 requests, 0% errors, p95 14ms
+2026-10-11T04:37:07.045+00:00 INJECTED PodChaos/ca-20261011-043646-pod-kill-cartservice
+2026-10-11T04:37:07.618+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T04:37:07.618+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T04:37:29.674+00:00 replacement pod cartservice-696756cf85-d8brl Ready after 22.6s
+2026-10-11T04:37:42.669+00:00 steady state restored: recovery 28.6s after the fault ended
+2026-10-11T04:37:43.182+00:00 cleaned up PodChaos/ca-20261011-043646-pod-kill-cartservice
+2026-10-11T04:37:49.315+00:00 COMPLETED

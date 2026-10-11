@@ -1,0 +1,13 @@
+2026-10-10T17:29:43.622+00:00 run 20261010-172943-pod_failure-redis-cart: pod_failure on redis-cart for 15s {}
+2026-10-10T17:29:43.623+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T17:29:43.690+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T17:29:43.709+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T17:30:03.727+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T17:30:03.737+00:00 INJECTED PodChaos/ca-20261010-172943-pod-failure-redis-cart
+2026-10-10T17:30:03.861+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T17:30:07.862+00:00 ABORT guard: frontend unresponsive for 4.2s -> removing PodChaos/ca-20261010-172943-pod-failure-redis-cart
+2026-10-10T17:30:08.374+00:00 fault removed in 0.5s
+2026-10-10T17:30:08.375+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T17:30:17.401+00:00 steady state restored: recovery 2.0s after the fault ended
+2026-10-10T17:30:17.416+00:00 prediction partly (2/4 aspects matched)
+2026-10-10T17:30:23.463+00:00 ABORTED: guard: frontend unresponsive for 4.2s

@@ -1,0 +1,58 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "redis-cart",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because redis-cart is a single-replica stateful service holding cart data, is on the checkout path, and has reach 1.0 across all five flows. A prior 15-second pod_failure made the frontend unresponsive and was aborted, so this tests the distinct recovery behavior of a pod kill rather than repeating an already-known outcome.",
+    "hypothesis": "While Redis is being replaced, cart-dependent requests will fail or stall across the shop; after replacement, the service should recover and preserve or restore cart availability.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-054423-pod-kill-redis-cart",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-054423-pod_kill-redis-cart"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Ranked first because redis-cart is a single-replica stateful service holding cart data, is on the checkout path, and has reach 1.0 across all five flows. A prior 15-second pod_failure made the frontend unresponsive and was aborted, so this tests the "
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "redis-cart"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

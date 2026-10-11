@@ -1,0 +1,12 @@
+2026-10-11T00:20:32.368+00:00 run 20261011-002032-network_delay-productcatalogservice: network_delay on productcatalogservice for 40s {'latency_ms': 100, 'jitter_ms': 0}
+2026-10-11T00:20:32.373+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T00:20:32.401+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T00:20:32.442+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T00:20:52.459+00:00 pre-check ok: 59 requests, 0% errors, p95 16ms
+2026-10-11T00:20:52.468+00:00 INJECTED NetworkChaos/ca-20261011-002032-network-delay-productcatalogservice
+2026-10-11T00:20:53.548+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T00:21:32.589+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T00:21:32.590+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T00:21:39.614+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T00:21:40.127+00:00 cleaned up NetworkChaos/ca-20261011-002032-network-delay-productcatalogservice
+2026-10-11T00:21:46.211+00:00 COMPLETED

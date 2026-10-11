@@ -1,0 +1,44 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "paymentservice",
+    "params": {},
+    "duration_s": 45,
+    "max_error_rate": 0.4,
+    "max_p95_ms": null,
+    "reason": "demo-user-view",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-203207-pod-failure-paymentservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203207-pod_failure-paymentservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "demo-user-view"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "paymentservice"
+        }
+      },
+      "duration": "45s",
+      "action": "pod-failure"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+2026-10-10T19:43:28.142+00:00 run 20261010-194328-network_loss-currencyservice: network_loss on currencyservice for 30s {'loss_pct': 20, 'correlation_pct': 0}
+2026-10-10T19:43:28.146+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T19:43:28.182+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T19:43:48.199+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T19:43:48.217+00:00 INJECTED NetworkChaos/ca-20261010-194328-network-loss-currencyservice
+2026-10-10T19:43:49.317+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T19:43:54.292+00:00 ABORT guard: p95 3086ms > 1500ms -> removing NetworkChaos/ca-20261010-194328-network-loss-currencyservice
+2026-10-10T19:43:54.803+00:00 fault removed in 0.5s
+2026-10-10T19:43:54.804+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T19:44:00.828+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T19:44:06.889+00:00 ABORTED: guard: p95 3086ms > 1500ms

@@ -1,0 +1,11 @@
+2026-10-10T10:18:38.325+00:00 run 20261010-101838-pod_kill-productcatalogservice: pod_kill on productcatalogservice for 45s {'grace_period_s': 0}
+2026-10-10T10:18:38.329+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T10:18:38.364+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T10:18:58.385+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T10:18:58.395+00:00 INJECTED PodChaos/ca-20261010-101838-pod-kill-productcatalogservice
+2026-10-10T10:18:58.988+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T10:18:58.989+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T10:19:00.009+00:00 replacement pod productcatalogservice-57d4565456-4l4zd Ready after 1.6s
+2026-10-10T10:19:28.029+00:00 steady state restored: recovery 22.6s after the fault ended
+2026-10-10T10:19:28.540+00:00 cleaned up PodChaos/ca-20261010-101838-pod-kill-productcatalogservice
+2026-10-10T10:19:34.642+00:00 COMPLETED

@@ -1,0 +1,54 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "shippingservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shippingservice has one replica, is shared by frontend and checkoutservice, and serves view_cart and checkout on the revenue path. Unlike the past pod-kill runs on two-replica cartservice and productcatalogservice, this tests recovery without replica redundancy.",
+    "hypothesis": "Deleting the only shippingservice pod will briefly disrupt view_cart and checkout while Kubernetes replaces it; unaffected flows should remain healthy, and the guard may abort if recovery is slow.",
+    "prediction": {
+      "affected_flows": [
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-190144-pod-kill-shippingservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-190144-pod_kill-shippingservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shippingservice has one replica, is shared by frontend and checkoutservice, and serves view_cart and checkout on the revenue path. Unlike the past pod-kill runs on two-replica cartservice and productcatalogservice, this tests recovery without replica"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "shippingservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

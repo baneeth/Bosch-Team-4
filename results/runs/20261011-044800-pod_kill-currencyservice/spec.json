@@ -1,0 +1,57 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "currencyservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "currencyservice has one replica, serves four flows, and is on the checkout path. A prior 15-second pod_failure test on this service reached a 40% peak error rate and was aborted; pod_kill is a distinct recovery test that measures replacement and the user impact during the restart.",
+    "hypothesis": "Requests using currencyservice will fail briefly while Kubernetes replaces the pod, then recover; flows that do not call it should remain usable.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "none",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-044800-pod-kill-currencyservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-044800-pod_kill-currencyservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "currencyservice has one replica, serves four flows, and is on the checkout path. A prior 15-second pod_failure test on this service reached a 40% peak error rate and was aborted; pod_kill is a distinct recovery test that measures replacement and the "
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "currencyservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

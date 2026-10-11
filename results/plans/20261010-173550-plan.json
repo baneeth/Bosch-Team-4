@@ -1,0 +1,142 @@
+{
+  "plan_id": "20261010-173550-plan",
+  "created_at": "2026-10-10T17:35:50+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Start with a short memory-pressure test on a shared checkout-path dependency, where an OOM could affect both cart review and checkout. Then test an isolated checkout dependency failure and checkout-service recovery, followed by a bounded shipping-latency test to measure slowdown without approaching the guard threshold. The plan covers resource exhaustion, errors, recovery, and slowdown while avoiding already well-characterized failure modes.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "shippingservice",
+        "params": {
+          "size_mb": 100,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is a single-replica, high-risk dependency shared by checkoutservice and frontend; it reaches view_cart and checkout. Its 128Mi memory limit makes a 100MB allocation a short, meaningful resource-exhaustion test.",
+        "hypothesis": "Memory pressure may OOM or stall shippingservice, disrupting both view_cart and checkout; the safety guard is likely to stop the test if errors or latency persist.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner"
+      },
+      "learning_goal": "Does shippingservice have enough memory headroom to withstand a brief allocation spike, and how do its two dependent flows behave if it becomes unhealthy?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "emailservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "emailservice has one replica and is on the checkout path, but its reach is limited to checkout. A prior 30-second paymentservice failure affected checkout with 16.67% impact and 23.8ms peak p95, completing despite a 21% peak error rate; this tests whether email failure behaves similarly.",
+        "hypothesis": "Checkout may return errors while emailservice is unavailable, while the other four flows remain healthy; the limited flow reach may keep the guard from aborting.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "learning_goal": "Does checkout depend on emailservice availability for a successful response, or can it tolerate the service being unavailable?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "pod_kill",
+        "target": "checkoutservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single replica on the revenue path and depends on six downstream services. Unlike the prior pod-kill runs on cartservice and productcatalogservice, this isolates the checkout flow and measures replacement and recovery for the checkout coordinator.",
+        "hypothesis": "Checkout requests may fail or slow while Kubernetes replaces checkoutservice; the other user flows should remain largely unaffected, and the flow should recover after the pod returns.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "learning_goal": "How quickly does checkout recover after its single coordinator pod is killed, and what do users experience during replacement?"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "network_delay",
+        "target": "shippingservice",
+        "params": {
+          "latency_ms": 40,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is shared by frontend and checkoutservice and reaches view_cart and checkout. There is no prior shippingservice delay run; the 40ms injection tests a new dependency while staying far below the 1500ms guard limit. Past runs show 100ms on productcatalogservice severely slows all flows, so this uses a lower, bounded intensity.",
+        "hypothesis": "Added latency should measurably slow view_cart and checkout, but should not cause errors or approach the safety guard's p95 threshold.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "learning_goal": "How sensitively do view_cart and checkout respond to modest latency in their shared shipping dependency?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat a 100ms network delay on productcatalogservice",
+      "why_not": "Multiple past runs already show severe slowdown across all five flows, with p95 around 718–757ms; repeating the same intensity adds little information."
+    },
+    {
+      "idea": "Increase frontend traffic to 300 users",
+      "why_not": "Repeated 300-user runs crossed the 1500ms p95 guard, while a 150-user run completed; the capacity boundary is already well established."
+    },
+    {
+      "idea": "Repeat memory stress on cartservice at 110MB",
+      "why_not": "A prior 110MB run caused broad errors, an abort, and a cartservice restart; repeating the same intensity would be destructive without answering a new question."
+    },
+    {
+      "idea": "Make redis-cart unavailable again",
+      "why_not": "A prior 15-second failure caused frontend silence and a guard abort. redis-cart is stateful and stores cart data, so repeating that high-impact test is not justified for this budget."
+    },
+    {
+      "idea": "Kill or fail the frontend pod",
+      "why_not": "The AI policy explicitly prohibits frontend pod kill or failure because it would cause a total outage."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261010-173550-planner.json",
+  "note": null
+}

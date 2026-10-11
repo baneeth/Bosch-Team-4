@@ -1,0 +1,97 @@
+{
+  "campaign_id": "20261010-172943-campaign",
+  "plan_id": "20261010-172915-plan",
+  "started_at": "2026-10-10T17:29:43+00:00",
+  "ended_at": "2026-10-10T17:32:08+00:00",
+  "status": "stopped: adapter: The cartservice memory probe was aborted after 3.6 seconds, but it caused errors across all five flows, a cartservice restart, and a 42-second recovery. The latest timeline sample (49.6 seconds) still reports RECOVERING with p95 at 861.9 ms, so the shop has not returned cleanly to baseline; defer the remaining experiments.",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_failure",
+        "target": "redis-cart",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Rank 1: redis-cart is a single-replica stateful service holding cart data, and the map gives it reach 1.0 across all five flows and the checkout path. A short outage probes the shop’s response to losing this shared dependency; an abort on user impact is acceptable for this brief error-class test.",
+        "hypothesis": "While Redis is unavailable, cart operations and dependent flows will fail or time out; removing the fault should restore access without intentional data deletion.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-172943-pod_failure-redis-cart",
+      "status": "ABORTED",
+      "abort_reason": "guard: frontend unresponsive for 4.2s",
+      "recovery_s": 2.0,
+      "peak_error_rate": 0.6667,
+      "peak_p95_ms": 5003.7,
+      "prediction": "partly"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "cartservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Rank 2: cartservice is a single replica with a 128Mi memory limit, is shared by frontend and checkoutservice, and reaches every flow. A short 110MB allocation probes the documented near-limit/OOM behavior on a critical service; the target is stressed directly, and an abort if users are hurt is expected.",
+        "hypothesis": "The allocation may cause severe contention or an OOM restart of cartservice, disrupting cart-dependent flows until the service recovers.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-173035-memory_stress-cartservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 55% > 20%",
+      "recovery_s": 42.0,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 914.7,
+      "prediction": "confirmed"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261010-172943-pod_failure-redis-cart",
+      "action": "continue",
+      "reason": "The 15-second redis-cart pod failure was aborted after 4.6 seconds: home reached 100% errors and about 5004 ms p95, while product was unaffected and no cart-flow requests were observed. Although the prediction overestimated the observed flow spread, recovery was reported at 2 seconds; the planned cartservice memory probe is distinct, validator-approved, and tests the next critical dependency.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-173035-adapter.json"
+    },
+    {
+      "after_run": "20261010-173035-memory_stress-cartservice",
+      "action": "stop",
+      "reason": "The cartservice memory probe was aborted after 3.6 seconds, but it caused errors across all five flows, a cartservice restart, and a 42-second recovery. The latest timeline sample (49.6 seconds) still reports RECOVERING with p95 at 861.9 ms, so the shop has not returned cleanly to baseline; defer the remaining experiments.",
+      "applied": true,
+      "detail": "campaign stopped by the adapter",
+      "transcript": "ai/20261010-173208-adapter.json"
+    }
+  ],
+  "skipped": []
+}

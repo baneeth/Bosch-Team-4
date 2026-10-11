@@ -1,0 +1,155 @@
+{
+  "plan_id": "20261011-044550-plan",
+  "created_at": "2026-10-11T04:45:50+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Start with a lower-intensity packet-loss test on cartservice: it reaches every flow, and the prior 20% loss run hit the p95 guard quickly. Then probe currencyservice’s untested memory and pod-replacement behavior, followed by a low-latency currencyservice test to measure slowdown without expecting a guard trip. This covers errors, resource exhaustion, recovery, and slowdown while keeping the highest-risk injections brief.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "network_loss",
+        "target": "cartservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single-replica, high-risk dependency shared by frontend and checkoutservice, with reach across all five flows. A prior 20% loss test caused p95 to reach 1571 ms and was stopped by the guard after 6.6 seconds, with no errors; 5% probes whether a milder loss rate degrades flows below that threshold.",
+        "hypothesis": "A small amount of packet loss will add tail latency to cart-dependent flows, but is less likely than the prior 20% test to cross the p95 guard; errors should remain uncommon.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "At a lower loss rate, does cartservice traffic cause measurable user-facing slowdown without triggering the guard?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "currencyservice",
+        "params": {
+          "size_mb": 112,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single-replica, high-risk shared dependency on the checkout path, reaching home, product, view_cart, and checkout; its memory limit is 128Mi. There are no currencyservice memory-stress results, and prior tests varied by service: 110 MB caused cartservice OOM behavior, while 110 MB on productcatalogservice did not. This short near-limit test probes the service-specific exhaustion threshold.",
+        "hypothesis": "A 112 MB allocation may exhaust currencyservice’s available memory, causing errors and possibly a restart in flows that call it; the guard should limit the duration of any disruption.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does currencyservice encounter memory pressure or OOM behavior near its 128Mi limit, and which user flows are affected?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "pod_kill",
+        "target": "currencyservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice has one replica, serves four flows, and is on the checkout path. A prior 15-second pod_failure test on this service reached a 40% peak error rate and was aborted; pod_kill is a distinct recovery test that measures replacement and the user impact during the restart.",
+        "hypothesis": "Requests using currencyservice will fail briefly while Kubernetes replaces the pod, then recover; flows that do not call it should remain usable.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How quickly does currencyservice recover after pod loss, and does the brief interruption exceed the error guard?"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "network_delay",
+        "target": "currencyservice",
+        "params": {
+          "latency_ms": 10,
+          "jitter_ms": 0
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single-replica shared dependency with reach 0.8, including the checkout path. A prior 50 ms delay produced a 528 ms peak p95 and affected home, product, view_cart, and checkout; 10 ms tests a substantially milder intensity expected to reveal propagation without simply repeating the severe slowdown.",
+        "hypothesis": "A 10 ms delay will increase latency in flows that call currencyservice, but should stay below the p95 guard and produce no material errors.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How much user-visible slowdown does a small currencyservice delay cause across its dependent flows?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat a traffic spike on frontend at 100–300 users",
+      "why_not": "Past runs already show broad slowdown at 100–150 users and repeated p95 guard trips around 300 users, so another similar run is unlikely to add useful resilience evidence."
+    },
+    {
+      "idea": "pod_failure on redis-cart",
+      "why_not": "Prior runs became severe and were aborted within seconds, including frontend unresponsiveness; repeating this would mostly reproduce an already-known, highly disruptive blast radius."
+    },
+    {
+      "idea": "Repeat a 100 ms network delay on productcatalogservice",
+      "why_not": "Multiple past runs already established severe slowdown across all five flows at this intensity."
+    },
+    {
+      "idea": "pod_kill or pod_failure on frontend",
+      "why_not": "The AI policy explicitly prohibits pod outages on the entrypoint because they amount to a total shop outage."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-044550-planner.json",
+  "note": null
+}

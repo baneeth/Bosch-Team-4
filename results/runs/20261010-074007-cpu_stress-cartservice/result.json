@@ -1,0 +1,133 @@
+{
+  "run_id": "20261010-074007-cpu_stress-cartservice",
+  "spec": {
+    "type": "cpu_stress",
+    "target": "cartservice",
+    "params": {
+      "workers": 1,
+      "load": 80
+    },
+    "duration_s": 120,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "A5 acceptance: manual abort",
+    "hypothesis": null
+  },
+  "status": "ABORTED",
+  "abort_reason": "kill switch: chaos resource was deleted externally",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-10T07:40:07.452+00:00",
+  "injected_at": "2026-10-10T07:40:27.538+00:00",
+  "fault_ended_at": "2026-10-10T07:40:43.576+00:00",
+  "fault_duration_s": 16.0,
+  "recovery_s": 0.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": 82.4,
+  "guard_breaches": [],
+  "worst_flow": "add_to_cart",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.4,
+        "p95_ms": 12.5,
+        "p99_ms": 26.4
+      },
+      "impact": {
+        "count": 14,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 13.0,
+        "p95_ms": 66.5,
+        "p99_ms": 66.7
+      },
+      "p95_factor": 5.32
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.7,
+        "p95_ms": 10.2,
+        "p99_ms": 13.9
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.6,
+        "p95_ms": 39.3,
+        "p99_ms": 58.6
+      },
+      "p95_factor": 3.85
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.5,
+        "p95_ms": 4.4,
+        "p99_ms": 4.9
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 4.8,
+        "p95_ms": 70.6,
+        "p99_ms": 80.0
+      },
+      "p95_factor": 16.05
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.8,
+        "p95_ms": 10.0,
+        "p99_ms": 11.4
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.2,
+        "p95_ms": 17.6,
+        "p99_ms": 18.0
+      },
+      "p95_factor": 1.76
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12.6,
+        "p95_ms": 16.8,
+        "p99_ms": 21.7
+      },
+      "impact": {
+        "count": 12,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 71.5,
+        "p95_ms": 81.2,
+        "p99_ms": 82.6
+      },
+      "p95_factor": 4.83
+    }
+  },
+  "pod_restarts": {},
+  "notes": [
+    "kill switch took 0.0s from decision to fault removed"
+  ]
+}

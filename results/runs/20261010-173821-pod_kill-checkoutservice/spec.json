@@ -1,0 +1,53 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "checkoutservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "checkoutservice is a single replica on the revenue path and depends on six downstream services. Unlike the prior pod-kill runs on cartservice and productcatalogservice, this isolates the checkout flow and measures replacement and recovery for the checkout coordinator.",
+    "hypothesis": "Checkout requests may fail or slow while Kubernetes replaces checkoutservice; the other user flows should remain largely unaffected, and the flow should recover after the pod returns.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "low",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-173821-pod-kill-checkoutservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-173821-pod_kill-checkoutservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "checkoutservice is a single replica on the revenue path and depends on six downstream services. Unlike the prior pod-kill runs on cartservice and productcatalogservice, this isolates the checkout flow and measures replacement and recovery for the che"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "checkoutservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

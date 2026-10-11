@@ -1,0 +1,54 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "productcatalogservice",
+    "params": {},
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "highest risk + reach (100% of flows)",
+    "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "none",
+      "outcome": "ABORTED"
+    },
+    "origin": "fallback"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-171530-pod-failure-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-171530-pod_failure-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "highest risk + reach (100% of flows)"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-failure"
+    }
+  }
+}

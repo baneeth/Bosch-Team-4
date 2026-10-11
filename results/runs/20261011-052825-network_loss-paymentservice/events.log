@@ -1,0 +1,13 @@
+2026-10-11T05:28:25.066+00:00 run 20261011-052825-network_loss-paymentservice: network_loss on paymentservice for 30s {'loss_pct': 5, 'correlation_pct': 0}
+2026-10-11T05:28:25.067+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T05:28:25.115+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T05:28:25.131+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T05:28:45.151+00:00 pre-check ok: 59 requests, 0% errors, p95 53ms
+2026-10-11T05:28:45.159+00:00 INJECTED NetworkChaos/ca-20261011-052825-network-loss-paymentservice
+2026-10-11T05:28:45.407+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T05:29:15.380+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T05:29:15.380+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T05:29:17.401+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T05:29:17.910+00:00 cleaned up NetworkChaos/ca-20261011-052825-network-loss-paymentservice
+2026-10-11T05:29:17.927+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T05:29:23.974+00:00 COMPLETED

@@ -1,0 +1,12 @@
+2026-10-11T03:47:20.685+00:00 run 20261011-034720-pod_kill-adservice: pod_kill on adservice for 30s {'grace_period_s': 0}
+2026-10-11T03:47:20.689+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T03:47:20.796+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T03:47:20.834+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T03:47:40.850+00:00 pre-check ok: 60 requests, 0% errors, p95 15ms
+2026-10-11T03:47:40.858+00:00 INJECTED PodChaos/ca-20261011-034720-pod-kill-adservice
+2026-10-11T03:47:40.974+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T03:47:40.974+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T03:47:42.994+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T03:48:13.019+00:00 replacement pod adservice-854578d668-ttxtg Ready after 32.1s
+2026-10-11T03:48:13.532+00:00 cleaned up PodChaos/ca-20261011-034720-pod-kill-adservice
+2026-10-11T03:48:19.604+00:00 COMPLETED

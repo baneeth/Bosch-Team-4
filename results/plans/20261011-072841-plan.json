@@ -1,0 +1,85 @@
+{
+  "plan_id": "20261011-072841-plan",
+  "created_at": "2026-10-11T07:28:41+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run the cartservice memory-exhaustion test first because it has the broadest shopper blast radius; wait for the pod and flows to recover before starting the second test. Then take paymentservice offline to demonstrate a distinct, checkout-specific error mode. These two experiments cover two failure classes; the two-experiment budget does not allow the general three-class coverage goal.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "cartservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica with a 128 Mi limit, reach 1.0 across all five flows, and is shared by frontend and checkoutservice on the revenue path. A prior 110 MB cartservice stress run caused errors across all flows, was guard-aborted, and restarted the pod, so this is a directly shopper-visible, high-blast-radius resource-exhaustion demonstration. The validator accepted this configuration.",
+        "hypothesis": "The 110 MB allocation will exhaust cartservice's memory headroom, causing an OOM/restart and failures or severe latency across cart-dependent shopper flows; the safety guard will likely remove the fault before 30 seconds elapse.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Confirm the live-shop blast radius and recovery behavior when the single cartservice replica reaches memory exhaustion."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked second to test a distinct failure type on a narrower but revenue-critical path: paymentservice is a single replica used by checkoutservice, and its reach is limited to checkout. Past 30-second paymentservice failures produced checkout errors, with peak error rates around 21%; the validator accepted this configuration. Run only after cartservice has recovered so the shopper-visible effects remain attributable to this fault.",
+        "hypothesis": "With paymentservice unavailable, checkout attempts will fail while home, product, cart, and view-cart flows remain available; latency should remain close to baseline, and the error guard may abort the test.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the shopper-visible checkout impact and guard response to a payment dependency outage, distinct from cart resource exhaustion."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "network_delay productcatalogservice at 300 ms for 60 seconds",
+      "why_not": "The service is a single-replica dependency on every flow, and prior runs at only 100 ms already raised p95 to roughly 716–757 ms. The proposed intensity is likely to drive the slowdown guard, making it a poor choice for this short demo."
+    },
+    {
+      "idea": "network_loss cartservice at 20% for 30 seconds",
+      "why_not": "A prior run at this intensity was guard-aborted after p95 exceeded 1500 ms; cartservice's broad blast radius makes this a less controlled demo than the selected pair."
+    },
+    {
+      "idea": "pod_kill cartservice for 30 seconds",
+      "why_not": "Prior runs showed severe, all-flow shopper impact and roughly 22–24 seconds for the pod to become ready. The selected cartservice memory test already demonstrates its broad impact while providing a different failure class from the payment outage."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "resource exhaustion"
+  ],
+  "transcript": "ai/20261011-072841-planner.json",
+  "note": null
+}

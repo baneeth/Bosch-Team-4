@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "productcatalogservice",
+    "params": {
+      "size_mb": 112,
+      "workers": 1
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Increase the earlier productcatalogservice memory allocation from 64 MB to 112 MB to probe the near-limit OOM behavior the prior test did not expose.",
+    "hypothesis": "Allocating 112 MB inside the catalog container may exceed its remaining memory headroom and trigger OOM or service unavailability; because the catalog dependency reaches all flows, this may cause broad impact and trip the safety guard.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-203939-memory-stress-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203939-memory_stress-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Increase the earlier productcatalogservice memory allocation from 64 MB to 112 MB to probe the near-limit OOM behavior the prior test did not expose."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "112MB"
+        }
+      }
+    }
+  }
+}

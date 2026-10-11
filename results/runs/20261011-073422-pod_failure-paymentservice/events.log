@@ -1,0 +1,12 @@
+2026-10-11T07:34:22.483+00:00 run 20261011-073422-pod_failure-paymentservice: pod_failure on paymentservice for 30s {}
+2026-10-11T07:34:22.483+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T07:34:22.505+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T07:34:22.521+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T07:34:42.541+00:00 pre-check ok: 60 requests, 0% errors, p95 21ms
+2026-10-11T07:34:42.551+00:00 INJECTED PodChaos/ca-20261011-073422-pod-failure-paymentservice
+2026-10-11T07:34:43.679+00:00 ABORT kill switch: chaos resource was deleted externally -> removing PodChaos/ca-20261011-073422-pod-failure-paymentservice
+2026-10-11T07:34:43.685+00:00 fault removed in 0.0s
+2026-10-11T07:34:43.686+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T07:34:45.708+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T07:34:45.726+00:00 prediction partly (2/4 aspects matched)
+2026-10-11T07:34:51.774+00:00 ABORTED: kill switch: chaos resource was deleted externally

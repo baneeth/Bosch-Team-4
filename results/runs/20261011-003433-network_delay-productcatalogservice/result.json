@@ -1,0 +1,47 @@
+{
+  "run_id": "20261011-003433-network_delay-productcatalogservice",
+  "spec": {
+    "type": "network_delay",
+    "target": "productcatalogservice",
+    "params": {
+      "latency_ms": 500
+    },
+    "duration_s": 60,
+    "max_error_rate": null,
+    "max_p95_ms": 300.0,
+    "reason": null,
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual",
+    "combined_with": []
+  },
+  "status": "ABORTED",
+  "abort_reason": "manual abort (Ctrl-C) (before injection)",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 300.0
+  },
+  "started_at": "2026-10-11T00:34:33.157+00:00",
+  "injected_at": null,
+  "fault_ended_at": null,
+  "fault_duration_s": null,
+  "recovery_s": null,
+  "pod_ready_s": null,
+  "peak_error_rate": 0.0,
+  "peak_p95_ms": null,
+  "impact_error_rate": null,
+  "impact_p95_ms": null,
+  "availability": null,
+  "affected_flows": [],
+  "guard_breaches": [],
+  "worst_flow": null,
+  "flow_impact": {},
+  "prediction_check": null,
+  "flags": [],
+  "pod_restarts": {},
+  "resources": {},
+  "node_cpu_baseline_pct": null,
+  "node_cpu_peak_pct": null,
+  "load": null,
+  "notes": []
+}

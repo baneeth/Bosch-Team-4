@@ -1,0 +1,13 @@
+2026-10-10T17:40:35.033+00:00 run 20261010-174035-network_delay-shippingservice: network_delay on shippingservice for 45s {'latency_ms': 20, 'jitter_ms': 5}
+2026-10-10T17:40:35.033+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T17:40:35.055+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T17:40:35.070+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T17:40:55.087+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T17:40:55.095+00:00 INJECTED NetworkChaos/ca-20261010-174035-network-delay-shippingservice
+2026-10-10T17:40:56.175+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T17:41:40.213+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T17:41:40.214+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T17:41:42.232+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T17:41:42.743+00:00 cleaned up NetworkChaos/ca-20261010-174035-network-delay-shippingservice
+2026-10-10T17:41:42.760+00:00 prediction confirmed (4/4 aspects matched)
+2026-10-10T17:41:48.812+00:00 COMPLETED

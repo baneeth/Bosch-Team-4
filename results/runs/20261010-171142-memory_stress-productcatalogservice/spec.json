@@ -1,0 +1,50 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "productcatalogservice",
+    "params": {
+      "size_mb": 64
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Day-2 live test of memory_stress",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-171142-memory-stress-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-171142-memory_stress-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Day-2 live test of memory_stress"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "64MB"
+        }
+      }
+    }
+  }
+}

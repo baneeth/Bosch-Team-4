@@ -1,0 +1,93 @@
+{
+  "plan_id": "20261011-061014-plan",
+  "created_at": "2026-10-11T06:10:14+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Test cartservice loss first: its single replica is a shared dependency on all five flows and the checkout path, and prior kills caused shopper-visible errors followed by roughly 22–31 seconds of recovery. Once cartservice is ready and all flows have returned to baseline, apply the frontend load spike as a distinct fault on a different service; 200 users probes resource pressure below the repeated 300-user guard-abort region. Together the runs expose errors and recovery as well as resource-driven slowdown.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first for its broad, high-risk blast radius: cartservice has one replica, reach 1.0 across home, product, add_to_cart, view_cart, and checkout, and is shared by frontend and checkoutservice on the revenue path. Prior cartservice kills affected all five flows, with impact error rates around 83–96% and recovery around 22–31 seconds, making this a direct live-site test of errors and replacement recovery.",
+        "hypothesis": "While Kubernetes replaces the sole cartservice pod, requests depending on cart operations will fail or slow across the shop; after the replacement becomes ready, flows should recover. The fault is expected to complete while making the outage plainly visible to shoppers.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the shopper-visible blast radius of losing cartservice and the time for Kubernetes replacement and user flows to recover."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 200,
+          "ramp_s": 30,
+          "think_ms": 1000,
+          "checkout_pct": 20
+        },
+        "duration_s": 90,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "The frontend is a single-replica entrypoint for every user request and has a 200m CPU limit. Prior 150-user spikes visibly slowed all five flows while completing without errors; repeated 300-user spikes crossed the p95 guard. At 200 users this probes frontend resource pressure between those observed levels, on a different service and with a different fault type from the cartservice kill.",
+        "hypothesis": "The increased concurrency should cause noticeable latency across the user flows as the single frontend handles the load, but should remain below the guard threshold at this intensity. Prior spikes suggest errors are less likely than broad slowdown.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Find how much shopper-visible latency rises at 200 concurrent users and whether the frontend still stays below the guard."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "network_delay productcatalogservice, 300 ms for 60 s",
+      "why_not": "Prior +100 ms runs already raised page p95 by roughly 700–757 ms, consistent with the repeated catalog calls; 300 ms risks crossing the p95 guard and yielding only a short aborted slowdown test."
+    },
+    {
+      "idea": "memory_stress cartservice, 110 MB for 30 s",
+      "why_not": "A prior 110 MB cartservice run OOM-killed the pod, produced errors across all flows, and required about 42 seconds to recover. The selected cartservice kill already gives a live, broad cart-failure and recovery test; the spike adds a different service and failure type."
+    },
+    {
+      "idea": "network_loss cartservice, 20% for 30 s",
+      "why_not": "A prior run was stopped by the p95 guard after about 6.6 seconds, so it is likely to reproduce an abrupt guard abort rather than provide a useful second demonstration."
+    }
+  ],
+  "coverage": [
+    "recovery",
+    "resource exhaustion"
+  ],
+  "transcript": "ai/20261011-061014-planner.json",
+  "note": null
+}

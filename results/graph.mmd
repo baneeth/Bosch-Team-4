@@ -1,0 +1,36 @@
+flowchart LR
+  adservice["adservice<br/>1 replica"]:::medium
+  cartservice["cartservice<br/>1 replica"]:::high
+  checkoutservice["checkoutservice<br/>1 replica"]:::medium
+  currencyservice["currencyservice<br/>1 replica"]:::high
+  emailservice["emailservice<br/>1 replica"]:::medium
+  frontend["frontend<br/>1 replica"]:::high
+  loadgenerator["loadgenerator<br/>(traffic)"]:::traffic
+  paymentservice["paymentservice<br/>1 replica"]:::medium
+  productcatalogservice["productcatalogservice<br/>1 replica"]:::high
+  recommendationservice["recommendationservice<br/>1 replica"]:::medium
+  redis_cart["redis-cart<br/>1 replica"]:::high
+  shippingservice["shippingservice<br/>1 replica"]:::high
+  shoppingassistantservice["shoppingassistantservice<br/>(missing)"]:::missing
+  cartservice --> redis_cart
+  checkoutservice --> productcatalogservice
+  checkoutservice --> shippingservice
+  checkoutservice --> paymentservice
+  checkoutservice --> emailservice
+  checkoutservice --> currencyservice
+  checkoutservice --> cartservice
+  frontend --> productcatalogservice
+  frontend --> currencyservice
+  frontend --> cartservice
+  frontend --> recommendationservice
+  frontend --> shippingservice
+  frontend --> checkoutservice
+  frontend --> adservice
+  frontend -.-> shoppingassistantservice
+  loadgenerator -.-> frontend
+  recommendationservice --> productcatalogservice
+  classDef high fill:#f8d7da,stroke:#b02a37,color:#000
+  classDef medium fill:#fff3cd,stroke:#997404,color:#000
+  classDef low fill:#d1e7dd,stroke:#146c43,color:#000
+  classDef traffic fill:#e2e3e5,stroke:#6c757d,color:#000
+  classDef missing fill:#fff,stroke:#6c757d,stroke-dasharray:4 4,color:#6c757d

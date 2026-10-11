@@ -1,0 +1,37 @@
+# Secrets and machine-specific details - never commit (the repo is a public deliverable)
+*.pem
+*.key
+kubeconfig*
+infra/VM-details.txt
+infra/vm.env
+day-*-details.md
+prompts/inject-fault.md
+.env
+.chaos-lab/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Bulky raw run data (selected runs are copied to results/ as evidence)
+results/raw/
+
+# Browser automation scratch
+.playwright-mcp/
+
+# Teammates' tooling: a scratch copy of the latest console log (duplicate of results/runs/<id>/console.log)
+# and per-run links files that contain the VM's public IP
+results/console-latest.log
+results/runs/*/links.txt
+
+# Dashboard (React): dependencies, build output, local screenshots
+dashboard/node_modules/
+dashboard/client/dist/
+dashboard/.shots/
+
+# Internal project notes (progress log and assistant memory) - kept local, not published
+CLAUDE.md
+plan.md

@@ -1,0 +1,62 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "recommendationservice",
+    "params": {
+      "latency_ms": 30,
+      "jitter_ms": 5
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "recommendationservice is single-replica and reaches product, view_cart, and checkout. Its earlier 40 ms delay attempt was aborted before injection, leaving its slowdown sensitivity unmeasured; 30 ms with modest jitter is a bounded probe, unlike the documented 100 ms catalog delay that drove all flows to roughly 700 ms.",
+    "hypothesis": "Added latency will slow flows that call recommendationservice, particularly product, without causing errors or approaching the 1500 ms guard limit.",
+    "prediction": {
+      "affected_flows": [
+        "product",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-203716-network-delay-recommendationservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-203716-network_delay-recommendationservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "recommendationservice is single-replica and reaches product, view_cart, and checkout. Its earlier 40 ms delay attempt was aborted before injection, leaving its slowdown sensitivity unmeasured; 30 ms with modest jitter is a bounded probe, unlike the d"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "recommendationservice"
+        }
+      },
+      "duration": "45s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "30ms",
+        "jitter": "5ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

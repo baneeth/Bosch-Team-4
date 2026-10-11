@@ -1,0 +1,13 @@
+2026-10-10T17:35:50.382+00:00 run 20261010-173550-memory_stress-shippingservice: memory_stress on shippingservice for 15s {'size_mb': 100, 'workers': 1}
+2026-10-10T17:35:50.383+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T17:35:50.404+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-10T17:35:50.421+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T17:36:10.440+00:00 pre-check ok: 59 requests, 0% errors, p95 15ms
+2026-10-10T17:36:10.447+00:00 INJECTED StressChaos/ca-20261010-173550-memory-stress-shippingservice
+2026-10-10T17:36:10.548+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T17:36:25.564+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-10T17:36:25.564+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T17:36:27.582+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T17:36:28.094+00:00 cleaned up StressChaos/ca-20261010-173550-memory-stress-shippingservice
+2026-10-10T17:36:28.111+00:00 prediction refuted (0/4 aspects matched)
+2026-10-10T17:36:34.157+00:00 COMPLETED

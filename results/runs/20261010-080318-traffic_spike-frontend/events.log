@@ -1,0 +1,10 @@
+2026-10-10T08:03:18.463+00:00 run 20261010-080318-traffic_spike-frontend: traffic_spike on frontend for 90s {'users': 100, 'ramp_s': 30, 'think_ms': 1000, 'checkout_pct': 20}
+2026-10-10T08:03:18.467+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T08:03:18.502+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T08:03:38.520+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T08:03:38.522+00:00 INJECTED k6 traffic spike (100 users)
+2026-10-10T08:05:12.140+00:00 duration elapsed - fault ended by itself
+2026-10-10T08:05:12.141+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T08:05:16.179+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T08:05:16.180+00:00 cleaned up k6 traffic spike (100 users)
+2026-10-10T08:05:22.222+00:00 COMPLETED

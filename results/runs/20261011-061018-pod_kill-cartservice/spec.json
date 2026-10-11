@@ -1,0 +1,58 @@
+{
+  "spec": {
+    "type": "pod_kill",
+    "target": "cartservice",
+    "params": {
+      "grace_period_s": 0
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first for its broad, high-risk blast radius: cartservice has one replica, reach 1.0 across home, product, add_to_cart, view_cart, and checkout, and is shared by frontend and checkoutservice on the revenue path. Prior cartservice kills affected all five flows, with impact error rates around 83\u201396% and recovery around 22\u201331 seconds, making this a direct live-site test of errors and replacement recovery.",
+    "hypothesis": "While Kubernetes replaces the sole cartservice pod, requests depending on cart operations will fail or slow across the shop; after the replacement becomes ready, flows should recover. The fault is expected to complete while making the outage plainly visible to shoppers.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-061018-pod-kill-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-061018-pod_kill-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Ranked first for its broad, high-risk blast radius: cartservice has one replica, reach 1.0 across home, product, add_to_cart, view_cart, and checkout, and is shared by frontend and checkoutservice on the revenue path. Prior cartservice kills affected"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  }
+}

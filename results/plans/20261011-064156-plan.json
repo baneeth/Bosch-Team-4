@@ -1,0 +1,84 @@
+{
+  "plan_id": "20261011-064156-plan",
+  "created_at": "2026-10-11T06:41:56+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run the broad cartservice recovery test first, then—after the shop has recovered—test the narrower checkout-only payment failure. The two-experiment budget cannot cover three distinct failure classes; these experiments cover recovery and errors while using different experiment types and services.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, has high risk, is shared by frontend and checkoutservice, and reaches all five flows. Prior cartservice pod kills affected all flows with peak errors near 90–100% and recovery around 22–31 seconds, making this the broadest shopper-visible test.",
+        "hypothesis": "The killed cartservice pod will cause visible errors across shopping and checkout flows until Kubernetes replaces it; recovery will take tens of seconds. The brief outage is expected to complete rather than be stopped by the guard, consistent with prior cartservice pod-kill runs.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the shopper-visible blast radius and recovery time when the single cartservice pod is killed."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked second because paymentservice is a single replica on the revenue-critical checkout path, but its reach is limited to checkout. Prior 30-second paymentservice failures affected checkout; observed peak error rates around 21% show this failure is visible and may activate the guard.",
+        "hypothesis": "With paymentservice unavailable, checkout attempts will fail while the other flows remain usable. Errors should dominate rather than latency; the guard is likely to abort if the checkout error threshold is exceeded on consecutive checks.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Verify whether checkout errors from a sustained payment dependency outage cross the safety guard threshold, and confirm isolation from other shopper flows."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "network_delay on productcatalogservice at 300 ms for 60 s",
+      "why_not": "Prior +100 ms already made pages roughly 700 ms slower across all flows, and the service is called sequentially multiple times; this stronger slowdown risks tripping the p95 guard rather than providing a controlled shopper-visible slowdown test."
+    },
+    {
+      "idea": "traffic_spike on frontend at 200 users",
+      "why_not": "A prior 200-user run reached p95 1578 ms and was guard-aborted. The frontend is also the single-replica entrypoint, so this recipe risks broadly disrupting shoppers."
+    },
+    {
+      "idea": "memory_stress on cartservice at 110 MB",
+      "why_not": "A prior run at this intensity was guard-aborted with high errors across all flows and a cartservice restart; the selected cartservice test already provides the broad cart-path failure measurement."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery"
+  ],
+  "transcript": "ai/20261011-064156-planner.json",
+  "note": null
+}

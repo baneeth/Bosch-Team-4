@@ -1,0 +1,13 @@
+2026-10-11T07:38:01.028+00:00 run 20261011-073801-memory_stress-cartservice: memory_stress on cartservice for 30s {'size_mb': 110, 'workers': 1}
+2026-10-11T07:38:01.029+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T07:38:01.055+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T07:38:01.076+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T07:38:21.096+00:00 pre-check ok: 60 requests, 0% errors, p95 15ms
+2026-10-11T07:38:21.104+00:00 INJECTED StressChaos/ca-20261011-073801-memory-stress-cartservice
+2026-10-11T07:38:21.186+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T07:38:24.177+00:00 ABORT guard: error rate 55% > 20% -> removing StressChaos/ca-20261011-073801-memory-stress-cartservice
+2026-10-11T07:38:24.692+00:00 fault removed in 0.5s
+2026-10-11T07:38:24.693+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T07:38:56.732+00:00 steady state restored: recovery 25.0s after the fault ended
+2026-10-11T07:38:56.755+00:00 prediction partly (3/4 aspects matched)
+2026-10-11T07:39:02.798+00:00 ABORTED: guard: error rate 55% > 20%

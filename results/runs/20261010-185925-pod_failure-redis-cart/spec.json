@@ -1,0 +1,54 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "redis-cart",
+    "params": {},
+    "duration_s": 20,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because redis-cart is a single-replica, stateful service holding cart data, and the map gives it reach across all five flows and the checkout path. This short outage tests the broadest critical dependency; the fault does not intentionally delete cart data.",
+    "hypothesis": "While Redis is unavailable, cart operations will fail and affect all flows that depend on cartservice; removing the fault should restore access to existing cart data.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-185925-pod-failure-redis-cart",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-185925-pod_failure-redis-cart"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Ranked first because redis-cart is a single-replica, stateful service holding cart data, and the map gives it reach across all five flows and the checkout path. This short outage tests the broadest critical dependency; the fault does not intentionall"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "redis-cart"
+        }
+      },
+      "duration": "20s",
+      "action": "pod-failure"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+2026-10-11T04:47:00.211+00:00 run 20261011-044700-memory_stress-currencyservice: memory_stress on currencyservice for 15s {'size_mb': 112, 'workers': 1}
+2026-10-11T04:47:00.211+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T04:47:00.234+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T04:47:00.255+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T04:47:20.275+00:00 pre-check ok: 60 requests, 0% errors, p95 16ms
+2026-10-11T04:47:20.285+00:00 INJECTED StressChaos/ca-20261011-044700-memory-stress-currencyservice
+2026-10-11T04:47:20.369+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T04:47:35.373+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T04:47:35.374+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T04:47:37.394+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T04:47:37.903+00:00 cleaned up StressChaos/ca-20261011-044700-memory-stress-currencyservice
+2026-10-11T04:47:37.928+00:00 prediction refuted (1/4 aspects matched)
+2026-10-11T04:47:43.972+00:00 COMPLETED

@@ -1,0 +1,10 @@
+2026-10-10T08:07:23.274+00:00 run 20261010-080723-traffic_spike-frontend: traffic_spike on frontend for 120s {'users': 50, 'ramp_s': 10, 'think_ms': 1000, 'checkout_pct': 20}
+2026-10-10T08:07:23.278+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T08:07:23.313+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T08:07:43.329+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T08:07:43.331+00:00 INJECTED k6 traffic spike (50 users)
+2026-10-10T08:08:00.360+00:00 ABORT kill switch: load generator stopped before its scheduled end (exit code 105) -> removing k6 traffic spike (50 users) at ~50 users
+2026-10-10T08:08:00.361+00:00 fault removed in 0.0s
+2026-10-10T08:08:00.362+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T08:08:02.380+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T08:08:08.418+00:00 ABORTED: kill switch: load generator stopped before its scheduled end (exit code 105)

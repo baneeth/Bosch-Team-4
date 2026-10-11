@@ -1,0 +1,13 @@
+2026-10-11T04:45:50.705+00:00 run 20261011-044550-network_loss-cartservice: network_loss on cartservice for 30s {'loss_pct': 5, 'correlation_pct': 0}
+2026-10-11T04:45:50.706+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-11T04:45:50.741+00:00 Kubernetes server-side dry-run accepted the fault definition
+2026-10-11T04:45:50.759+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-11T04:46:10.778+00:00 pre-check ok: 60 requests, 0% errors, p95 16ms
+2026-10-11T04:46:10.790+00:00 INJECTED NetworkChaos/ca-20261011-044550-network-loss-cartservice
+2026-10-11T04:46:11.893+00:00 Chaos Mesh confirms the fault is injected
+2026-10-11T04:46:40.915+00:00 duration elapsed - Chaos Mesh reverted the fault
+2026-10-11T04:46:40.916+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-11T04:46:42.936+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-11T04:46:43.449+00:00 cleaned up NetworkChaos/ca-20261011-044550-network-loss-cartservice
+2026-10-11T04:46:43.466+00:00 prediction partly (2/4 aspects matched)
+2026-10-11T04:46:49.515+00:00 COMPLETED

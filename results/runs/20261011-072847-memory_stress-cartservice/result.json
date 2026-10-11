@@ -1,0 +1,298 @@
+{
+  "run_id": "20261011-072847-memory_stress-cartservice",
+  "spec": {
+    "type": "memory_stress",
+    "target": "cartservice",
+    "params": {
+      "size_mb": 110,
+      "workers": 1
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Ranked first because cartservice is a single replica with a 128 Mi limit, reach 1.0 across all five flows, and is shared by frontend and checkoutservice on the revenue path. A prior 110 MB cartservice stress run caused errors across all flows, was guard-aborted, and restarted the pod, so this is a directly shopper-visible, high-blast-radius resource-exhaustion demonstration. The validator accepted this configuration.",
+    "hypothesis": "The 110 MB allocation will exhaust cartservice's memory headroom, causing an OOM/restart and failures or severe latency across cart-dependent shopper flows; the safety guard will likely remove the fault before 30 seconds elapse.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "status": "ABORTED",
+  "abort_reason": "guard: error rate 55% > 20%",
+  "thresholds": {
+    "max_error_rate": 0.2,
+    "max_p95_ms": 1500.0
+  },
+  "started_at": "2026-10-11T07:28:47.153+00:00",
+  "injected_at": "2026-10-11T07:29:07.224+00:00",
+  "fault_ended_at": "2026-10-11T07:29:10.807+00:00",
+  "fault_duration_s": 3.6,
+  "recovery_s": 41.0,
+  "pod_ready_s": null,
+  "peak_error_rate": 1.0,
+  "peak_p95_ms": 1127.5,
+  "impact_error_rate": 0.9593,
+  "impact_p95_ms": 5.3,
+  "availability": 0.0407,
+  "affected_flows": [
+    "home",
+    "product",
+    "add_to_cart",
+    "view_cart",
+    "checkout"
+  ],
+  "guard_breaches": [
+    "error rate 35% > 20%"
+  ],
+  "worst_flow": "add_to_cart",
+  "flow_impact": {
+    "home": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 10.9,
+        "p95_ms": 17.1,
+        "p99_ms": 77.0
+      },
+      "impact": {
+        "count": 36,
+        "errors": 35,
+        "error_rate": 0.9722,
+        "p50_ms": 3.3,
+        "p95_ms": 4.4,
+        "p99_ms": 13.6
+      },
+      "p95_factor": 0.26
+    },
+    "product": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 8.9,
+        "p95_ms": 14.0,
+        "p99_ms": 20.0
+      },
+      "impact": {
+        "count": 36,
+        "errors": 34,
+        "error_rate": 0.9444,
+        "p50_ms": 3.4,
+        "p95_ms": 176.4,
+        "p99_ms": 862.5
+      },
+      "p95_factor": 12.6
+    },
+    "add_to_cart": {
+      "baseline": {
+        "count": 96,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 3.6,
+        "p95_ms": 6.6,
+        "p99_ms": 8.2
+      },
+      "impact": {
+        "count": 36,
+        "errors": 32,
+        "error_rate": 0.8889,
+        "p50_ms": 2.7,
+        "p95_ms": 267.8,
+        "p99_ms": 1191.5
+      },
+      "p95_factor": 40.58
+    },
+    "view_cart": {
+      "baseline": {
+        "count": 94,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 9.9,
+        "p95_ms": 15.3,
+        "p99_ms": 18.7
+      },
+      "impact": {
+        "count": 32,
+        "errors": 32,
+        "error_rate": 1.0,
+        "p50_ms": 2.9,
+        "p95_ms": 3.3,
+        "p99_ms": 3.4
+      },
+      "p95_factor": 0.22
+    },
+    "checkout": {
+      "baseline": {
+        "count": 93,
+        "errors": 0,
+        "error_rate": 0.0,
+        "p50_ms": 13.7,
+        "p95_ms": 21.6,
+        "p99_ms": 35.0
+      },
+      "impact": {
+        "count": 32,
+        "errors": 32,
+        "error_rate": 1.0,
+        "p50_ms": 2.7,
+        "p95_ms": 3.2,
+        "p99_ms": 4.4
+      },
+      "p95_factor": 0.15
+    }
+  },
+  "prediction_check": {
+    "verdict": "confirmed",
+    "matched": 4,
+    "total": 4,
+    "observed": {
+      "affected_flows": [
+        "add_to_cart",
+        "checkout",
+        "home",
+        "product",
+        "view_cart"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "details": [
+      "affected flows: predicted ['add_to_cart', 'checkout', 'home', 'product', 'view_cart'], observed ['add_to_cart', 'checkout', 'home', 'product', 'view_cart'] -> match",
+      "error band: predicted high, observed high -> match",
+      "slowdown band: predicted severe, observed severe -> match",
+      "outcome: predicted ABORTED, observed ABORTED -> match"
+    ]
+  },
+  "flags": [],
+  "pod_restarts": {
+    "cartservice": 1
+  },
+  "resources": {
+    "adservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 300.0,
+      "memory_peak_mib": 99.2
+    },
+    "cartservice": {
+      "cpu_limit_cores": 0.3,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.064,
+      "cpu_peak_pct_of_limit": 21.5,
+      "throttled_peak_pct": 77.3,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 55.5
+    },
+    "checkoutservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.006,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 4.2,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 10.0
+    },
+    "currencyservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.027,
+      "cpu_peak_pct_of_limit": 13.3,
+      "throttled_peak_pct": 0.7,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 37.1
+    },
+    "emailservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 36.1
+    },
+    "frontend": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.045,
+      "cpu_peak_cores": 0.052,
+      "cpu_peak_pct_of_limit": 25.8,
+      "throttled_peak_pct": 1.4,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 15.5
+    },
+    "loadgenerator": {
+      "cpu_limit_cores": 0.5,
+      "cpu_baseline_cores": null,
+      "cpu_peak_cores": 0.004,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 512.0,
+      "memory_peak_mib": 88.0
+    },
+    "paymentservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.002,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 0.8,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 31.8
+    },
+    "productcatalogservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.015,
+      "cpu_peak_cores": 0.008,
+      "cpu_peak_pct_of_limit": 3.9,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 9.6
+    },
+    "recommendationservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.016,
+      "cpu_peak_cores": 0.011,
+      "cpu_peak_pct_of_limit": 5.5,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 450.0,
+      "memory_peak_mib": 32.9
+    },
+    "redis-cart": {
+      "cpu_limit_cores": 0.125,
+      "cpu_baseline_cores": 0.003,
+      "cpu_peak_cores": 0.002,
+      "cpu_peak_pct_of_limit": 1.7,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 256.0,
+      "memory_peak_mib": 6.2
+    },
+    "shippingservice": {
+      "cpu_limit_cores": 0.2,
+      "cpu_baseline_cores": 0.004,
+      "cpu_peak_cores": 0.0,
+      "cpu_peak_pct_of_limit": 0.2,
+      "throttled_peak_pct": 0.0,
+      "memory_limit_mib": 128.0,
+      "memory_peak_mib": 8.7
+    }
+  },
+  "node_cpu_baseline_pct": 21.1,
+  "node_cpu_peak_pct": 32.7,
+  "load": null,
+  "notes": [
+    "kill switch took 0.5s from decision to fault removed"
+  ]
+}

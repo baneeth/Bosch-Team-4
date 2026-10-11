@@ -1,0 +1,94 @@
+{
+  "campaign_id": "20261011-064201-campaign",
+  "plan_id": "20261011-064156-plan",
+  "started_at": "2026-10-11T06:42:01+00:00",
+  "ended_at": "2026-10-11T06:44:27+00:00",
+  "status": "stopped: budget used (2 experiments)",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, has high risk, is shared by frontend and checkoutservice, and reaches all five flows. Prior cartservice pod kills affected all flows with peak errors near 90–100% and recovery around 22–31 seconds, making this the broadest shopper-visible test.",
+        "hypothesis": "The killed cartservice pod will cause visible errors across shopping and checkout flows until Kubernetes replaces it; recovery will take tens of seconds. The brief outage is expected to complete rather than be stopped by the guard, consistent with prior cartservice pod-kill runs.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-064201-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 27.6,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 711.7,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked second because paymentservice is a single replica on the revenue-critical checkout path, but its reach is limited to checkout. Prior 30-second paymentservice failures affected checkout; observed peak error rates around 21% show this failure is visible and may activate the guard.",
+        "hypothesis": "With paymentservice unavailable, checkout attempts will fail while the other flows remain usable. Errors should dominate rather than latency; the guard is likely to abort if the checkout error threshold is exceeded on consecutive checks.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-064314-pod_failure-paymentservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 25% > 20%",
+      "recovery_s": 1.0,
+      "peak_error_rate": 0.25,
+      "peak_p95_ms": 729.2,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-064201-pod_kill-cartservice",
+      "action": "continue",
+      "reason": "The cartservice pod kill completed as predicted and affected all five flows, with 90.48% impact error rate, a 28.21× worst-flow slowdown, and 27.6 s recovery; the shop is now healthy. The planned 30 s paymentservice pod_failure is validator-approved and probes the distinct, checkout-limited failure mode.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-064314-adapter.json"
+    },
+    {
+      "after_run": "20261011-064314-pod_failure-paymentservice",
+      "action": "insert_followup",
+      "reason": "The paymentservice pod_failure aborted at a 25% peak error rate, with 75% checkout errors; unexpectedly, add_to_cart also reached 729.2 ms p95 (110.48× baseline) despite zero errors. Probe paymentservice with a moderate delay to see whether a less disruptive fault reproduces latency or cross-flow impact.",
+      "applied": true,
+      "detail": "follow-up inserted: network_delay on paymentservice {'latency_ms': 100, 'jitter_ms': 0}",
+      "transcript": "ai/20261011-064427-adapter.json"
+    }
+  ],
+  "skipped": []
+}

@@ -1,0 +1,86 @@
+{
+  "campaign_id": "20261011-073307-campaign",
+  "plan_id": "20261011-073302-plan",
+  "started_at": "2026-10-11T07:33:07+00:00",
+  "ended_at": "2026-10-11T07:34:51+00:00",
+  "status": "stopped: manual abort (kill switch: chaos resource was deleted externally)",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, is shared by frontend and checkoutservice, and reaches all five flows. Prior 30-second cartservice pod-kill runs visibly affected all flows, with high errors and recovery taking about 22–31 seconds. Validator accepted this configuration.",
+        "hypothesis": "While cartservice is unavailable and being replaced, shoppers will see errors across the shop; after the replacement becomes Ready, flows will recover. The experiment should complete while exposing the blast radius and recovery time.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-073307-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 31.1,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 940.4,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked second because paymentservice is a single replica on the revenue-critical checkout path, but its map reach is limited to checkout, reducing the blast radius compared with cartservice. Prior paymentservice pod-failure runs visibly affected checkout and reached a 21–25% peak error rate; a short guard abort is expected and useful for measuring this failure. Validator accepted this configuration.",
+        "hypothesis": "Checkout attempts will fail while paymentservice is unavailable, while the other flows should remain usable. The error guard may remove the fault before its full 30-second duration.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261011-073422-pod_failure-paymentservice",
+      "status": "ABORTED",
+      "abort_reason": "kill switch: chaos resource was deleted externally",
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 28.5,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261011-073307-pod_kill-cartservice",
+      "action": "continue",
+      "reason": "The cartservice pod kill confirmed the predicted broad blast radius: all five flows were affected, with a 74.79% impact error rate and severe slowdown, and the shop is now healthy again. The planned paymentservice pod failure remains a useful, distinct probe of the checkout-only dependency path and adds a second failure class.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261011-073422-adapter.json"
+    }
+  ],
+  "skipped": []
+}

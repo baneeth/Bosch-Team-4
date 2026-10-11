@@ -1,0 +1,62 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "productcatalogservice",
+    "params": {
+      "latency_ms": 100
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shared dependency of 3 services",
+    "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "severe",
+      "outcome": "COMPLETED"
+    },
+    "origin": "fallback"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261010-171613-network-delay-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-171613-network_delay-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shared dependency of 3 services"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "45s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "100ms",
+        "jitter": "0ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "productcatalogservice",
+    "params": {
+      "size_mb": 124,
+      "workers": 1
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Increase the allocation beyond the prior 112 MB test, which peaked at 118.2 MiB without impact, to probe the 128 MiB container limit on the single-replica catalog service.",
+    "hypothesis": "The larger allocation may exceed the catalog container's memory limit and cause OOM or temporary unavailability, affecting flows that depend on the catalog and potentially triggering the safety guard.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "moderate",
+      "outcome": "ABORTED"
+    },
+    "origin": "adapter",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-204104-memory-stress-productcatalogservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-204104-memory_stress-productcatalogservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Increase the allocation beyond the prior 112 MB test, which peaked at 118.2 MiB without impact, to probe the 128 MiB container limit on the single-replica catalog service."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "productcatalogservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "124MB"
+        }
+      }
+    }
+  }
+}

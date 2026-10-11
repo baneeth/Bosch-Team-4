@@ -1,0 +1,63 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "cartservice",
+    "params": {
+      "size_mb": 110,
+      "workers": 1
+    },
+    "duration_s": 30,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "cartservice is a single replica with 1.0 reach across all five flows, is shared by frontend and checkoutservice, and has a 128 Mi memory limit. A prior 110 MB run caused errors across all flows, guard abort, and a 41-second recovery, so this is a high-risk, shopper-visible test of OOM behavior.",
+    "hypothesis": "Allocating 110 MB inside cartservice will exhaust its available memory, trigger errors across the shop, and likely cause the safety guard to abort the fault; the service may need time to recover.",
+    "prediction": {
+      "affected_flows": [
+        "home",
+        "product",
+        "add_to_cart",
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261011-073801-memory-stress-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-073801-memory_stress-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "cartservice is a single replica with 1.0 reach across all five flows, is shared by frontend and checkoutservice, and has a 128 Mi memory limit. A prior 110 MB run caused errors across all flows, guard abort, and a 41-second recovery, so this is a hig"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "30s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "110MB"
+        }
+      }
+    }
+  }
+}

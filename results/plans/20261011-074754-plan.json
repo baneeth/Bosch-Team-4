@@ -1,0 +1,93 @@
+{
+  "plan_id": "20261011-074754-plan",
+  "created_at": "2026-10-11T07:47:54+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run the cartservice pod kill first to expose the widest, highest-risk user impact and measure recovery; then run a lower-than-200-user frontend load spike to test capacity without repeating the known guard breach. Together, the experiments probe shopper-visible errors and recovery, plus resource pressure and slowdown, while using different experiment types and targets.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice is a single replica, a shared dependency of checkoutservice and frontend, and has reach across all five flows. Prior 30-second cartservice pod-kill runs showed errors across all flows and recovery around 22–31 seconds, making this a direct test of both the shopper-visible error blast radius and recovery.",
+        "hypothesis": "With the only cartservice pod terminated, shoppers will see errors across the shop until Kubernetes replaces it; all flows depend on cartservice directly or through checkout. The fault should complete and recovery should take tens of seconds.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the live shopper impact and recovery time when the single cartservice replica is killed."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 150,
+          "ramp_s": 30,
+          "think_ms": 1000,
+          "checkout_pct": 20
+        },
+        "duration_s": 60,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Frontend is a single-replica entrypoint with 200m CPU and 128Mi memory limits, so load is visible across every user flow. A previous 150-user, 30-second-ramp run completed with p95 around 1094 ms, while 200 users has previously breached the 1500 ms guard; 150 users provides visible slowdown while staying below that observed breach point.",
+        "hypothesis": "The increased load will put resource pressure on the single frontend and slow all flows substantially, but should complete without breaching the p95 guard or causing errors at this intensity.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Check whether the frontend sustains a shopper-visible, all-flow slowdown at 150 concurrent users without triggering the safety guard."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "network_delay on productcatalogservice at 300 ms for 60 seconds",
+      "why_not": "Prior evidence shows that even 100 ms added latency makes pages about 700 ms slower; the higher intensity risks simply tripping the slowdown guard and teaches less than the controlled load test."
+    },
+    {
+      "idea": "memory_stress on cartservice at 110 MB",
+      "why_not": "Prior runs at this intensity caused broad shopper-visible errors and guard aborts. The cartservice pod kill already probes broad outage impact and recovery, so this would add destructive risk without enough distinct learning."
+    },
+    {
+      "idea": "pod_failure on paymentservice",
+      "why_not": "It would expose checkout errors, but its impact is limited to the checkout path and overlaps the error-class learning from the broader cartservice outage."
+    }
+  ],
+  "coverage": [
+    "recovery",
+    "resource exhaustion"
+  ],
+  "transcript": "ai/20261011-074754-planner.json",
+  "note": null
+}

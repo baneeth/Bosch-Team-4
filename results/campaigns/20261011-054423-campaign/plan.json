@@ -1,0 +1,116 @@
+{
+  "plan_id": "20261011-054420-plan",
+  "created_at": "2026-10-11T05:44:20+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run a short, stateful-service recovery test first, followed by a bounded cart-service outage and a lower-intensity checkout-path slowdown. This covers recovery, errors, and slowdown while prioritizing single-replica dependencies with broad shopper impact; the shipping delay is last because prior tests suggest it remains far below the p95 guard.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_kill",
+        "target": "redis-cart",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because redis-cart is a single-replica stateful service holding cart data, is on the checkout path, and has reach 1.0 across all five flows. A prior 15-second pod_failure made the frontend unresponsive and was aborted, so this tests the distinct recovery behavior of a pod kill rather than repeating an already-known outcome.",
+        "hypothesis": "While Redis is being replaced, cart-dependent requests will fail or stall across the shop; after replacement, the service should recover and preserve or restore cart availability.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "How broad is shopper impact during redis-cart pod replacement, and does the safety guard intervene before cart availability returns?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "cartservice",
+        "params": {},
+        "duration_s": 10,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "cartservice has one replica, is a shared dependency of checkoutservice and frontend, and reaches every user flow. Prior cartservice pod kills caused high errors across all flows; this brief unavailability test checks whether the error blast radius differs when the pod stays unavailable rather than being immediately replaced.",
+        "hypothesis": "With cartservice unavailable, cart operations and flows that call the frontend/cart path will fail; the guard is likely to abort before the full 10 seconds elapse.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does sustained cartservice unavailability produce the same broad shopper impact as a pod kill, and how quickly does the guard contain it?"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_delay",
+        "target": "shippingservice",
+        "params": {
+          "latency_ms": 15,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is a single-replica high-risk dependency used by checkoutservice and frontend, with reach 0.4 on view_cart and checkout. Prior delays of 20 ms plus 5 ms jitter and 40 ms plus 5 ms jitter affected checkout without errors (p95 79.7 ms and 139.8 ms respectively); this lower intensity probes shopper-visible slowdown below the guard threshold.",
+        "hypothesis": "Checkout will slow moderately, while errors remain negligible and p95 stays well below 1500 ms; prior observations suggest the impact will be concentrated in checkout rather than view_cart.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "At a lower latency than previously tested, does shippingservice still make checkout noticeably slower, and is view_cart unaffected?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat 100 ms network delay on productcatalogservice.",
+      "why_not": "Repeated runs already show this adds roughly 700 ms across all flows; the outcome is well established and less informative than an untested target."
+    },
+    {
+      "idea": "Increase traffic_spike on frontend toward 300 users.",
+      "why_not": "Repeated 300-user runs have crossed the 1500 ms p95 guard, while prior runs already establish that this load produces broad slowdown."
+    },
+    {
+      "idea": "Memory stress cartservice near its memory limit.",
+      "why_not": "A prior 110 MB stress test already caused high errors across all flows and guard abort; repeating it would add risk without answering a new question."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "recovery",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-054420-planner.json",
+  "note": null
+}

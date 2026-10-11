@@ -1,0 +1,446 @@
+{
+  "report_id": "20261011-073104-report",
+  "created_at": "2026-10-11T07:31:04+00:00",
+  "scope": "20261011-072847-campaign",
+  "run_ids": [
+    "20261011-072847-memory_stress-cartservice"
+  ],
+  "model": "gpt-6-luna",
+  "score_version": "1",
+  "overall_score": 33.0,
+  "overall_anchor": 32.8,
+  "grade": "F",
+  "services": [
+    {
+      "service": "frontend",
+      "tested": false,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 32.0,
+        "recovery": 66.0,
+        "containment": 20.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 29.2,
+      "anchor_score": 60.0,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "Although frontend was not the fault target, all five user flows failed heavily in 20261011-072847-memory_stress-cartservice; overall impact error rate was 95.93% and peak p95 was 1127.5 ms versus a 16.5 ms baseline. The scores reflect this measured user-facing impact and 41-second recovery, while posture 60 reflects one replica with probes and limits."
+    },
+    {
+      "service": "cartservice",
+      "tested": true,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 43.0,
+        "recovery": 66.0,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": 0.0,
+        "latency": 42.7,
+        "recovery": 65.8,
+        "containment": 30.0,
+        "posture": 60.0
+      },
+      "score": 33.0,
+      "anchor_score": 32.8,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "In 20261011-072847-memory_stress-cartservice, impact error rate reached 95.93%, peak p95 was 1127.5 ms, recovery took 41 seconds, and cartservice restarted once. These scores retain the supplied tested anchors; its single replica, readiness/liveness probes, and resource limits yield posture 60."
+    },
+    {
+      "service": "checkoutservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 0.0,
+        "latency": 50.0,
+        "recovery": 60.0,
+        "containment": 35.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 34.0,
+      "anchor_score": 60.0,
+      "grade": "F",
+      "weight": 3.0,
+      "justification": "No experiment targeted checkoutservice directly, but the checkout flow had a 100% error rate during 20261011-072847-memory_stress-cartservice. The flow's 3.2 ms p95 is not evidence of usable fast checkout because the requests failed; other dimensions are inferred cautiously from its cartservice dependency and static posture."
+    },
+    {
+      "service": "adservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.0,
+      "justification": "No direct experiment targeted adservice, so the untested dimensions remain near the anchor using the supplied posture and dependency map. It is a single replica with probes and limits, and its home/product reach is lower than checkout-critical services."
+    },
+    {
+      "service": "currencyservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.5,
+      "justification": "No direct currencyservice fault test or service-specific impact measurement was provided. Scores remain near the untested anchor; the dependency map shows it is shared and checkout-relevant, with a single replica, probes, and limits."
+    },
+    {
+      "service": "emailservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.5,
+      "justification": "No direct emailservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. It is a single-replica checkout dependency with probes and limits."
+    },
+    {
+      "service": "paymentservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "No direct paymentservice fault test or service-specific measurement was provided, so scores remain near the untested anchor. The map places it on the checkout path, but the observed checkout errors arose during a cartservice fault."
+    },
+    {
+      "service": "productcatalogservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.8,
+      "justification": "No direct productcatalogservice fault test or service-specific measurement was provided. Scores remain near the untested anchor; it is a shared, checkout-relevant dependency with one replica, probes, and limits."
+    },
+    {
+      "service": "recommendationservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 1.2,
+      "justification": "No direct recommendationservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. Its single replica and dependency on productcatalogservice are noted, but the measured fault targeted cartservice."
+    },
+    {
+      "service": "redis-cart",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 3.0,
+      "justification": "redis-cart was not directly tested, so service-level dimensions remain near the untested anchor. It is a single-replica stateful dependency on the checkout path; the observed restart and flow failures were attributed to cartservice, not a measured redis-cart fault."
+    },
+    {
+      "service": "shippingservice",
+      "tested": false,
+      "dimensions": {
+        "availability": 60.0,
+        "latency": 60.0,
+        "recovery": 60.0,
+        "containment": 60.0,
+        "posture": 60.0
+      },
+      "anchors": {
+        "availability": null,
+        "latency": null,
+        "recovery": null,
+        "containment": null,
+        "posture": 60.0
+      },
+      "score": 60.0,
+      "anchor_score": 60.0,
+      "grade": "D",
+      "weight": 2.0,
+      "justification": "No direct shippingservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. It is a single-replica checkout dependency with probes and limits."
+    }
+  ],
+  "coverage": {
+    "experiments": 1,
+    "types": [
+      "memory_stress"
+    ],
+    "failure_classes": [
+      "resource exhaustion"
+    ]
+  },
+  "predictions": {
+    "confirmed": 1,
+    "partly": 0,
+    "refuted": 0
+  },
+  "ai": {
+    "summary": "A single memory-stress experiment on cartservice caused near-total failure across all five shopper flows, including checkout. The injected fault was removed after 3.6 seconds, but errors persisted until recovery at about 41 seconds, and cartservice restarted once. The external guard stopped the experiment; the application-level failure was not contained. Evidence is limited to one short run, so other services remain largely untested.",
+    "findings": [
+      {
+        "title": "Cartservice resource exhaustion causes a broad shopper-flow outage",
+        "severity": "critical",
+        "services": [
+          "cartservice",
+          "frontend",
+          "checkoutservice"
+        ],
+        "evidence_runs": [
+          "20261011-072847-memory_stress-cartservice"
+        ],
+        "evidence": "With 110 MB memory stress for one worker, overall impact error rate was 95.93%, peak error rate was 100%, peak p95 was 1127.5 ms, and the run was aborted by the error-rate guard. All five flows were affected: error rates were 88.9% on add_to_cart, 94.4% on product, 97.2% on home, and 100% on view_cart and checkout. cartservice restarted once; the fault was active for 3.6 seconds, but recovery took 41 seconds. Its configured memory limit was 128 Mi and peak CPU throttling was 77.3%.",
+        "root_cause": "The single cartservice replica has little resource headroom under memory pressure. Its restart and unavailability break requests that depend on cart operations; because cartservice is shared by frontend and checkoutservice, failures propagate across every shopper flow. The low p95 values in some individual flows coincide with very high error rates and therefore do not indicate successful fast responses.",
+        "fix": {
+          "target": "cartservice",
+          "action": "set_resources",
+          "cpu_limit_millicores": 300,
+          "memory_limit_mib": 256
+        },
+        "fix_rationale": "Increasing cartservice's memory limit addresses the demonstrated resource-exhaustion mechanism while retaining the existing CPU limit. This is a targeted mitigation for the memory-stress failure; it does not provide replica redundancy.",
+        "expected_improvement": "On the same stress experiment, expect no cartservice restart, substantially fewer cart-dependent request failures, and recovery closer to baseline without a prolonged post-fault error period.",
+        "verify_with": {
+          "type": "memory_stress",
+          "target": "cartservice",
+          "duration_s": 30,
+          "params": {
+            "size_mb": 110,
+            "workers": 1
+          }
+        }
+      }
+    ],
+    "service_scores": [
+      {
+        "service": "adservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.0,
+        "justification": "No direct experiment targeted adservice, so the untested dimensions remain near the anchor using the supplied posture and dependency map. It is a single replica with probes and limits, and its home/product reach is lower than checkout-critical services."
+      },
+      {
+        "service": "cartservice",
+        "availability": 0,
+        "latency": 43,
+        "recovery": 66,
+        "containment": 30,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "In 20261011-072847-memory_stress-cartservice, impact error rate reached 95.93%, peak p95 was 1127.5 ms, recovery took 41 seconds, and cartservice restarted once. These scores retain the supplied tested anchors; its single replica, readiness/liveness probes, and resource limits yield posture 60."
+      },
+      {
+        "service": "checkoutservice",
+        "availability": 0,
+        "latency": 50,
+        "recovery": 60,
+        "containment": 35,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "No experiment targeted checkoutservice directly, but the checkout flow had a 100% error rate during 20261011-072847-memory_stress-cartservice. The flow's 3.2 ms p95 is not evidence of usable fast checkout because the requests failed; other dimensions are inferred cautiously from its cartservice dependency and static posture."
+      },
+      {
+        "service": "currencyservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.5,
+        "justification": "No direct currencyservice fault test or service-specific impact measurement was provided. Scores remain near the untested anchor; the dependency map shows it is shared and checkout-relevant, with a single replica, probes, and limits."
+      },
+      {
+        "service": "emailservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.5,
+        "justification": "No direct emailservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. It is a single-replica checkout dependency with probes and limits."
+      },
+      {
+        "service": "frontend",
+        "availability": 0,
+        "latency": 32,
+        "recovery": 66,
+        "containment": 20,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "Although frontend was not the fault target, all five user flows failed heavily in 20261011-072847-memory_stress-cartservice; overall impact error rate was 95.93% and peak p95 was 1127.5 ms versus a 16.5 ms baseline. The scores reflect this measured user-facing impact and 41-second recovery, while posture 60 reflects one replica with probes and limits."
+      },
+      {
+        "service": "paymentservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "No direct paymentservice fault test or service-specific measurement was provided, so scores remain near the untested anchor. The map places it on the checkout path, but the observed checkout errors arose during a cartservice fault."
+      },
+      {
+        "service": "productcatalogservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.8,
+        "justification": "No direct productcatalogservice fault test or service-specific measurement was provided. Scores remain near the untested anchor; it is a shared, checkout-relevant dependency with one replica, probes, and limits."
+      },
+      {
+        "service": "recommendationservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 1.2,
+        "justification": "No direct recommendationservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. Its single replica and dependency on productcatalogservice are noted, but the measured fault targeted cartservice."
+      },
+      {
+        "service": "redis-cart",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 3.0,
+        "justification": "redis-cart was not directly tested, so service-level dimensions remain near the untested anchor. It is a single-replica stateful dependency on the checkout path; the observed restart and flow failures were attributed to cartservice, not a measured redis-cart fault."
+      },
+      {
+        "service": "shippingservice",
+        "availability": 60,
+        "latency": 60,
+        "recovery": 60,
+        "containment": 60,
+        "posture": 60,
+        "criticality_weight": 2.0,
+        "justification": "No direct shippingservice experiment or service-specific impact measurement was provided, so untested dimensions remain near the anchor. It is a single-replica checkout dependency with probes and limits."
+      }
+    ],
+    "score_explanation": "Criticality weights range from 0.5 to 3.0 and reflect shopper-flow reach and revenue impact: frontend and checkout/cart paths are highest, while ads, recommendations, and email are lower. Tested cartservice scores retain the supplied anchors. For untested services, null dimension anchors required judgment; scores generally remain near 60, with frontend and checkoutservice reduced for their measured indirect user-flow impact during the cartservice run. Posture is 60 throughout the scored services because each has one replica, readiness and liveness probes, and CPU/memory limits.",
+    "planner_review": "The planner's prediction was confirmed: it predicted all five affected flows, high errors, severe slowdown, and an aborted run, and all were observed. The run also showed a cartservice restart and 41-second recovery, consistent with the predicted resource-exhaustion risk. The guard stopped the injected fault after 3.6 seconds, but the prolonged error period shows that this external safety mechanism did not ensure rapid application recovery.",
+    "limitations": [
+      "Only one experiment was run, targeting cartservice with memory stress; other services and failure classes were not directly tested.",
+      "The experiment ran on a single-node Kubernetes setup, so results do not establish multi-node behavior or resilience to node failure.",
+      "The probe was small and the fault was short; flow-level request counts were limited.",
+      "The run reports a 110 MB stress allocation and one cartservice restart, but its recorded cartservice peak memory was 55.5 MiB against a 128 Mi limit; the exact termination mechanism is not established by the supplied measurements."
+    ]
+  },
+  "guardrail": {
+    "attempts": 1,
+    "problems": [],
+    "clamped": []
+  },
+  "transcripts": [
+    "ai/20261011-073104-analyst.json"
+  ]
+}

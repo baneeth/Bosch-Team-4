@@ -1,0 +1,88 @@
+{
+  "plan_id": "20261011-061215-plan",
+  "created_at": "2026-10-11T06:12:15+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "First, test moderate CPU contention on cartservice: it is a single-replica, high-risk shared dependency on every user flow, and its earlier 80% stress run ended externally before its behavior was fully characterized. Second, test low packet loss on recommendationservice to probe partial-network-failure behavior on product, cart-view, and checkout flows without repeating its prior delay or pod-kill tests. The two-experiment budget conflicts with the requirement to cover at least three failure classes, so these runs cover slowdown and errors; a third class is deferred rather than exceeding budget.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "cpu_stress",
+        "target": "cartservice",
+        "params": {
+          "workers": 1,
+          "load": 50
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because cartservice has one replica, is a shared dependency of checkoutservice and frontend, reaches all five flows, and is on the checkout path. A previous 80%-load run ended after 16 seconds due to an external kill switch, so a shorter 50%-load run tests a lower, bounded intensity rather than repeating a completed result; the validator accepts these settings.",
+        "hypothesis": "At 50% load, cartservice remains available and requests continue succeeding, but contention causes moderate latency increases on flows that rely on it. The lower intensity should avoid a safety-guard abort.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "add_to_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does a less intense CPU load on the all-flow, single-replica cart service cause user-visible slowdown, and which flows are most sensitive?"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_loss",
+        "target": "recommendationservice",
+        "params": {
+          "loss_pct": 5,
+          "correlation_pct": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Recommendationservice is a single-replica dependency reached by product, view_cart, and checkout flows. Its previous 30 ms delay affected those flows moderately, while its pod-kill run had no observed flow impact; low, uncorrelated packet loss is an untested fault mode that can reveal retry-related latency without repeating either experiment. The validator accepts these settings.",
+        "hypothesis": "At 5% uncorrelated loss, the service remains available and most calls succeed, though retries may moderately slow product, view_cart, and checkout. The fault should complete without crossing the default guard thresholds.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Does mild packet loss to the recommendation service turn into user-visible latency or errors, and which of its dependent flows are affected?"
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Add a third experiment from another failure class, such as pod_kill for recovery or memory_stress for resource exhaustion.",
+      "why_not": "The budget allows at most two experiments, so covering three distinct failure classes is infeasible without exceeding it."
+    },
+    {
+      "idea": "Memory stress on redis-cart to test resource exhaustion.",
+      "why_not": "This would exceed the experiment budget and risks OOM behavior on the single-replica stateful service that holds cart data."
+    },
+    {
+      "idea": "Repeat pod_kill on cartservice to measure recovery.",
+      "why_not": "Multiple prior runs already show broad user impact and roughly 22–31 seconds for pod readiness/recovery, so this is less informative than the untested lower-intensity CPU stress and recommendation-service packet-loss cases."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-061215-planner.json",
+  "note": null
+}

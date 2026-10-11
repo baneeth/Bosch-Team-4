@@ -1,0 +1,110 @@
+{
+  "plan_id": "20261011-042352-plan",
+  "created_at": "2026-10-11T04:23:52+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "First, test a brief sustained checkout-service outage: it isolates the revenue flow and the stricter error guard bounds the blast radius. Next, probe checkout-service near its 128 Mi limit, since the 112 MB run was uneventful while a near-limit test can reveal an OOM threshold; finish with a low-latency cartservice slowdown that should remain well below the p95 guard. This covers outage errors, resource exhaustion, and slowdown without repeating the already well-characterized product-catalog latency or frontend load tests.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_failure",
+        "target": "checkoutservice",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": 0.15,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single replica on the checkout revenue path, and its reach is limited to checkout. A previous pod_kill had no observed user impact, but that tests rapid replacement rather than a sustained outage; the 15-second pod_failure fills that gap. The stricter 15% error guard limits exposure if checkout requests fail.",
+        "hypothesis": "While checkoutservice is unavailable, checkout requests will fail, while the other flows should remain available. The checkout error rate should cross the stricter guard threshold before the full fault duration.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Determine the checkout-only blast radius and whether the safety guard stops a sustained outage of the single checkoutservice replica."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "memory_stress",
+        "target": "checkoutservice",
+        "params": {
+          "size_mb": 124,
+          "workers": 1
+        },
+        "duration_s": 20,
+        "max_error_rate": 0.15,
+        "max_p95_ms": null,
+        "reason": "checkoutservice has a 128 Mi memory limit and is a single replica on the revenue path. A prior 112 MB stress run completed without impact, leaving the near-limit behavior untested; productcatalogservice did OOM at 124 MB, showing that near-limit allocation can reveal a sharp threshold. The stricter error guard bounds the impact if checkoutservice is OOM-killed.",
+        "hypothesis": "A 124 MB allocation is likely to push checkoutservice over its container limit, causing an OOM/restart and checkout errors; other flows should be largely unaffected because this service is specific to checkout.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Find out whether checkoutservice has an OOM threshold between the previously tested 112 MB and a near-limit allocation, and how quickly the guard responds."
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_delay",
+        "target": "cartservice",
+        "params": {
+          "latency_ms": 20,
+          "jitter_ms": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "cartservice is a single replica, has 1.0 reach across all listed flows, and is shared by frontend and checkoutservice. A prior 20% packet-loss run on cartservice tripped the p95 guard, while the prior CPU-stress run was externally aborted; a modest pure-latency test fills a safer slowdown gap.",
+        "hypothesis": "Adding 20 ms to cartservice traffic should cause a measurable but bounded slowdown, most evident in add_to_cart and product flows with low baseline p95, without materially increasing errors or approaching the 1500 ms guard.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "add_to_cart"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure how a small cartservice latency increase propagates through high-reach shop flows, without the tail-latency risk of packet loss."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Repeat 100 ms network delay on productcatalogservice",
+      "why_not": "Many past runs already showed a consistent roughly 700–757 ms p95 impact across all flows with no errors; this would repeat a well-established result."
+    },
+    {
+      "idea": "Run another 300-user traffic spike against frontend",
+      "why_not": "Repeated runs reached or exceeded the 1500 ms p95 guard, so this is a known high-impact test and adds little to the current resilience gaps."
+    },
+    {
+      "idea": "Repeat pod_failure on redis-cart",
+      "why_not": "Prior runs already showed severe shop-wide impact and rapid guard intervention, including frontend unresponsiveness; repeating it would be overly destructive for this budget."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "resource exhaustion",
+    "slowdown"
+  ],
+  "transcript": "ai/20261011-042351-planner.json",
+  "note": null
+}

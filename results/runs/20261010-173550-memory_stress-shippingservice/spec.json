@@ -1,0 +1,59 @@
+{
+  "spec": {
+    "type": "memory_stress",
+    "target": "shippingservice",
+    "params": {
+      "size_mb": 100,
+      "workers": 1
+    },
+    "duration_s": 15,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shippingservice is a single-replica, high-risk dependency shared by checkoutservice and frontend; it reaches view_cart and checkout. Its 128Mi memory limit makes a 100MB allocation a short, meaningful resource-exhaustion test.",
+    "hypothesis": "Memory pressure may OOM or stall shippingservice, disrupting both view_cart and checkout; the safety guard is likely to stop the test if errors or latency persist.",
+    "prediction": {
+      "affected_flows": [
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner"
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "StressChaos",
+    "metadata": {
+      "name": "ca-20261010-173550-memory-stress-shippingservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-173550-memory_stress-shippingservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shippingservice is a single-replica, high-risk dependency shared by checkoutservice and frontend; it reaches view_cart and checkout. Its 128Mi memory limit makes a 100MB allocation a short, meaningful resource-exhaustion test."
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "shippingservice"
+        }
+      },
+      "duration": "15s",
+      "stressors": {
+        "memory": {
+          "workers": 1,
+          "size": "100MB"
+        }
+      }
+    }
+  }
+}

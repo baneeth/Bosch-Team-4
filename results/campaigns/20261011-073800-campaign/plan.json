@@ -1,0 +1,85 @@
+{
+  "plan_id": "20261011-073756-plan",
+  "created_at": "2026-10-11T07:37:56+00:00",
+  "source": "ai",
+  "model": "gpt-6-luna",
+  "strategy": "Run the cartservice memory-exhaustion test first, then wait for recovery and a healthy baseline before testing paymentservice failure; do not overlap faults. The two distinct experiment types cover resource exhaustion and errors, but the exact two-experiment budget does not allow a third failure class.",
+  "experiments": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "cartservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "cartservice is a single replica with 1.0 reach across all five flows, is shared by frontend and checkoutservice, and has a 128 Mi memory limit. A prior 110 MB run caused errors across all flows, guard abort, and a 41-second recovery, so this is a high-risk, shopper-visible test of OOM behavior.",
+        "hypothesis": "Allocating 110 MB inside cartservice will exhaust its available memory, trigger errors across the shop, and likely cause the safety guard to abort the fault; the service may need time to recover.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure the cartservice OOM blast radius and recovery time after memory pressure."
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "paymentservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "paymentservice is a single replica on the checkout path. Past 30-second failures visibly affected checkout and reached 21–25% peak error rates, sometimes triggering the guard; this tests the shopper impact of losing payment processing, on a different service and with a different fault type from the first experiment.",
+        "hypothesis": "While paymentservice is unavailable, checkout attempts will fail, but other flows should remain largely unaffected; the error-rate guard is likely to abort the experiment.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "learning_goal": "Measure checkout’s error response and the guard’s behavior when the payment dependency is unavailable."
+    }
+  ],
+  "rejected": [],
+  "skipped_ideas": [
+    {
+      "idea": "Add a third experiment from a third failure class, such as a controlled slowdown test.",
+      "why_not": "The plan is limited to exactly two experiments, so a third distinct failure class cannot fit the budget."
+    },
+    {
+      "idea": "Add 300 ms network delay to productcatalogservice.",
+      "why_not": "Past evidence shows even 100 ms adds roughly 700 ms to pages through sequential calls; the stronger delay risks a guard-triggering slowdown that teaches little."
+    },
+    {
+      "idea": "Use 20% network loss on cartservice.",
+      "why_not": "A prior run already tripped the p95 guard after a few seconds, so it is likely to produce a brief, guard-limited slowdown rather than a useful additional result."
+    }
+  ],
+  "coverage": [
+    "errors",
+    "resource exhaustion"
+  ],
+  "transcript": "ai/20261011-073756-planner.json",
+  "note": null
+}

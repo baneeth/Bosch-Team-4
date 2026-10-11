@@ -1,0 +1,11 @@
+2026-10-10T07:42:06.158+00:00 run 20261010-074206-pod_kill-adservice: pod_kill on adservice for 30s {'grace_period_s': 0}
+2026-10-10T07:42:06.162+00:00 guard: abort if error rate > 20% or p95 > 1500ms (2 checks in a row), frontend silent > 3s, or blast radius exceeded
+2026-10-10T07:42:06.205+00:00 observing steady state for 20s (probe -> http://10.43.165.199:80)
+2026-10-10T07:42:26.226+00:00 pre-check ok: 60 requests, 0% errors, p95 13ms
+2026-10-10T07:42:26.243+00:00 INJECTED PodChaos/ca-20261010-074206-pod-kill-adservice
+2026-10-10T07:42:26.754+00:00 Chaos Mesh confirms the fault is injected
+2026-10-10T07:42:26.754+00:00 measuring recovery (steady = within baseline tolerance for 3 checks)
+2026-10-10T07:42:28.772+00:00 steady state restored: recovery 0.0s after the fault ended
+2026-10-10T07:42:58.799+00:00 replacement pod adservice-854578d668-25fjv Ready after 32.5s
+2026-10-10T07:42:59.310+00:00 cleaned up PodChaos/ca-20261010-074206-pod-kill-adservice
+2026-10-10T07:42:59.350+00:00 COMPLETED

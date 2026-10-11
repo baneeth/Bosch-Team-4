@@ -1,0 +1,52 @@
+{
+  "spec": {
+    "type": "pod_failure",
+    "target": "shippingservice",
+    "params": {},
+    "duration_s": 15,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shippingservice is a single replica shared by checkoutservice and frontend, with reach across view_cart and checkout and a place on the revenue path. A prior pod kill caused no observed user impact, but that brief recovery test does not establish how callers behave when the service stays unavailable; this short outage tests that gap.",
+    "hypothesis": "Unavailable shipping calls will impair view_cart and checkout, potentially causing timeouts or errors; the guard may stop the outage early if user impact is high.",
+    "prediction": {
+      "affected_flows": [
+        "view_cart",
+        "checkout"
+      ],
+      "error_band": "high",
+      "slowdown_band": "severe",
+      "outcome": "ABORTED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261011-052737-pod-failure-shippingservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-052737-pod_failure-shippingservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shippingservice is a single replica shared by checkoutservice and frontend, with reach across view_cart and checkout and a place on the revenue path. A prior pod kill caused no observed user impact, but that brief recovery test does not establish how"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "shippingservice"
+        }
+      },
+      "duration": "15s",
+      "action": "pod-failure"
+    }
+  }
+}

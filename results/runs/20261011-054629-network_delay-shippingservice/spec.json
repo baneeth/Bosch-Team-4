@@ -1,0 +1,60 @@
+{
+  "spec": {
+    "type": "network_delay",
+    "target": "shippingservice",
+    "params": {
+      "latency_ms": 15,
+      "jitter_ms": 5
+    },
+    "duration_s": 45,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "shippingservice is a single-replica high-risk dependency used by checkoutservice and frontend, with reach 0.4 on view_cart and checkout. Prior delays of 20 ms plus 5 ms jitter and 40 ms plus 5 ms jitter affected checkout without errors (p95 79.7 ms and 139.8 ms respectively); this lower intensity probes shopper-visible slowdown below the guard threshold.",
+    "hypothesis": "Checkout will slow moderately, while errors remain negligible and p95 stays well below 1500 ms; prior observations suggest the impact will be concentrated in checkout rather than view_cart.",
+    "prediction": {
+      "affected_flows": [
+        "checkout"
+      ],
+      "error_band": "none",
+      "slowdown_band": "moderate",
+      "outcome": "COMPLETED"
+    },
+    "origin": "planner",
+    "combined_with": []
+  },
+  "engine": "chaos-mesh",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "NetworkChaos",
+    "metadata": {
+      "name": "ca-20261011-054629-network-delay-shippingservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261011-054629-network_delay-shippingservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "shippingservice is a single-replica high-risk dependency used by checkoutservice and frontend, with reach 0.4 on view_cart and checkout. Prior delays of 20 ms plus 5 ms jitter and 40 ms plus 5 ms jitter affected checkout without errors (p95 79.7 ms a"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "shippingservice"
+        }
+      },
+      "duration": "45s",
+      "action": "delay",
+      "direction": "to",
+      "delay": {
+        "latency": "15ms",
+        "jitter": "5ms",
+        "correlation": "0"
+      }
+    }
+  }
+}

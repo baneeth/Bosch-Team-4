@@ -1,0 +1,265 @@
+{
+  "campaign_id": "20261010-203523-campaign",
+  "plan_id": "20261010-203453-plan",
+  "started_at": "2026-10-10T20:35:23+00:00",
+  "ended_at": "2026-10-10T20:41:46+00:00",
+  "status": "completed",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "productcatalogservice",
+        "params": {
+          "size_mb": 110,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Ranked first because productcatalogservice is single-replica, has a 128 Mi memory limit, and reaches all five user flows. The earlier 64 MB stress run had no user-visible impact, while 110 MB tests near-limit behavior; cartservice with the same 128 Mi limit OOMed under 110 MB stress.",
+        "hypothesis": "Near-limit allocation may OOM or destabilize productcatalogservice, causing broad errors and severe latency until the guard removes the fault.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261010-203523-memory_stress-productcatalogservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 18.2,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "currencyservice",
+        "params": {},
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "currencyservice is a single replica and a shared dependency of frontend and checkoutservice, reaching home, product, view_cart, and checkout. Its latency and packet-loss behavior have been tested, but an outright short outage has not; the short duration bounds this error-class blast-radius test.",
+        "hypothesis": "Taking currencyservice unavailable will cause errors in flows that need currency conversion; the broad reach makes a guard abort plausible, while failed RPCs may fail fast rather than create sustained slowdown.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261010-203618-pod_failure-currencyservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 40% > 20%",
+      "recovery_s": 6.0,
+      "peak_error_rate": 0.8,
+      "peak_p95_ms": 16.3,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "network_delay",
+        "target": "recommendationservice",
+        "params": {
+          "latency_ms": 30,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice is single-replica and reaches product, view_cart, and checkout. Its earlier 40 ms delay attempt was aborted before injection, leaving its slowdown sensitivity unmeasured; 30 ms with modest jitter is a bounded probe, unlike the documented 100 ms catalog delay that drove all flows to roughly 700 ms.",
+        "hypothesis": "Added latency will slow flows that call recommendationservice, particularly product, without causing errors or approaching the 1500 ms guard limit.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261010-203716-network_delay-recommendationservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 83.2,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "pod_kill",
+        "target": "recommendationservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "recommendationservice has one replica and reaches three flows, making it a useful recovery probe with a narrower expected blast radius than the all-flow entrypoint or shared cart dependency. A prior productcatalogservice kill coincided with a recommendationservice restart, but there is no direct recommendationservice kill run measuring its own replacement and user impact.",
+        "hypothesis": "Kubernetes should replace the killed pod; callers may see brief errors or latency while it restarts, then recover without a sustained guard breach.",
+        "prediction": {
+          "affected_flows": [
+            "product",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner",
+        "combined_with": []
+      },
+      "run_id": "20261010-203842-pod_kill-recommendationservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 79.3,
+      "prediction": "partly"
+    },
+    {
+      "rank": 5,
+      "spec": {
+        "type": "memory_stress",
+        "target": "productcatalogservice",
+        "params": {
+          "size_mb": 112,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Increase the earlier productcatalogservice memory allocation from 64 MB to 112 MB to probe the near-limit OOM behavior the prior test did not expose.",
+        "hypothesis": "Allocating 112 MB inside the catalog container may exceed its remaining memory headroom and trigger OOM or service unavailability; because the catalog dependency reaches all flows, this may cause broad impact and trip the safety guard.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "adapter",
+        "combined_with": []
+      },
+      "run_id": "20261010-203939-memory_stress-productcatalogservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 22.1,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 6,
+      "spec": {
+        "type": "memory_stress",
+        "target": "productcatalogservice",
+        "params": {
+          "size_mb": 124,
+          "workers": 1
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "Increase the allocation beyond the prior 112 MB test, which peaked at 118.2 MiB without impact, to probe the 128 MiB container limit on the single-replica catalog service.",
+        "hypothesis": "The larger allocation may exceed the catalog container's memory limit and cause OOM or temporary unavailability, affecting flows that depend on the catalog and potentially triggering the safety guard.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "moderate",
+          "outcome": "ABORTED"
+        },
+        "origin": "adapter",
+        "combined_with": []
+      },
+      "run_id": "20261010-204104-memory_stress-productcatalogservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 55% > 20%",
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.55,
+      "peak_p95_ms": 23.9,
+      "prediction": "confirmed"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261010-203523-memory_stress-productcatalogservice",
+      "action": "continue",
+      "reason": "The 110 MB productcatalogservice stress completed with no errors, no affected flows, no guard breaches, and only a 1.3× worst-flow slowdown; the predicted broad impact was refuted. The planned 15-second currencyservice outage remains a distinct, bounded blast-radius test and passed validation.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-203618-adapter.json"
+    },
+    {
+      "after_run": "20261010-203618-pod_failure-currencyservice",
+      "action": "continue",
+      "reason": "The currencyservice outage confirmed the predicted broad error blast radius: the run aborted at 40% error rate, peaked at 80%, and affected home, product, view_cart, and checkout, while add_to_cart remained error-free and latency stayed near baseline. The remaining recommendationservice delay and pod-kill probes still add useful network and recovery coverage on a different, narrower dependency.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-203716-adapter.json"
+    },
+    {
+      "after_run": "20261010-203716-network_delay-recommendationservice",
+      "action": "continue",
+      "reason": "The 30 ms recommendationservice delay completed with 0% errors and a 7.36× product p95 slowdown, affecting product, view_cart, and checkout exactly as predicted; the shop has recovered. The planned 30 s recommendationservice pod kill is a distinct recovery probe, and its parameters passed the validator.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-203842-adapter.json"
+    },
+    {
+      "after_run": "20261010-203842-pod_kill-recommendationservice",
+      "action": "insert_followup",
+      "reason": "The recommendationservice pod kill completed with no errors or guard breaches and the pod was ready in 7.6 s, although home and checkout p95s reached 3.64× and 3.22× baseline. The earlier 64 MB productcatalogservice memory test was refuted, so a stronger near-limit test is the most useful remaining probe; 112 MB against a stated 128 Mi limit could reveal OOM behavior.",
+      "applied": true,
+      "detail": "follow-up inserted: memory_stress on productcatalogservice {'size_mb': 112, 'workers': 1}",
+      "transcript": "ai/20261010-203938-adapter.json"
+    },
+    {
+      "after_run": "20261010-203939-memory_stress-productcatalogservice",
+      "action": "insert_followup",
+      "reason": "The 112 MB test completed with no errors, no guard breaches, and no affected flows, despite productcatalogservice peaking at 118.2 MiB of its 128 MiB limit. Since the catalog dependency reaches every flow, a 124 MB probe is a useful final check of whether crossing the apparent memory headroom triggers OOM and broad impact.",
+      "applied": true,
+      "detail": "follow-up inserted: memory_stress on productcatalogservice {'size_mb': 124, 'workers': 1}",
+      "transcript": "ai/20261010-204104-adapter.json"
+    }
+  ],
+  "skipped": []
+}

@@ -1,0 +1,210 @@
+{
+  "campaign_id": "20261010-173550-campaign",
+  "plan_id": "20261010-173550-plan",
+  "started_at": "2026-10-10T17:35:50+00:00",
+  "ended_at": "2026-10-10T17:42:00+00:00",
+  "status": "stopped: adapter: The 20 ms shippingservice delay completed with zero errors and no guard breaches; checkout slowed 5.42× while view_cart slowed 2.88×. This confirms the checkout-focused latency impact and, together with the prior 40 ms result, characterizes the dose response; the campaign already covers resource exhaustion, pod failure/kill, and network delay, so no follow-up is needed.",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "memory_stress",
+        "target": "shippingservice",
+        "params": {
+          "size_mb": 100,
+          "workers": 1
+        },
+        "duration_s": 15,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is a single-replica, high-risk dependency shared by checkoutservice and frontend; it reaches view_cart and checkout. Its 128Mi memory limit makes a 100MB allocation a short, meaningful resource-exhaustion test.",
+        "hypothesis": "Memory pressure may OOM or stall shippingservice, disrupting both view_cart and checkout; the safety guard is likely to stop the test if errors or latency persist.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "severe",
+          "outcome": "ABORTED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-173550-memory_stress-shippingservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 24.0,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "pod_failure",
+        "target": "emailservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "emailservice has one replica and is on the checkout path, but its reach is limited to checkout. A prior 30-second paymentservice failure affected checkout with 16.67% impact and 23.8ms peak p95, completing despite a 21% peak error rate; this tests whether email failure behaves similarly.",
+        "hypothesis": "Checkout may return errors while emailservice is unavailable, while the other four flows remain healthy; the limited flow reach may keep the guard from aborting.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-173649-pod_failure-emailservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 20.0,
+      "prediction": "partly"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "pod_kill",
+        "target": "checkoutservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "checkoutservice is a single replica on the revenue path and depends on six downstream services. Unlike the prior pod-kill runs on cartservice and productcatalogservice, this isolates the checkout flow and measures replacement and recovery for the checkout coordinator.",
+        "hypothesis": "Checkout requests may fail or slow while Kubernetes replaces checkoutservice; the other user flows should remain largely unaffected, and the flow should recover after the pod returns.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-173821-pod_kill-checkoutservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 13.3,
+      "prediction": "refuted"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "network_delay",
+        "target": "shippingservice",
+        "params": {
+          "latency_ms": 40,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shippingservice is shared by frontend and checkoutservice and reaches view_cart and checkout. There is no prior shippingservice delay run; the 40ms injection tests a new dependency while staying far below the 1500ms guard limit. Past runs show 100ms on productcatalogservice severely slows all flows, so this uses a lower, bounded intensity.",
+        "hypothesis": "Added latency should measurably slow view_cart and checkout, but should not cause errors or approach the safety guard's p95 threshold.",
+        "prediction": {
+          "affected_flows": [
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "planner"
+      },
+      "run_id": "20261010-173902-network_delay-shippingservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 139.8,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 0,
+      "spec": {
+        "type": "network_delay",
+        "target": "shippingservice",
+        "params": {
+          "latency_ms": 20,
+          "jitter_ms": 5
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "The prior 40 ms delay on shippingservice slowed checkout by 9.34x and view_cart by 4.62x, despite zero errors and no guard breaches. Testing 20 ms provides a lower-dose comparison to characterize latency sensitivity.",
+        "hypothesis": "A 20 ms delay should primarily affect checkout, with less slowdown than the measured 40 ms delay and no errors; the run should complete.",
+        "prediction": {
+          "affected_flows": [
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "moderate",
+          "outcome": "COMPLETED"
+        },
+        "origin": "adapter"
+      },
+      "run_id": "20261010-174035-network_delay-shippingservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 79.7,
+      "prediction": "confirmed"
+    }
+  ],
+  "decisions": [
+    {
+      "after_run": "20261010-173550-memory_stress-shippingservice",
+      "action": "continue",
+      "reason": "The 100 MB memory test on shippingservice completed with 0% errors, no affected flows or guard breaches, and only a 1.6× checkout slowdown; it refuted the predicted OOM/major-impact hypothesis. The planned 30-second emailservice pod failure remains a useful, distinct checkout-path failure test, and it passed validation.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-173649-adapter.json"
+    },
+    {
+      "after_run": "20261010-173649-pod_failure-emailservice",
+      "action": "continue",
+      "reason": "The 30-second emailservice failure completed with no errors, no guard breaches, and no affected flows; checkout p95 rose only 1.28×, despite three emailservice restarts. This refutes the predicted checkout impact, but the planned checkoutservice pod kill still tests a distinct, central dependency and its recovery behavior.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-173821-adapter.json"
+    },
+    {
+      "after_run": "20261010-173821-pod_kill-checkoutservice",
+      "action": "continue",
+      "reason": "The checkoutservice pod kill completed without guard breaches or measured impact (0% errors, 13.3 ms peak p95, pod ready in 2.1 s), but checkout received no requests during the fault, so the checkout-impact prediction was not meaningfully tested. The planned 40 ms shippingservice delay is validator-approved and probes a distinct dependency/slowdown mode; the prior shippingservice memory test does not duplicate it.",
+      "applied": true,
+      "detail": "plan unchanged",
+      "transcript": "ai/20261010-173902-adapter.json"
+    },
+    {
+      "after_run": "20261010-173902-network_delay-shippingservice",
+      "action": "insert_followup",
+      "reason": "The 40 ms shippingservice delay completed without errors or guard breaches, but produced a 9.34x checkout slowdown and a 4.62x view_cart slowdown. A lower, distinct 20 ms delay will probe the latency sensitivity of these flows without repeating the same parameters; the validator confirms it is within policy.",
+      "applied": true,
+      "detail": "follow-up inserted: network_delay on shippingservice {'latency_ms': 20, 'jitter_ms': 5}",
+      "transcript": "ai/20261010-174035-adapter.json"
+    },
+    {
+      "after_run": "20261010-174035-network_delay-shippingservice",
+      "action": "stop",
+      "reason": "The 20 ms shippingservice delay completed with zero errors and no guard breaches; checkout slowed 5.42× while view_cart slowed 2.88×. This confirms the checkout-focused latency impact and, together with the prior 40 ms result, characterizes the dose response; the campaign already covers resource exhaustion, pod failure/kill, and network delay, so no follow-up is needed.",
+      "applied": true,
+      "detail": "campaign stopped by the adapter",
+      "transcript": "ai/20261010-174200-adapter.json"
+    }
+  ],
+  "skipped": []
+}

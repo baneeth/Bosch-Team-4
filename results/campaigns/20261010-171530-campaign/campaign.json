@@ -1,0 +1,148 @@
+{
+  "campaign_id": "20261010-171530-campaign",
+  "plan_id": "20261010-171249-plan",
+  "started_at": "2026-10-10T17:15:30+00:00",
+  "ended_at": "2026-10-10T17:20:58+00:00",
+  "status": "completed",
+  "entries": [
+    {
+      "rank": 1,
+      "spec": {
+        "type": "pod_failure",
+        "target": "productcatalogservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "highest risk + reach (100% of flows)",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "high",
+          "slowdown_band": "none",
+          "outcome": "ABORTED"
+        },
+        "origin": "fallback"
+      },
+      "run_id": "20261010-171530-pod_failure-productcatalogservice",
+      "status": "ABORTED",
+      "abort_reason": "guard: error rate 60% > 20%",
+      "recovery_s": 2.0,
+      "peak_error_rate": 0.6,
+      "peak_p95_ms": 13.6,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 2,
+      "spec": {
+        "type": "network_delay",
+        "target": "productcatalogservice",
+        "params": {
+          "latency_ms": 100
+        },
+        "duration_s": 45,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "shared dependency of 3 services",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "fallback"
+      },
+      "run_id": "20261010-171613-network_delay-productcatalogservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 756.8,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 3,
+      "spec": {
+        "type": "traffic_spike",
+        "target": "frontend",
+        "params": {
+          "users": 150,
+          "ramp_s": 30
+        },
+        "duration_s": 90,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "every request passes through the entrypoint",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "none",
+          "slowdown_band": "severe",
+          "outcome": "COMPLETED"
+        },
+        "origin": "fallback"
+      },
+      "run_id": "20261010-171736-traffic_spike-frontend",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 0.0,
+      "peak_error_rate": 0.0,
+      "peak_p95_ms": 1094.1,
+      "prediction": "confirmed"
+    },
+    {
+      "rank": 4,
+      "spec": {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {},
+        "duration_s": 30,
+        "max_error_rate": null,
+        "max_p95_ms": null,
+        "reason": "single replica, risk high",
+        "hypothesis": "Users on home, product, add_to_cart, view_cart, checkout are affected.",
+        "prediction": {
+          "affected_flows": [
+            "home",
+            "product",
+            "add_to_cart",
+            "view_cart",
+            "checkout"
+          ],
+          "error_band": "low",
+          "slowdown_band": "none",
+          "outcome": "COMPLETED"
+        },
+        "origin": "fallback"
+      },
+      "run_id": "20261010-171948-pod_kill-cartservice",
+      "status": "COMPLETED",
+      "abort_reason": null,
+      "recovery_s": 31.1,
+      "peak_error_rate": 1.0,
+      "peak_p95_ms": 935.8,
+      "prediction": "partly"
+    }
+  ],
+  "decisions": [],
+  "skipped": []
+}

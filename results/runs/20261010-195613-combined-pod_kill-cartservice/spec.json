@@ -1,0 +1,60 @@
+{
+  "spec": {
+    "type": "traffic_spike",
+    "target": "frontend",
+    "params": {
+      "users": 100,
+      "ramp_s": 30
+    },
+    "duration_s": 120,
+    "max_error_rate": null,
+    "max_p95_ms": null,
+    "reason": "Combined failure: the cart pod dies while 100 shoppers are in the shop (F1 under load)",
+    "hypothesis": null,
+    "prediction": null,
+    "origin": "manual",
+    "combined_with": [
+      {
+        "type": "pod_kill",
+        "target": "cartservice",
+        "params": {
+          "grace_period_s": 0
+        },
+        "duration_s": 30,
+        "start_after_s": 45
+      }
+    ]
+  },
+  "engine": "combined",
+  "load": "load.js",
+  "manifest": {
+    "apiVersion": "chaos-mesh.org/v1alpha1",
+    "kind": "PodChaos",
+    "metadata": {
+      "name": "ca-20261010-195613-combined-pod-kill-cartservice",
+      "namespace": "boutique",
+      "labels": {
+        "app.kubernetes.io/managed-by": "chaos-agent",
+        "chaos-agent/run-id": "20261010-195613-combined-pod_kill-cartservice"
+      },
+      "annotations": {
+        "chaos-agent/reason": "Combined failure: the cart pod dies while 100 shoppers are in the shop (F1 under load)"
+      }
+    },
+    "spec": {
+      "mode": "one",
+      "selector": {
+        "namespaces": [
+          "boutique"
+        ],
+        "labelSelectors": {
+          "app": "cartservice"
+        }
+      },
+      "duration": "30s",
+      "action": "pod-kill",
+      "gracePeriod": 0
+    }
+  },
+  "start_after_s": 45
+}
