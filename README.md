@@ -248,7 +248,7 @@ scripts/run.sh run --type network_delay --target productcatalogservice -p latenc
 | `score`, `analyze`, `report` | Score runs, AI analysis, markdown report |
 | `grafana` | Create the Grafana dashboard |
 
-### Dashboard (optional)
+### Dashboard 
 
 A demo UI to watch the shop degrade in real time, with the guard, the AI plan, the replay and the findings. It has no manual fault injection; the AI decides.
 
